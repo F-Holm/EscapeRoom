@@ -24,35 +24,6 @@ def detenerSonido(canal):
 
 def delay(segundos):
     sleep(segundos)
-    
-sistema = Sistema()
-    
-root = tk.Tk()
-root.title("Escape room")
-
-juegoAnterior = ttk.Button(root, text="Nivel anterior", command=sistema.nivelAnterior)
-juegoAnterior.grid(row=0, column=0, padx=10, pady=10)
-root.bind("<KeyPress-Left>", lambda e: sistema.nivelAnterior())
-
-juegoSiguiente = ttk.Button(root, text="Siguiente nivel", command=sistema.nivelAnterior)
-juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<KeyPress-Right>", lambda e: sistema.nivelAnterior())
-
-juegoSiguiente = ttk.Button(root, text="Iniciar nivel", command=sistema.start)
-juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<KeyPress-Up>", lambda e: sistema.nivelAnterior())
-
-juegoSiguiente = ttk.Button(root, text="Detener nivel", command=sistema.stop)
-juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<KeyPress-Down>", lambda e: sistema.stop())
-
-juegoSiguiente = ttk.Button(root, text="Reiniciar nivel", command=sistema.restart)
-juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<Return>", lambda e: sistema.restart())
-
-juegoSiguiente = ttk.Button(root, text="Terminar juego", command=sistema.terminalJuego)
-juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<Escape>", lambda e: sistema.terminalJuego())
 
 class juegoIra:
     arduino = serial.Serial('COM3', 9600)
@@ -99,3 +70,32 @@ class Sistema:
         root.quit()
         root.destroy()
         sys.exit()
+
+sistema = Sistema()
+    
+root = tk.Tk()
+root.title("Escape room")
+
+juegoAnterior = ttk.Button(root, text="Nivel anterior", command=sistema.nivelAnterior)
+juegoAnterior.grid(row=0, column=0, padx=10, pady=10)
+root.bind("<KeyPress-Left>", lambda e: sistema.nivelAnterior())
+
+juegoSiguiente = ttk.Button(root, text="Siguiente nivel", command=sistema.nivelAnterior)
+juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
+root.bind("<KeyPress-Right>", lambda e: sistema.nivelAnterior())
+
+juegoSiguiente = ttk.Button(root, text="Iniciar nivel", command=sistema.start)
+juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
+root.bind("<KeyPress-Up>", lambda e: sistema.nivelAnterior())
+
+juegoSiguiente = ttk.Button(root, text="Detener nivel", command=sistema.stop)
+juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
+root.bind("<KeyPress-Down>", lambda e: sistema.stop())
+
+juegoSiguiente = ttk.Button(root, text="Reiniciar nivel", command=sistema.restart)
+juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
+root.bind("<Return>", lambda e: sistema.restart())
+
+juegoSiguiente = ttk.Button(root, text="Terminar juego", command=sistema.terminalJuego)
+juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
+root.bind("<Escape>", lambda e: sistema.terminalJuego())
