@@ -80,13 +80,13 @@ juegoAnterior = ttk.Button(root, text="Nivel anterior", command=sistema.nivelAnt
 juegoAnterior.grid(row=0, column=0, padx=10, pady=10)
 root.bind("<KeyPress-Left>", lambda e: sistema.nivelAnterior())
 
-juegoSiguiente = ttk.Button(root, text="Siguiente nivel", command=sistema.nivelAnterior)
+juegoSiguiente = ttk.Button(root, text="Siguiente nivel", command=sistema.siguienteNivel)
 juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<KeyPress-Right>", lambda e: sistema.nivelAnterior())
+root.bind("<KeyPress-Right>", lambda e: sistema.siguienteNivel())
 
 juegoSiguiente = ttk.Button(root, text="Iniciar nivel", command=sistema.start)
 juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<KeyPress-Up>", lambda e: sistema.nivelAnterior())
+root.bind("<KeyPress-Up>", lambda e: sistema.start())
 
 juegoSiguiente = ttk.Button(root, text="Detener nivel", command=sistema.stop)
 juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
