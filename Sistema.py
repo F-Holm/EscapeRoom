@@ -28,42 +28,42 @@ def delay(segundos):
 class juegoIra:
     arduino = serial.Serial('/dev/ttyUSB0', 9600)
 
-    def start():
-        arduino.write(b'0')
+    def start(self):
+        self.arduino.write(b'0')
 
-    def stop():
-        arduino.write(b'1')
+    def stop(self):
+        self.arduino.write(b'1')
 
-    def restart():
-        arduino.write(b'2')
+    def restart(self):
+        self.arduino.write(b'2')
 
-    def closeArduino():
-        arduino.close()
+    def closeArduino(self):
+        self.arduino.close()
 
 class Sistema:
     niveles = [juegoIra()]#Agregá niveles utilizando las clases hijas -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 
-    def start():
-        niveles[nivelActual].start()
+    def start(self):
+        self.niveles[self.nivelActual].start()
 
-    def stop():
-        niveles[nivelActual].stop()
+    def stop(self):
+        self.niveles[self.nivelActual].stop()
 
-    def restart():
-        niveles[nivelActual].restart()
+    def restart(self):
+        self.niveles[self.nivelActual].restart()
 
     def nivelAnterior(self):
         if self.nivelActual != 0:
-            nivelActual -= 1
+            self.nivelActual -= 1
 
     def siguienteNivel(self):
         if self.nivelActual != len(self.niveles) - 1:
             self.nivelActual += 1
         else:
-            self.terminalJuego()
+            self.terminarJuego()
     
-    def terminalJuego(self):
+    def terminarJuego(self):
         self.stop()
         self.niveles[0].closeArduino()
         pygame.quit()
@@ -96,6 +96,6 @@ juegoSiguiente = ttk.Button(root, text="Reiniciar nivel", command=sistema.restar
 juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
 root.bind("<Return>", lambda e: sistema.restart())
 
-juegoSiguiente = ttk.Button(root, text="Terminar juego", command=sistema.terminalJuego)
+juegoSiguiente = ttk.Button(root, text="Terminar juego", command=sistema.terminarJuego)
 juegoSiguiente.grid(row=0, column=1, padx=10, pady=10)
-root.bind("<Escape>", lambda e: sistema.terminalJuego())
+root.bind("<Escape>", lambda e: sistema.terminarJuego())
