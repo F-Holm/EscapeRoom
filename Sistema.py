@@ -26,7 +26,7 @@ def delay(segundos):
     sleep(segundos)
 
 class juegoIra:
-    arduino = serial.Serial('/dev/ttyACM0', 9600)
+    arduino = serial.Serial('/dev/ttyUSB0', 9600)
 
     def start():
         arduino.write(b'0')
