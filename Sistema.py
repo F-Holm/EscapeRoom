@@ -5,7 +5,7 @@ from time import sleep
 import tkinter as tk
 from tkinter import messagebox, ttk
 from tkinter import *
-import serial, time
+import serial, time, threading
 
 class Sonidos(Enum):
     HIMNO_URSS = "Sonidos/Himno nacional de la Unión de Repúblicas Socialistas Soviéticas.mp3"
@@ -28,18 +28,34 @@ def delay(segundos):
 
 class juegoIra:
     arduino = serial.Serial('/dev/ttyUSB0', 9600)
+    hilo = None
+    eventoFin = threading.Event()
 
     def start(self):
         self.arduino.write(b'0')
+        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo.start()
 
     def stop(self):
         self.arduino.write(b'1')
+        self.eventoFin.set()
 
     def restart(self):
         self.arduino.write(b'2')
 
     def closeArduino(self):
         self.arduino.close()
+    
+    def hiloArduino(self):
+        while self.eventoFin.is_set() == False:
+            try:
+                if self.arduino.in_waiting > 0:
+                    data = self.arduino.readline()
+                    if data == b'0':
+                        self.stop()
+            except:
+                pass
+        self.eventoFin.clear()
 
 class Sistema:
     niveles = [juegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
