@@ -1,4 +1,5 @@
 from enum import Enum
+import sys
 import pygame
 from time import sleep
 import tkinter as tk
@@ -41,7 +42,7 @@ class juegoIra:
         self.arduino.close()
 
 class Sistema:
-    niveles = [juegoIra()]#Agregá niveles utilizando las clases hijas -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+    niveles = [juegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 
     def start(self):
@@ -56,6 +57,8 @@ class Sistema:
     def nivelAnterior(self):
         if self.nivelActual != 0:
             self.nivelActual -= 1
+        else:
+            self.restart()
 
     def siguienteNivel(self):
         if self.nivelActual != len(self.niveles) - 1:
