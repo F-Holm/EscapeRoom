@@ -118,3 +118,5 @@ root.bind("<Return>", lambda e: sistema.restart())
 juegoSiguiente = ttk.Button(root, text="Terminar juego", command=sistema.terminarJuego)
 juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
 root.bind("<Escape>", lambda e: sistema.terminarJuego())
+
+root.mainloop()
