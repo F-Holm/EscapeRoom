@@ -33,6 +33,7 @@ class juegoIra:
 
     def start(self):
         self.arduino.write(b'0')
+        self.eventoFin.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
@@ -50,12 +51,13 @@ class juegoIra:
         while self.eventoFin.is_set() == False:
             try:
                 if self.arduino.in_waiting > 0:
+                    print("Transnistria")
+                    print("permutacionadorador")
                     data = self.arduino.readline()
-                    if data == b'0':
-                        self.stop()
+                    print(data)
+                    self.stop()
             except:
                 pass
-        self.eventoFin.clear()
 
 class Sistema:
     niveles = [juegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
@@ -83,6 +85,7 @@ class Sistema:
             self.terminarJuego()
     
     def terminarJuego(self):
+        print("Juego terminado correctamente :)")
         self.stop()
         self.niveles[0].closeArduino()
         pygame.quit()
