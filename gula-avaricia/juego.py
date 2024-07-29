@@ -5,8 +5,6 @@ import random
 score = 0
 easy_correct = 0
 current_question = None
-signal_connections = []  # Lista para almacenar las conexiones de señales
-app = None  # Variable global para la aplicación
 
 class Question:
     def __init__(self, text, options, correct_answer):
@@ -16,12 +14,9 @@ class Question:
 
 def main():
     global current_question
-    global app
-    
     app = QApplication(sys.argv)
     window = QWidget()
     window.setWindowTitle("Trivia")
-    window.setGeometry(100, 100, 500, 300)  # Ajustar geometría de la ventana
 
     layout = QVBoxLayout()
     window.setLayout(layout)
@@ -49,7 +44,6 @@ def main():
 def check_answer(answer, question_display, answer_buttons):
     global score
     global easy_correct
-    
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
@@ -57,43 +51,23 @@ def check_answer(answer, question_display, answer_buttons):
     else:
         score = 0
         QMessageBox.critical(None, "Respuesta", "¡Incorrecto!")
-    
     QMessageBox.information(None, "Puntuación", f"Tienes {score} monedas de chocolate.")
-    
-    if easy_correct >= 2:
-        reply = QMessageBox.question(None, 'Continuar', '¿Quieres seguir jugando?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if reply == QMessageBox.Yes:
-            next_question(question_display, answer_buttons, hard=True)
-        else:
-            QMessageBox.information(None, "Fin del juego", "¡Gracias por jugar!")
-            app.quit()
-    else:
-        next_question(question_display, answer_buttons, hard=False)
+    if score == 0 and easy_correct >= 2:
+        easy_correct = 0
+    next_question(question_display, answer_buttons)
 
-def next_question(question_display, answer_buttons, hard=False):
+def next_question(question_display, answer_buttons):
     global current_question
-    global signal_connections
-    
-    if not hard:
+    if easy_correct < 2:
         current_question = random.choice(easy_questions)
     else:
         current_question = random.choice(hard_questions)
-    
     question_display.setText(current_question.text)
-    
-    # Actualizar texto de los botones y conectar señales
+
     for i in range(4):
         answer_buttons[i].setText(current_question.options[i])
-        
-        # Conectar señales usando una función lambda para capturar el valor correcto de la respuesta
-        connection = answer_buttons[i].clicked.connect(lambda _, ans=current_question.options[i][0]: check_answer(ans, question_display, answer_buttons))
-        signal_connections.append(connection)
-
-    # Desconectar señales anteriores (si es necesario)
-    if len(signal_connections) > 4:
-        for connection in signal_connections[:-4]:
-            connection.disconnect()
-            signal_connections = signal_connections[-4:]
+        answer_buttons[i].disconnect()
+        answer_buttons[i].clicked.connect(lambda _, ans=current_question.options[i][0]: check_answer(ans, question_display, answer_buttons))
 
 easy_questions = [
     Question("¿Cuál es la capital de Francia?", ["a) París", "b) Madrid", "c) Roma", "d) Londres"], "a"),
