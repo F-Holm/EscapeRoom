@@ -1,45 +1,40 @@
 from enum import Enum
 import sys
-import pygame
-from time import sleep
 import tkinter as tk
 from tkinter import messagebox, ttk
 from tkinter import *
+from time import sleep
+from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
 import serial, time, threading
 
-class Sonidos(Enum):
-    HIMNO_URSS = "Sonidos/Himno nacional de la Unión de Repúblicas Socialistas Soviéticas.mp3"
-    JIJIJIJA = "Sonidos/JIJIJIJA.mp3"
-
-pygame.mixer.init()
-pygame.mixer.set_num_channels(10)#Cambiar el numero una vez que sepamos cunatos canales vamos a necesitar
-
-def reproducirSonido(sonido, loop, canal):#enum sonido, bool loop, int canal
-    if loop:
-        pygame.mixer.Channel(canal).play(pygame.mixer.Sound(sonido.value), -1)
-    else:
-        pygame.mixer.Channel().play(pygame.mixer.Sound(sonido.value), -1)
-
-def detenerSonido(canal):
-    pygame.mixer.Channel(canal).stop()
-
-def delay(segundos):
-    sleep(segundos)
+sistema = None
 
 class juegoIra:
-    arduino = serial.Serial('/dev/ttyUSB0', 9600)
+    arduino = serial.Serial('/dev/ttyUSB2', 9600)
+    
     hilo = None
-    eventoFin = threading.Event()
+    terminar = threading.Event()
+    termino = threading.Event()
 
     def start(self):
         self.arduino.write(b'0')
-        self.eventoFin.clear()
+        self.terminar.clear()
+        self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def stop(self):
         self.arduino.write(b'1')
-        self.eventoFin.set()
+        if self.hilo.is_alive():
+            self.terminar.set()
+            self.hilo.join()
+        #print("esperando")
+        #self.hilo.join()
+        #print("termino")
+    
+    def close(self):
+        self.stop()
+        self.closeArduino()
 
     def restart(self):
         self.arduino.write(b'2')
@@ -48,16 +43,12 @@ class juegoIra:
         self.arduino.close()
     
     def hiloArduino(self):
-        while self.eventoFin.is_set() == False:
-            try:
-                if self.arduino.in_waiting > 0:
-                    print("Transnistria")
-                    print("permutacionadorador")
-                    data = self.arduino.readline()
-                    print(data)
-                    self.stop()
-            except:
-                pass
+        while not self.terminar.is_set():
+            if self.arduino.in_waiting > 0:
+                print("siguiente nivel")
+                self.arduino.readline()
+                self.terminar.set()
+                self.termino.set()
 
 class Sistema:
     niveles = [juegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
@@ -74,23 +65,26 @@ class Sistema:
 
     def nivelAnterior(self):
         if self.nivelActual != 0:
+            self.stop()
             self.nivelActual -= 1
+            self.start()
         else:
             self.restart()
 
     def siguienteNivel(self):
         if self.nivelActual != len(self.niveles) - 1:
+            self.stop()
             self.nivelActual += 1
+            self.start()
         else:
             self.terminarJuego()
     
     def terminarJuego(self):
+        for nivel in self.niveles:
+            nivel.close()
+        closePygame()
+        closeTTK()
         print("Juego terminado correctamente :)")
-        self.stop()
-        self.niveles[0].closeArduino()
-        pygame.quit()
-        root.quit()
-        root.destroy()
         sys.exit()
 
 sistema = Sistema()
@@ -121,5 +115,9 @@ root.bind("<Return>", lambda e: sistema.restart())
 juegoSiguiente = ttk.Button(root, text="Terminar juego", command=sistema.terminarJuego)
 juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
 root.bind("<Escape>", lambda e: sistema.terminarJuego())
+
+def closeTTK():
+    root.quit()
+    root.destroy()
 
 root.mainloop()
