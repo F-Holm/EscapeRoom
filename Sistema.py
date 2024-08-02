@@ -9,8 +9,11 @@ import serial, time, threading
 
 sistema = None
 
+root = tk.Tk()
+root.title("Escape room")
+
 class juegoIra:
-    arduino = serial.Serial('/dev/ttyUSB2', 9600)
+    arduino = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
     
     hilo = None
     terminar = threading.Event()
@@ -23,17 +26,18 @@ class juegoIra:
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
-    def stop(self):
+    def cerrarHilo(self):
         self.arduino.write(b'1')
-        if self.hilo.is_alive():
+        if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
-        #print("esperando")
-        #self.hilo.join()
-        #print("termino")
+
+    def stop(self):
+        self.cerrarHilo()
+        sistema.siguienteNivel()
     
     def close(self):
-        self.stop()
+        self.cerrarHilo()
         self.closeArduino()
 
     def restart(self):
@@ -45,8 +49,12 @@ class juegoIra:
     def hiloArduino(self):
         while not self.terminar.is_set():
             if self.arduino.in_waiting > 0:
-                print("siguiente nivel")
-                self.arduino.readline()
+                try:
+                    self.arduino.readline().decode('utf-8').strip()  # Decodificar y eliminar saltos de línea
+                except Exception as e:
+                    print(f"Error leyendo desde el puerto serial: {e}")
+                if not self.terminar.is_set():
+                    root.after(500, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
 
@@ -88,9 +96,6 @@ class Sistema:
         sys.exit()
 
 sistema = Sistema()
-    
-root = tk.Tk()
-root.title("Escape room")
 
 juegoAnterior = ttk.Button(root, text="Nivel anterior", command=sistema.nivelAnterior)
 juegoAnterior.grid(row=0, column=0, padx=10, pady=10)
