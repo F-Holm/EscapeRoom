@@ -1,73 +1,32 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QLabel, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel, QVBoxLayout, QWidget, QPushButton
+from PyQt5.QtCore import Qt
 import random
+
+STYLE="style.css"
+
+def load_stylesheet():
+    with open(STYLE, "r") as file:
+        return file.read()
+
+def bienvenida():
+    bienvenida = QMessageBox()
+    bienvenida.setWindowTitle("¡Bienvenido a la trivia!")
+    bienvenida.setText("Responde las siguientes preguntas y gana monedas de chocolate:")
+    bienvenida.setObjectName("bienvenida")
+    bienvenida.setDefaultButton(QMessageBox.Ok)
+    bienvenida.exec()
 
 score = 0
 easy_correct = 0
 current_question = None
+
 
 class Question:
     def __init__(self, text, options, correct_answer):
         self.text = text
         self.options = options
         self.correct_answer = correct_answer
-
-def main():
-    global current_question
-    app = QApplication(sys.argv)
-    window = QWidget()
-    window.setWindowTitle("Trivia")
-
-    layout = QVBoxLayout()
-    window.setLayout(layout)
-
-    question_label = QLabel("¡Bienvenido a la trivia! Responde las siguientes preguntas y gana monedas de chocolate:")
-    layout.addWidget(question_label)
-
-    question_display = QLabel()
-    layout.addWidget(question_display)
-
-    buttons_layout = QVBoxLayout()
-
-    answer_buttons = []
-    for i in range(4):
-        button = QPushButton()
-        buttons_layout.addWidget(button)
-        answer_buttons.append(button)
-
-    layout.addLayout(buttons_layout)
-
-    window.show()
-    next_question(question_display, answer_buttons)
-    sys.exit(app.exec_())
-
-def check_answer(answer, question_display, answer_buttons):
-    global score
-    global easy_correct
-    if answer == current_question.correct_answer:
-        score += 1
-        easy_correct += 1
-        QMessageBox.information(None, "Respuesta", "¡Correcto!")
-    else:
-        score = 0
-        QMessageBox.critical(None, "Respuesta", "¡Incorrecto!")
-    QMessageBox.information(None, "Puntuación", f"Tienes {score} monedas de chocolate.")
-    if score == 0 and easy_correct >= 2:
-        easy_correct = 0
-    next_question(question_display, answer_buttons)
-
-def next_question(question_display, answer_buttons):
-    global current_question
-    if easy_correct < 2:
-        current_question = random.choice(easy_questions)
-    else:
-        current_question = random.choice(hard_questions)
-    question_display.setText(current_question.text)
-
-    for i in range(4):
-        answer_buttons[i].setText(current_question.options[i])
-        answer_buttons[i].disconnect()
-        answer_buttons[i].clicked.connect(lambda _, ans=current_question.options[i][0]: check_answer(ans, question_display, answer_buttons))
 
 easy_questions = [
     Question("¿Cuál es la capital de Francia?", ["a) París", "b) Madrid", "c) Roma", "d) Londres"], "a"),
@@ -86,6 +45,105 @@ hard_questions = [
     Question("¿Cuál es el resultado de elevar e (la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "a"),
     Question("¿Cuál es el valor aproximado de la constante de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "a")
 ]
+
+preguntasFacil=easy_questions
+preguntasDificil= hard_questions
+
+
+def verificarRta(answer, question_display, answer_buttons):
+    global score
+    global easy_correct
+    if answer == current_question.correct_answer:
+        score += 1
+        easy_correct += 1
+        QMessageBox.information(None, "Respuesta", "¡Correcto!")
+        
+
+    else:
+        score = 0
+        QMessageBox.critical(None, "Respuesta", "¡Incorrecto!")
+    QMessageBox.information(None, "Puntuación", f"Tenés {score} monedas de chocolate.")
+    if score != 0 :
+        seguir = QWidget()
+        seguirJugando(seguir) ## SE MUERE PQ NO SE MANTIENE EN LA MEMORIA 
+
+    if score == 0 and easy_correct >= 2:
+        easy_correct = 0
+    cargarPregunta(question_display, answer_buttons)
+
+
+def cargarPregunta(question_display, answer_buttons):
+    global current_question
+
+    if easy_correct < 2:
+        current_question = random.choice(preguntasFacil)
+        preguntasFacil.remove(current_question)
+        question_display.setText(current_question.text)
+
+    else:
+        current_question = random.choice(preguntasDificil)
+        preguntasDificil.remove(current_question)
+        question_display.setText(current_question.text)
+
+    for i in range(4):
+        answer_buttons[i].setText(current_question.options[i])
+        answer_buttons[i].disconnect()
+        answer_buttons[i].clicked.connect(lambda _, ans=current_question.options[i][0]: verificarRta(ans, question_display, answer_buttons))
+    
+
+def seguirJugando(seguir):
+    seguir.label = QLabel("Respondiste muy bien! ¿Queres seguir jugando  ganar MAS monedas de chocolate?")
+    layout = QVBoxLayout()
+    aceptar = QPushButton('Si')
+    denegar = QPushButton('No')
+    layout.addWidget(aceptar)
+    layout.addWidget(denegar)
+    seguir.setLayout(layout)
+    print("mostrar")
+    seguir.show()
+    if seguir.sender() == aceptar :
+        ganar()
+    
+        
+def ganar():
+    mensaje = QMessageBox()
+    mensaje.setText("GANASTE!!!")
+    mensaje.exec()
+
+def main():
+    global current_question
+    
+    app = QApplication(sys.argv)
+    stylesheet = load_stylesheet()
+    app.setStyleSheet(stylesheet)
+    
+    bienvenida()
+
+    ventanaPreguntas = QWidget()
+    ventanaPreguntas.setWindowTitle("Trivia")
+
+    layout = QVBoxLayout()
+    ventanaPreguntas.setLayout(layout)
+
+    question_display = QLabel()
+    layout.addWidget(question_display)
+
+    buttons_layout = QVBoxLayout()
+    answer_buttons = []
+    
+    for i in range(4):
+        button = QPushButton()
+        buttons_layout.addWidget(button)
+        answer_buttons.append(button)
+    
+    layout.addLayout(buttons_layout)
+
+    ventanaPreguntas.show()
+
+    cargarPregunta(question_display, answer_buttons)
+    
+    sys.exit(app.exec_())
+
 
 if __name__ == "__main__":
     main()
