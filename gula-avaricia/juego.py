@@ -3,11 +3,13 @@ from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel, QVBoxLayout, QWid
 from PyQt5.QtCore import Qt
 import random
 
+
 STYLE="style.css"
 
 def load_stylesheet():
     with open(STYLE, "r") as file:
         return file.read()
+
 
 def bienvenida():
     bienvenida = QMessageBox()
@@ -56,16 +58,14 @@ def verificarRta(answer, question_display, answer_buttons):
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
-        QMessageBox.information(None, "Respuesta", "¡Correcto!")
-        
-
+        QMessageBox.information(None, "Respuesta", "¡Correcto!")        
     else:
         score = 0
         QMessageBox.critical(None, "Respuesta", "¡Incorrecto!")
+
     QMessageBox.information(None, "Puntuación", f"Tenés {score} monedas de chocolate.")
-    if score != 0 :
-        seguir = QWidget()
-        seguirJugando(seguir) ## SE MUERE PQ NO SE MANTIENE EN LA MEMORIA 
+    if score !=0:
+        seguirJugando()
 
     if score == 0 and easy_correct >= 2:
         easy_correct = 0
@@ -91,32 +91,37 @@ def cargarPregunta(question_display, answer_buttons):
         answer_buttons[i].clicked.connect(lambda _, ans=current_question.options[i][0]: verificarRta(ans, question_display, answer_buttons))
     
 
-def seguirJugando(seguir):
-    seguir.label = QLabel("Respondiste muy bien! ¿Queres seguir jugando  ganar MAS monedas de chocolate?")
+def seguirJugando():
+    global seguir
+    seguir = QWidget()
+    seguir.setWindowTitle("Seguir Jugando")
+    seguir.label = QLabel("Respondiste muy bien! ¿Queres seguir jugando y ganar MÁS monedas de chocolate?")
     layout = QVBoxLayout()
-    aceptar = QPushButton('Si')
+    aceptar = QPushButton('Sí')
     denegar = QPushButton('No')
+    layout.addWidget(seguir.label)
     layout.addWidget(aceptar)
     layout.addWidget(denegar)
-    seguir.setLayout(layout)
-    print("mostrar")
+    seguir.setLayout(layout) 
+    aceptar.clicked.connect(seguir.close)
+    denegar.clicked.connect(ganar)
     seguir.show()
-    if seguir.sender() == aceptar :
-        ganar()
     
         
 def ganar():
     mensaje = QMessageBox()
     mensaje.setText("GANASTE!!!")
     mensaje.exec()
+    QApplication.quit()
 
 def main():
     global current_question
     
     app = QApplication(sys.argv)
+    
     stylesheet = load_stylesheet()
     app.setStyleSheet(stylesheet)
-    
+
     bienvenida()
 
     ventanaPreguntas = QWidget()
