@@ -7,10 +7,24 @@ const int bluePin = 6;
 int juegosCompletados = 0;
 
 // valor de cada color
-int r = 255;
-int g = 0;
-int b = 0;
+int red = 0;
+int green = 0;
+int blue = 0;
 
+void cambiarColor(int r, int g, int b){
+  analogWrite(redPin, r); red = r;
+  analogWrite(greenPin, g); green = g;
+  analogWrite(bluePin, b); blue = b;
+}
+
+void rayo(){
+  cambiarColor(61, 126, 255);
+  delay(400);
+  cambiarColor(0, 0, 0);
+  delay(200);
+  cambiarColor(61, 126, 255);
+  delay(400);
+}
 
 void setup() {
     pinMode(redPin, OUTPUT);
@@ -27,6 +41,19 @@ void setup() {
 void loop(){
     // FALTA RECIBIR EL INT DE HOLM
 
+    if(Serial.avaliable() > 0){
+      string colores = Serial.read();
+      if (colores.size() == 1){
+        switch (colores[0]){
+          case 0:
+            rayo();
+            cambiarColor(red, green, blue);
+            break;
+        }
+      }
+      else cambiarColor(colores[0], colores[1], colores[2]);
+    }
+    /*
     // 5 presets, 1 por cada etapa. Desde rojo hasta blanco
     switch(juegosCompletados) {
       case 1:
@@ -55,4 +82,5 @@ void loop(){
         analogWrite(bluePin, b);
         break:
     }
+    */
 }
