@@ -6,13 +6,16 @@ from tkinter import *
 from time import sleep
 from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
 import serial, time, threading
+import socket
+from Led import cambiarColor, efecto, Efectos, Colores
+from Codigos import Codigos
 
 sistema = None
 
 root = tk.Tk()
 root.title("Escape room")
 
-class juegoIra:
+class JuegoIra:
     arduino = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
     
     hilo = None
@@ -58,8 +61,59 @@ class juegoIra:
                 self.terminar.set()
                 self.termino.set()
 
+class JuegoGulaAvaricia:
+    ip_servidor = input("Ingrese la dirección IP del servidor: ")
+    
+    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    hilo = None
+    terminar = threading.Event()
+    termino = threading.Event()
+    
+    def enviarMensaje(self, codigo):
+        self.socket.sendall(codigo.value.encode())
+
+    def start(self):
+        self.arduino.write(b'0')
+        self.terminar.clear()
+        self.termino.clear()
+        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo.start()
+
+    def cerrarHilo(self):
+        self.arduino.write(b'1')
+        if self.hilo != None and self.hilo.is_alive():
+            self.terminar.set()
+            self.hilo.join()
+
+    def stop(self):
+        self.cerrarHilo()
+        sistema.siguienteNivel()
+    
+    def close(self):
+        self.cerrarHilo()
+        self.closeArduino()
+
+    def restart(self):
+        self.arduino.write(b'2')
+
+    def closeArduino(self):
+        self.arduino.close()
+    
+    def hiloArduino(self):
+        while not self.terminar.is_set():
+            if self.arduino.in_waiting > 0:
+                try:
+                    self.arduino.readline().decode('utf-8').strip()  # Decodificar y eliminar saltos de línea
+                except Exception as e:
+                    print(f"Error leyendo desde el puerto serial: {e}")
+                if not self.terminar.is_set():
+                    root.after(500, lambda: sistema.siguienteNivel())
+                self.terminar.set()
+                self.termino.set()
+
 class Sistema:
-    niveles = [juegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+    niveles = [JuegoIra(), JuegoGulaAvaricia()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 
     def start(self):
