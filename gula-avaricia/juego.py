@@ -36,7 +36,7 @@ def bienvenida():
     dialog.exec()
 
 score = 0
-easy_correct = 0
+easy_correct = 0    
 current_question = None
 
 class Question:
@@ -56,11 +56,11 @@ easy_questions = [
 ]
 
 hard_questions = [
-    Question("¿Cuál es la distancia desde Buenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "b"),
-    Question("¿Cuál es el elemento más abundante en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "b"),
-    Question("¿Cuál es la cantidad aproximada de galaxias en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "c"),
-    Question("¿Cuál es el resultado de elevar e (la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "a"),
-    Question("¿Cuál es el valor aproximado de la constante de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "a")
+    Question("¿Cuál es la distancia desde Buenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "e"),
+    Question("¿Cuál es el elemento más abundante en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "h"),
+    Question("¿Cuál es la cantidad aproximada de galaxias en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "l"),
+    Question("¿Cuál es el resultado de elevar e (la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "f"),
+    Question("¿Cuál es el valor aproximado de la constante de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
 ]
 
 preguntasFacil = easy_questions
@@ -133,7 +133,7 @@ def seguirJugando():
     seguir.exec()
 
 def ganar():
-    mensaje = CustomDialog("¡GANASTE!", "¡GANASTE!\nFelicidades, has ganado.")
+    mensaje = CustomDialog("¡GANASTE!", "¡GANASTE!\nFelicidades, has ganado Sali a buscar tus monedas!!.")
     mensaje.exec()
     QApplication.quit()
 
