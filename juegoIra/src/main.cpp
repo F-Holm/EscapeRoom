@@ -121,6 +121,8 @@ void ganar(){
   ledStateRed = 0;
   digitalWrite(REDled, ledStateRed);
   
+  delay(3000);
+
   terminarJuego();
   notificarTermino();
 }
