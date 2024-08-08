@@ -1,28 +1,43 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel, QVBoxLayout, QWidget, QPushButton
+from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QDialog
 from PyQt5.QtCore import Qt
+import sys
 import random
 
 
-STYLE="style.css"
+STYLE = "style.css"
 
 def load_stylesheet():
     with open(STYLE, "r") as file:
         return file.read()
 
+class CustomDialog(QDialog):
+    def __init__(self, title, message, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(title)
+        self.setStyleSheet(load_stylesheet())
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.showFullScreen()
+
+        layout = QVBoxLayout()
+        layout.setAlignment(Qt.AlignCenter)  # Centrar los elementos
+        
+        self.message_label = QLabel(message)
+        self.message_label.setAlignment(Qt.AlignCenter)  # Centrar el texto
+        layout.addWidget(self.message_label)
+        
+        self.ok_button = QPushButton("OK")
+        self.ok_button.clicked.connect(self.accept)
+        layout.addWidget(self.ok_button)
+        
+        self.setLayout(layout)
 
 def bienvenida():
-    bienvenida = QMessageBox()
-    bienvenida.setWindowTitle("¡Bienvenido a la trivia!")
-    bienvenida.setText("Responde las siguientes preguntas y gana monedas de chocolate:")
-    bienvenida.setObjectName("bienvenida")
-    bienvenida.setDefaultButton(QMessageBox.Ok)
-    bienvenida.exec()
+    dialog = CustomDialog("¡Bienvenido a la trivia!", "¡Bienvenido a la trivia!\nResponde las siguientes preguntas y gana monedas de chocolate:")
+    dialog.exec()
 
 score = 0
 easy_correct = 0
 current_question = None
-
 
 class Question:
     def __init__(self, text, options, correct_answer):
@@ -48,9 +63,8 @@ hard_questions = [
     Question("¿Cuál es el valor aproximado de la constante de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "a")
 ]
 
-preguntasFacil=easy_questions
-preguntasDificil= hard_questions
-
+preguntasFacil = easy_questions
+preguntasDificil = hard_questions
 
 def verificarRta(answer, question_display, answer_buttons):
     global score
@@ -58,19 +72,22 @@ def verificarRta(answer, question_display, answer_buttons):
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
-        QMessageBox.information(None, "Respuesta", "¡Correcto!")        
+        msg_box = CustomDialog("Respuesta", "¡Correcto!")
+        msg_box.exec()
     else:
         score = 0
-        QMessageBox.critical(None, "Respuesta", "¡Incorrecto!")
+        msg_box = CustomDialog("Respuesta", "¡Incorrecto!")
+        msg_box.exec()
 
-    QMessageBox.information(None, "Puntuación", f"Tenés {score} monedas de chocolate.")
-    if score !=0:
+    score_msg = CustomDialog("Puntuación", f"Puntuación Total : \n {score} monedas de chocolate.")
+    score_msg.exec()
+    
+    if score != 0:
         seguirJugando()
 
     if score == 0 and easy_correct >= 2:
         easy_correct = 0
     cargarPregunta(question_display, answer_buttons)
-
 
 def cargarPregunta(question_display, answer_buttons):
     global current_question
@@ -79,7 +96,6 @@ def cargarPregunta(question_display, answer_buttons):
         current_question = random.choice(preguntasFacil)
         preguntasFacil.remove(current_question)
         question_display.setText(current_question.text)
-
     else:
         current_question = random.choice(preguntasDificil)
         preguntasDificil.remove(current_question)
@@ -89,36 +105,43 @@ def cargarPregunta(question_display, answer_buttons):
         answer_buttons[i].setText(current_question.options[i])
         answer_buttons[i].disconnect()
         answer_buttons[i].clicked.connect(lambda _, ans=current_question.options[i][0]: verificarRta(ans, question_display, answer_buttons))
-    
 
 def seguirJugando():
     global seguir
-    seguir = QWidget()
+    seguir = QDialog()
     seguir.setWindowTitle("Seguir Jugando")
-    seguir.label = QLabel("Respondiste muy bien! ¿Queres seguir jugando y ganar MÁS monedas de chocolate?")
+    seguir.setStyleSheet(load_stylesheet())
+    seguir.setWindowFlag(Qt.FramelessWindowHint)
+    seguir.showFullScreen()
+
     layout = QVBoxLayout()
+    layout.setAlignment(Qt.AlignCenter)  # Centrar los elementos
+    
+    seguir.label = QLabel("Respondiste muy bien! ¿Queres seguir jugando y ganar MÁS monedas de chocolate?")
+    seguir.label.setAlignment(Qt.AlignCenter)  # Centrar el texto
+    layout.addWidget(seguir.label)
+    
     aceptar = QPushButton('Sí')
     denegar = QPushButton('No')
-    layout.addWidget(seguir.label)
     layout.addWidget(aceptar)
     layout.addWidget(denegar)
-    seguir.setLayout(layout) 
+    
+    seguir.setLayout(layout)
     aceptar.clicked.connect(seguir.close)
     denegar.clicked.connect(ganar)
-    seguir.show()
     
-        
+    seguir.exec()
+
 def ganar():
-    mensaje = QMessageBox()
-    mensaje.setText("GANASTE!!!")
+    mensaje = CustomDialog("¡GANASTE!", "¡GANASTE!\nFelicidades, has ganado.")
     mensaje.exec()
     QApplication.quit()
 
 def main():
     global current_question
-    
+
     app = QApplication(sys.argv)
-    
+
     stylesheet = load_stylesheet()
     app.setStyleSheet(stylesheet)
 
@@ -126,29 +149,35 @@ def main():
 
     ventanaPreguntas = QWidget()
     ventanaPreguntas.setWindowTitle("Trivia")
+    ventanaPreguntas.setStyleSheet(stylesheet)
+    ventanaPreguntas.setWindowFlag(Qt.FramelessWindowHint)
+    ventanaPreguntas.showFullScreen()
 
     layout = QVBoxLayout()
+    layout.setAlignment(Qt.AlignCenter)  # Centrar los elementos
     ventanaPreguntas.setLayout(layout)
 
     question_display = QLabel()
+    question_display.setAlignment(Qt.AlignCenter)  # Centrar el texto
     layout.addWidget(question_display)
 
-    buttons_layout = QVBoxLayout()
+    buttons_layout = QHBoxLayout()
+    buttons_layout.setAlignment(Qt.AlignCenter)  # Centrar los botones
     answer_buttons = []
-    
-    for i in range(4):
-        button = QPushButton()
-        buttons_layout.addWidget(button)
-        answer_buttons.append(button)
-    
+
+    for i in range(2):
+        button_layout = QVBoxLayout()
+        for j in range(2):
+            button = QPushButton()
+            button_layout.addWidget(button)
+            answer_buttons.append(button)
+        buttons_layout.addLayout(button_layout)
+
     layout.addLayout(buttons_layout)
 
-    ventanaPreguntas.show()
-
     cargarPregunta(question_display, answer_buttons)
-    
-    sys.exit(app.exec_())
 
+    sys.exit(app.exec_())
 
 if __name__ == "__main__":
     main()

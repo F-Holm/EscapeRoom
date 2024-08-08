@@ -1,2 +1,86 @@
+QWidget {
+    background-color: black;
+    color: lime;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+    text-align: center;
+}
 
+QLabel {
+    color: lime;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 20px;
+}
 
+QDialog QLabel {
+    text-align: center;
+}
+
+QVBoxLayout, QHBoxLayout {
+    align-items: center; 
+    justify-content: center;
+}
+
+QPushButton {
+    background-color: lime;
+    color: black;
+    padding: 40px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 24px;
+    border: 2px solid lime;
+    text-align: center;
+    margin: 10px;
+}
+
+QPushButton:hover {
+    background-color: black;
+    color: lime;
+    border: 2px solid lime;
+}
+
+QPushButton:pressed {
+    background-color: lime;
+    color: black;
+    border: 2px solid lime;
+}
+
+QMessageBox {
+    background-color: black;
+    color: lime;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+}
+
+QMessageBox QLabel {
+    color: lime;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 18px;
+}
+
+QMessageBox QPushButton {
+    background-color: lime;
+    color: black;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16px;
+    border: 2px solid lime;
+    padding: 5px;
+}
+
+QMessageBox QPushButton:hover {
+    background-color: black;
+    color: lime;
+    border: 2px solid lime;
+}
+
+QMessageBox QPushButton:pressed {
+    background-color: lime;
+    color: black;
+    border: 2px solid lime;
+}
+
+#tvAnimation {
+    background-color: black;
+    border: none;
+}
