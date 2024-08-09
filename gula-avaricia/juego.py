@@ -32,7 +32,7 @@ class CustomDialog(QDialog):
         self.setLayout(layout)
 
 def bienvenida():
-    dialog = CustomDialog("¡Bienvenido a la trivia!", "¡Bienvenido a la trivia!\nResponde las siguientes preguntas y gana monedas de chocolate:")
+    dialog = CustomDialog("¡Bienvenido a la trivia!", "¡Bienvenido a la trivia!\nResponde las siguientes preguntas y gana MUCHISIMAS monedas de chocolate:")
     dialog.exec()
 
 score = 0
@@ -63,6 +63,8 @@ hard_questions = [
     Question("¿Cuál es el valor aproximado de la constante de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
 ]
 
+dichos =["La avaricia ha rompe el saco","Quien come para vivir, se alimenta; que vive para comer, revienta."]
+
 preguntasFacil = easy_questions
 preguntasDificil = hard_questions
 
@@ -74,7 +76,11 @@ def verificarRta(answer, question_display, answer_buttons):
         easy_correct += 1
         msg_box = CustomDialog("Respuesta", "¡Correcto!")
         msg_box.exec()
-    else:
+    elif score > 0 :
+        score = 0
+        msg_box = CustomDialog("Respuesta", "¡Incorrecto! \n "+ random.choice(dichos))
+        msg_box.exec()  
+    else :
         score = 0
         msg_box = CustomDialog("Respuesta", "¡Incorrecto!")
         msg_box.exec()
@@ -133,7 +139,8 @@ def seguirJugando():
     seguir.exec()
 
 def ganar():
-    mensaje = CustomDialog("¡GANASTE!", "¡GANASTE!\nFelicidades, has ganado Sali a buscar tus monedas!!.")
+    global score
+    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepaso!  \n  Sali a buscar tus {score} monedas!!.")
     mensaje.exec()
     QApplication.quit()
 
