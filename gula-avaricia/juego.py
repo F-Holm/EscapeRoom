@@ -1,7 +1,9 @@
-from PyQt5.QtWidgets import QApplication, QMessageBox, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QDialog
-from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QDialog,QGridLayout
+from PyQt5.QtCore import Qt, QTimer, QSize
+from PyQt5.QtGui import QPixmap, QPainter, QImage, QBrush
 import sys
 import random
+import os
 
 
 STYLE = "style.css"
@@ -19,10 +21,10 @@ class CustomDialog(QDialog):
         self.showFullScreen()
 
         layout = QVBoxLayout()
-        layout.setAlignment(Qt.AlignCenter)  # Centrar los elementos
+        layout.setAlignment(Qt.AlignCenter)
         
         self.message_label = QLabel(message)
-        self.message_label.setAlignment(Qt.AlignCenter)  # Centrar el texto
+        self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
         
         self.ok_button = QPushButton("OK")
@@ -56,17 +58,22 @@ easy_questions = [
 ]
 
 hard_questions = [
-    Question("¿Cuál es la distancia desde Buenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "e"),
-    Question("¿Cuál es el elemento más abundante en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "h"),
-    Question("¿Cuál es la cantidad aproximada de galaxias en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "l"),
-    Question("¿Cuál es el resultado de elevar e (la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "f"),
-    Question("¿Cuál es el valor aproximado de la constante de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
+    Question("¿Cuál es la distancia desde \nBuenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "e"),
+    Question("¿Cuál es el elemento más abundante\n en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "h"),
+    Question("¿Cuál es la cantidad aproximada de galaxias\n en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "l"),
+    Question("¿Cuál es el resultado de elevar e \n(la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "f"),
+    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
 ]
 
-dichos =["La avaricia ha rompe el saco","Quien come para vivir, se alimenta; que vive para comer, revienta."]
+dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque vive para comer, revienta."]
 
 preguntasFacil = easy_questions
 preguntasDificil = hard_questions
+
+def glitch_effect(label, original_text):
+    glitch_text = ''.join(random.choice(['@', '#', '%', '&', '*', original_text[i]]) for i in range(len(original_text)))
+    label.setText(glitch_text)
+    QTimer.singleShot(200, lambda: label.setText(original_text))
 
 def verificarRta(answer, question_display, answer_buttons):
     global score
@@ -78,7 +85,7 @@ def verificarRta(answer, question_display, answer_buttons):
         msg_box.exec()
     elif score > 0 :
         score = 0
-        msg_box = CustomDialog("Respuesta", "¡Incorrecto! \n "+ random.choice(dichos))
+        msg_box = CustomDialog("Respuesta", "¡Incorrecto! \n " + random.choice(dichos))
         msg_box.exec()  
     else :
         score = 0
@@ -121,10 +128,10 @@ def seguirJugando():
     seguir.showFullScreen()
 
     layout = QVBoxLayout()
-    layout.setAlignment(Qt.AlignCenter)  # Centrar los elementos
+    layout.setAlignment(Qt.AlignCenter)
     
-    seguir.label = QLabel("Respondiste muy bien! ¿Queres seguir jugando y ganar MÁS monedas de chocolate?")
-    seguir.label.setAlignment(Qt.AlignCenter)  # Centrar el texto
+    seguir.label = QLabel("¡Respondiste muy bien!\n¿Quieres seguir jugando y ganar MÁS monedas de chocolate?")
+    seguir.label.setAlignment(Qt.AlignCenter)
     layout.addWidget(seguir.label)
     
     aceptar = QPushButton('Sí')
@@ -140,14 +147,16 @@ def seguirJugando():
 
 def ganar():
     global score
-    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepaso!  \n  Sali a buscar tus {score} monedas!!.")
+    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
     mensaje.exec()
     QApplication.quit()
+
 
 def main():
     global current_question
 
     app = QApplication(sys.argv)
+    app.setOverrideCursor(Qt.BlankCursor)
 
     stylesheet = load_stylesheet()
     app.setStyleSheet(stylesheet)
@@ -161,29 +170,27 @@ def main():
     ventanaPreguntas.showFullScreen()
 
     layout = QVBoxLayout()
-    layout.setAlignment(Qt.AlignCenter)  # Centrar los elementos
+    layout.setAlignment(Qt.AlignCenter)
     ventanaPreguntas.setLayout(layout)
 
     question_display = QLabel()
-    question_display.setAlignment(Qt.AlignCenter)  # Centrar el texto
+    question_display.setAlignment(Qt.AlignCenter)
     layout.addWidget(question_display)
 
-    buttons_layout = QHBoxLayout()
-    buttons_layout.setAlignment(Qt.AlignCenter)  # Centrar los botones
-    answer_buttons = []
-
-    for i in range(2):
-        button_layout = QVBoxLayout()
-        for j in range(2):
-            button = QPushButton()
-            button_layout.addWidget(button)
-            answer_buttons.append(button)
-        buttons_layout.addLayout(button_layout)
-
+    buttons_layout = QGridLayout()
     layout.addLayout(buttons_layout)
+
+    answer_buttons = [QPushButton() for _ in range(4)]
+    for i, button in enumerate(answer_buttons):
+        buttons_layout.addWidget(button, i // 2, i % 2)
 
     cargarPregunta(question_display, answer_buttons)
 
+    glitch_timer = QTimer()
+    glitch_timer.timeout.connect(lambda: glitch_effect(question_display, current_question.text))
+    glitch_timer.start(random.randint(3000))  # Cada 5 segundos se ejecuta el efecto de glitch
+
+    ventanaPreguntas.show()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":

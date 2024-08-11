@@ -6,6 +6,7 @@ QWidget {
     font-family: 'Courier New', Courier, monospace;
     font-size: 18px;
     text-align: center;
+    cursor: none;
 }
 
 
@@ -83,7 +84,6 @@ QMessageBox QPushButton:pressed {
     border: 2px solid lime;
 }
 
-#tvAnimation {
-    background-color: black;
-    border: none;
+QPushButton:focus {
+    outline: none;
 }
