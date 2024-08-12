@@ -151,6 +151,88 @@ def ganar():
     mensaje.exec()
     QApplication.quit()
 
+class PasswordDialog(QDialog):
+    def __init__(self, correct_password, parent=None):
+        super().__init__(parent)
+        self.correct_password = correct_password
+        self.entered_password = ""
+        
+        self.setWindowTitle("Ingresar Contraseña")
+        self.setStyleSheet(load_stylesheet())
+        self.setWindowFlag(Qt.FramelessWindowHint)
+        self.showFullScreen()
+
+        self.layout = QVBoxLayout()
+        self.layout.setAlignment(Qt.AlignCenter)
+        self.setLayout(self.layout)
+
+        self.display = QHBoxLayout()
+        self.layout.addLayout(self.display)
+
+        self.password_labels = []
+        for _ in range(4):  # Assuming password length is 4
+            label = QLabel("_")
+            label.setAlignment(Qt.AlignCenter)
+            label.setStyleSheet("font-size: 36px; color: lime; border: 2px solid lime; padding: 10px;")
+            self.display.addWidget(label)
+            self.password_labels.append(label)
+
+        self.button_grid = QGridLayout()
+        self.layout.addLayout(self.button_grid)
+
+        buttons = [
+            ('1', 0, 0), ('2', 0, 1), ('3', 0, 2),
+            ('4', 1, 0), ('5', 1, 1), ('6', 1, 2),
+            ('7', 2, 0), ('8', 2, 1), ('9', 2, 2),
+            ('0', 3, 1)
+        ]
+
+        for text, row, col in buttons:
+            button = QPushButton(text)
+            button.clicked.connect(self.button_clicked)
+            self.button_grid.addWidget(button, row, col)
+
+    def button_clicked(self):
+        sender = self.sender().text()
+        if len(self.entered_password) < 4:
+            self.entered_password += sender
+            self.update_display()
+
+        if len(self.entered_password) == 4:
+            QTimer.singleShot(500, self.check_password)
+
+    def update_display(self):
+        for i, label in enumerate(self.password_labels):
+            label.setText(self.entered_password[i] if i < len(self.entered_password) else "_")
+
+    def check_password(self):
+        if self.entered_password == self.correct_password:
+            self.accept()  # Password correct, close dialog
+        else:
+            self.wrong_password()
+
+    def wrong_password(self):
+        self.entered_password = ""
+        self.update_display()
+        self.flash_red()
+
+    def flash_red(self):
+        original_style = self.styleSheet()
+
+        def set_red():
+            self.setStyleSheet("QLabel {color: red; border: 2px solid red;} QPushButton {background-color: red; color: black;}")
+        
+        def set_original():
+            self.setStyleSheet(original_style)
+        
+        def flash():
+            set_red()
+            QTimer.singleShot(250, set_original)
+            QTimer.singleShot(500, set_red)
+            QTimer.singleShot(750, set_original)
+
+        flash()
+
 
 def main():
     global current_question
@@ -160,6 +242,11 @@ def main():
 
     stylesheet = load_stylesheet()
     app.setStyleSheet(stylesheet)
+
+    correct_password = "1234"
+    dialog = PasswordDialog(correct_password)
+    if dialog.exec() == QDialog.Accepted:
+        print("Contraseña correcta, iniciando el juego...")
 
     bienvenida()
 
@@ -188,7 +275,7 @@ def main():
 
     glitch_timer = QTimer()
     glitch_timer.timeout.connect(lambda: glitch_effect(question_display, current_question.text))
-    glitch_timer.start(random.randint(3000))  # Cada 5 segundos se ejecuta el efecto de glitch
+    glitch_timer.start(3000)  # Cada 3 segundos se ejecuta el efecto de glitch
 
     ventanaPreguntas.show()
     sys.exit(app.exec_())
