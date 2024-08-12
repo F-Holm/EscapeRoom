@@ -9,6 +9,7 @@ import serial, time, threading
 import socket
 from Led import cambiarColor, efecto, Efectos, Colores
 from Codigos import Codigos
+from Puertos import Puertos
 
 sistema = None
 
@@ -16,21 +17,21 @@ root = tk.Tk()
 root.title("Escape room")
 
 class JuegoIra:
-    arduino = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+    arduino = serial.Serial(Puertos.IRA, 9600, timeout=1)
     
     hilo = None
     terminar = threading.Event()
     termino = threading.Event()
 
     def start(self):
-        self.arduino.write(b'0')
+        self.arduino.write(Codigos.START)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.arduino.write(b'1')
+        self.arduino.write(Codigos.STOP)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -44,7 +45,7 @@ class JuegoIra:
         self.closeArduino()
 
     def restart(self):
-        self.arduino.write(b'2')
+        self.arduino.write(Codigos.RESTART)
 
     def closeArduino(self):
         self.arduino.close()
@@ -61,11 +62,12 @@ class JuegoIra:
                 self.terminar.set()
                 self.termino.set()
 
-class JuegoGulaAvaricia:
+class JuegoTrivia:
     ip_servidor = input("Ingrese la dirección IP del servidor: ")
     
     socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    
+    socket.connect((Puertos.IP_TRIVIA, Puertos.PUERTO_TRIVIA))
+
     hilo = None
     terminar = threading.Event()
     termino = threading.Event()
@@ -74,14 +76,14 @@ class JuegoGulaAvaricia:
         self.socket.sendall(codigo.value.encode())
 
     def start(self):
-        self.arduino.write(b'0')
+        self.enviarMensaje(Codigos.START)
         self.terminar.clear()
         self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo = threading.Thread(target=self.hiloSocket)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.arduino.write(b'1')
+        self.enviarMensaje(Codigos.STOP)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -92,28 +94,25 @@ class JuegoGulaAvaricia:
     
     def close(self):
         self.cerrarHilo()
-        self.closeArduino()
+        self.closeSocket()
 
     def restart(self):
-        self.arduino.write(b'2')
+        self.enviarMensaje(Codigos.RESTART)
 
-    def closeArduino(self):
-        self.arduino.close()
+    def closeSocket(self):
+        self.socket.close()
     
-    def hiloArduino(self):
+    def hiloSocket(self):
         while not self.terminar.is_set():
-            if self.arduino.in_waiting > 0:
-                try:
-                    self.arduino.readline().decode('utf-8').strip()  # Decodificar y eliminar saltos de línea
-                except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
+            datos = socket.recv(1024)
+            if datos.decode() == Codigos.TERMINO:
                 if not self.terminar.is_set():
                     root.after(500, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
 
 class Sistema:
-    niveles = [JuegoIra(), JuegoGulaAvaricia()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+    niveles = [JuegoIra(), JuegoTrivia()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 
     def start(self):
@@ -149,6 +148,10 @@ class Sistema:
         print("Juego terminado correctamente :)")
         sys.exit()
 
+def closeTTK():
+    root.quit()
+    root.destroy()
+
 sistema = Sistema()
 
 juegoAnterior = ttk.Button(root, text="Nivel anterior\n<--", command=sistema.nivelAnterior)
@@ -174,9 +177,5 @@ root.bind("<Return>", lambda e: sistema.restart())
 juegoSiguiente = ttk.Button(root, text="Terminar juego\nescape", command=sistema.terminarJuego)
 juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
 root.bind("<Escape>", lambda e: sistema.terminarJuego())
-
-def closeTTK():
-    root.quit()
-    root.destroy()
 
 root.mainloop()

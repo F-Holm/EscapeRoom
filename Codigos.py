@@ -5,3 +5,4 @@ class Codigos(Enum):
     RESTART = chr(1)
     STOP = chr(2)
     CLOSE = chr(3)
+    TERMINO = chr(4)
