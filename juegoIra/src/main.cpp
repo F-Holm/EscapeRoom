@@ -24,7 +24,13 @@ int ledStateRed = 0;
 int ledStateYellow = 0;
 int ledStateGreen = 0;
 
-
+enum Codigos {
+  START = 0,
+  RESTART = 1,
+  STOP = 2,
+  CLOSE = 3,
+  TERMINO = 4
+};
 
 void setup()
 {
@@ -62,20 +68,20 @@ void terminarJuego(){
 }
 
 void notificarTermino(){
-  Serial.print('0');
+  Serial.print(Codigos::TERMINO);
 }
 
 void recibirInfo(){
   if (Serial.available() > 0){
-    char info = Serial.read();
+    int info = Serial.read();
     switch (info){
-      case '0'://iniciar
+      case Codigos::START://iniciar
         listoEmpezar = true;
         break;
-      case '1'://terminar
+      case Codigos::STOP://terminar
         terminarJuego();
         break;
-      case '2'://reiniciar
+      case Codigos::RESTART://reiniciar
         terminarJuego();
         listoEmpezar = true;
       default:
