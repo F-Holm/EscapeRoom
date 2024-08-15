@@ -1,12 +1,14 @@
 #include <Adafruit_NeoPixel.h>
  
  
-#define PIN 9
+#define PIN 8
 #define NUMPIXELS 300
  
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
  
 void setup() {
+  Serial.begin(9600);
+
   pixel.begin(); 
   pixel.show();
 }
@@ -67,10 +69,17 @@ void cielo(){
   pixel.show(); 
 }
  
-void loop() {
-  cieloInfierno();
-  delay(5000);
-  cielo();
-
-
+void loop() { 
+  if (Serial.available() > 0) {
+      int num = Serial.read();
+      Serial.println(num);
+      switch(num){
+        case 0:
+          cieloInfierno();
+          break;
+        case 1:
+          cielo();
+          break;
+      }
+  }
 }
