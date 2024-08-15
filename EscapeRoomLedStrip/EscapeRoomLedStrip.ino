@@ -39,7 +39,7 @@ void setup() {
 }
 
 void loop(){
-    // FALTA RECIBIR EL INT DE HOLM
+    // Test colores
     /*cambiarColor(255,0,0);
     delay(500);
     cambiarColor(255,255,0);
@@ -52,52 +52,17 @@ void loop(){
     delay(500);
     cambiarColor(255,0,255);
     delay(500);*/
-if (Serial.available() > 0) {
-    String colores = Serial.readString(); // Cambiar a readString
-    if (colores.length() == 1) { // Usar length() para verificar el tamaño
-        switch (colores[0]) {
-            case '0': // Comparar como carácter
-                rayo();
-                cambiarColor(red, green, blue); // Asegúrate de que estas variables estén definidas
-                break;
-            // Puedes añadir más casos aquí si es necesario
-        }
-    } else if (colores.length() >= 3) { // Asegúrate de que hay al menos 3 caracteres para RGB
-        int r = colores[0];
-        int g = colores[1];
-        int b = colores[2];
-        cambiarColor(r, g, b);
-    }
-}
-
-    /*
-    // 5 presets, 1 por cada etapa. Desde rojo hasta blanco
-    switch(juegosCompletados) {
-      case 1:
-        g=63; b=63;
-        analogWrite(greenPin, g);
-        analogWrite(bluePin, b);
-        break:
-      case 2:
-        g=127; b=127;
-        analogWrite(greenPin, g);
-        analogWrite(bluePin, b);
-        break:
-      case 3:
-        g=189; b=189;
-        analogWrite(greenPin, g);
-        analogWrite(bluePin, b);
-        break;
-      case 4:
-        g=255; b=255;
-        analogWrite(greenPin, g);
-        analogWrite(bluePin, b);
-        break:
-      default:
-        g=0; b=0;
-        analogWrite(greenPin, g);
-        analogWrite(bluePin, b);
-        break:
-    }
-    */
+  if (Serial.available() > 0) {
+      String colores = Serial.readString();
+      if (colores.length() == 1) {
+          switch (colores[0]) {
+              case '0':
+                  rayo();
+                  cambiarColor(red, green, blue);
+                  break;
+          }
+      } else if (colores.length() >= 3) {
+          cambiarColor(colores[0], colores[1], colores[2]);
+      }
+  }
 }
