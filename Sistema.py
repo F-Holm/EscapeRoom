@@ -178,4 +178,20 @@ juegoSiguiente = ttk.Button(root, text="Terminar juego\nescape", command=sistema
 juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
 root.bind("<Escape>", lambda e: sistema.terminarJuego())
 
+juegoSiguiente = ttk.Button(root, text="Rayo\nq", command=efecto(Efectos.RAYO))
+juegoSiguiente.grid(row=1, column=0, padx=10, pady=10)
+root.bind("<KeyPress-q>", lambda e: efecto(Efectos.RAYO))
+
+juegoSiguiente = ttk.Button(root, text="rojo\na", command=cambiarColor(Colores.ROJO))
+juegoSiguiente.grid(row=1, column=2, padx=10, pady=10)
+root.bind("<KeyPress-a>", lambda e: cambiarColor(Colores.ROJO))
+
+juegoSiguiente = ttk.Button(root, text="verde\ns", command=cambiarColor(Colores.VERDE))
+juegoSiguiente.grid(row=1, column=1, padx=10, pady=10)
+root.bind("<KeyPress-s>", lambda e: cambiarColor(Colores.VERDE))
+
+juegoSiguiente = ttk.Button(root, text="azul\nd", command=cambiarColor(Colores.AZUL))
+juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
+root.bind("<KeyPress-d>", lambda e: cambiarColor(Colores.AZUL))
+
 root.mainloop()
