@@ -17,13 +17,20 @@ void cambiarColor(int r, int g, int b){
   analogWrite(bluePin, b); blue = b;
 }
 
+void cambiarColorSinGuardar(int r, int g, int b){
+  analogWrite(redPin, r);
+  analogWrite(greenPin, g);
+  analogWrite(bluePin, b);
+}
+
 void rayo(){
-  cambiarColor(61, 126, 255);
+  cambiarColorSinGuardar(61, 126, 255);
   delay(400);
-  cambiarColor(0, 0, 0);
+  cambiarColorSinGuardar(0, 0, 0);
   delay(200);
-  cambiarColor(61, 126, 255);
+  cambiarColorSinGuardar(61, 126, 255);
   delay(400);
+  cambiarColorSinGuardar(red, green, blue);
 }
 
 void setup() {
@@ -54,11 +61,11 @@ void loop(){
     delay(500);*/
   if (Serial.available() > 0) {
       String colores = Serial.readString();
+      //Serial.println(colores);
       if (colores.length() == 1) {
           switch (colores[0]) {
-              case '0':
+              case 0:
                   rayo();
-                  cambiarColor(red, green, blue);
                   break;
           }
       } else if (colores.length() >= 3) {
