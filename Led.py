@@ -1,20 +1,26 @@
 from enum import Enum
 import serial
-from enum import Enum
 from Puertos import Puertos
 
 class Efectos(Enum):
-    RAYO = chr(0)
+    RAYO = b'\x00' + b'\x00'
+
+class EfectosNeoPixel(Enum):
+    CIELO_INFIERNO = b'\x01' + b'\x00'
+    CIELO = b'\x01' + b'\x01'
 
 class Colores(Enum):
-    ROJO = chr(255) + chr(0) + chr(0)
-    VERDE = chr(0) + chr(255) + chr(0)
-    AZUL = chr(0) + chr(0) + chr(255)
+    ROJO = b'\xFF' + b'\x00' + b'\x00'
+    VERDE = b'\x00' + b'\xFF' + b'\x00'
+    AZUL = b'\x00' + b'\x00' + b'\xFF'
 
-arduino = serial.Serial(Puertos.LEDS_RGB.value, 9600, timeout=1)
+arduino = serial.Serial(Puertos.LEDS.value, 9600, timeout=1)
 
 def cambiarColor(color):
     arduino.write(color.value)
 
 def efecto(efecto):
     arduino.write(efecto.value)
+
+def closeLED():
+    arduino.close()

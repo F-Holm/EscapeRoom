@@ -7,8 +7,8 @@ from time import sleep
 from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
 import serial, time, threading
 import socket
-from Led import cambiarColor, efecto, Efectos, Colores
-from Codigos import Codigos
+from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
+from Codigos import Codigos, CodigosArduino
 from Puertos import Puertos
 
 sistema = None
@@ -17,21 +17,21 @@ root = tk.Tk()
 root.title("Escape room")
 
 class JuegoIra:
-    arduino = serial.Serial(Puertos.IRA, 9600, timeout=1)
+    arduino = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
     
     hilo = None
     terminar = threading.Event()
     termino = threading.Event()
 
     def start(self):
-        self.arduino.write(Codigos.START)
+        self.arduino.write(CodigosArduino.START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.arduino.write(Codigos.STOP)
+        self.arduino.write(CodigosArduino.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -45,7 +45,7 @@ class JuegoIra:
         self.closeArduino()
 
     def restart(self):
-        self.arduino.write(Codigos.RESTART)
+        self.arduino.write(CodigosArduino.RESTART.value)
 
     def closeArduino(self):
         self.arduino.close()
@@ -62,11 +62,9 @@ class JuegoIra:
                 self.terminar.set()
                 self.termino.set()
 
-class JuegoTrivia:
-    ip_servidor = input("Ingrese la dirección IP del servidor: ")
-    
-    socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    socket.connect((Puertos.IP_TRIVIA, Puertos.PUERTO_TRIVIA))
+class JuegoTrivia:    
+    #socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    #socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))
 
     hilo = None
     terminar = threading.Event()
@@ -76,14 +74,14 @@ class JuegoTrivia:
         self.socket.sendall(codigo.value.encode())
 
     def start(self):
-        self.enviarMensaje(Codigos.START)
+        self.enviarMensaje(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloSocket)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.enviarMensaje(Codigos.STOP)
+        self.enviarMensaje(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -97,7 +95,7 @@ class JuegoTrivia:
         self.closeSocket()
 
     def restart(self):
-        self.enviarMensaje(Codigos.RESTART)
+        self.enviarMensaje(Codigos.RESTART.value)
 
     def closeSocket(self):
         self.socket.close()
@@ -105,14 +103,14 @@ class JuegoTrivia:
     def hiloSocket(self):
         while not self.terminar.is_set():
             datos = socket.recv(1024)
-            if datos.decode() == Codigos.TERMINO:
+            if datos.decode() == Codigos.TERMINO.value:
                 if not self.terminar.is_set():
                     root.after(500, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
 
 class Sistema:
-    niveles = [JuegoIra(), JuegoTrivia()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+    niveles = [JuegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 
     def start(self):
@@ -143,6 +141,7 @@ class Sistema:
     def terminarJuego(self):
         for nivel in self.niveles:
             nivel.close()
+        closeLED()
         closePygame()
         closeTTK()
         print("Juego terminado correctamente :)")
@@ -178,20 +177,34 @@ juegoSiguiente = ttk.Button(root, text="Terminar juego\nescape", command=sistema
 juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
 root.bind("<Escape>", lambda e: sistema.terminarJuego())
 
-juegoSiguiente = ttk.Button(root, text="Rayo\nq", command=efecto(Efectos.RAYO))
-juegoSiguiente.grid(row=1, column=0, padx=10, pady=10)
+#Efectos RGB
+
+juegoSiguiente = ttk.Button(root, text="Rayo\nq", command=lambda: efecto(Efectos.RAYO))
+juegoSiguiente.grid(row=3, column=0, padx=10, pady=10)
 root.bind("<KeyPress-q>", lambda e: efecto(Efectos.RAYO))
 
-juegoSiguiente = ttk.Button(root, text="rojo\na", command=cambiarColor(Colores.ROJO))
-juegoSiguiente.grid(row=1, column=2, padx=10, pady=10)
+#Colores RGB
+
+juegoSiguiente = ttk.Button(root, text="rojo\na", command=lambda: cambiarColor(Colores.ROJO))
+juegoSiguiente.grid(row=4, column=0, padx=10, pady=10)
 root.bind("<KeyPress-a>", lambda e: cambiarColor(Colores.ROJO))
 
-juegoSiguiente = ttk.Button(root, text="verde\ns", command=cambiarColor(Colores.VERDE))
-juegoSiguiente.grid(row=1, column=1, padx=10, pady=10)
+juegoSiguiente = ttk.Button(root, text="verde\ns", command=lambda: cambiarColor(Colores.VERDE))
+juegoSiguiente.grid(row=4, column=1, padx=10, pady=10)
 root.bind("<KeyPress-s>", lambda e: cambiarColor(Colores.VERDE))
 
-juegoSiguiente = ttk.Button(root, text="azul\nd", command=cambiarColor(Colores.AZUL))
-juegoSiguiente.grid(row=2, column=1, padx=10, pady=10)
+juegoSiguiente = ttk.Button(root, text="azul\nd", command=lambda: cambiarColor(Colores.AZUL))
+juegoSiguiente.grid(row=4, column=2, padx=10, pady=10)
 root.bind("<KeyPress-d>", lambda e: cambiarColor(Colores.AZUL))
+
+#Efectos neo pixel
+
+juegoSiguiente = ttk.Button(root, text="cielo infierno\nz", command=lambda: efecto(EfectosNeoPixel.CIELO_INFIERNO))
+juegoSiguiente.grid(row=5, column=0, padx=10, pady=10)
+root.bind("<KeyPress-z>", lambda e: efecto(EfectosNeoPixel.CIELO_INFIERNO))
+
+juegoSiguiente = ttk.Button(root, text="cielo\nx", command=lambda: efecto(EfectosNeoPixel.CIELO))
+juegoSiguiente.grid(row=5, column=1, padx=10, pady=10)
+root.bind("<KeyPress-x>", lambda e: efecto(EfectosNeoPixel.CIELO))
 
 root.mainloop()
