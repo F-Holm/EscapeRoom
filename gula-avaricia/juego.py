@@ -4,7 +4,84 @@ from PyQt5.QtGui import QPixmap, QPainter, QImage, QBrush
 import sys
 import random
 import os
+import time
+import socket
+import threading
+from enum import Enum
 
+class Codigos(Enum):
+    START = chr(0)
+    RESTART = chr(1)
+    STOP = chr(2)
+    CLOSE = chr(3)
+    TERMINO = chr(4)
+
+
+evento = threading.Event()
+
+class MiClase:
+    servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    conexion = None
+
+    def __init__(self):
+        self.hilo = threading.Thread(target=self.mi_metodo)
+        # Crear un socket TCP/IP
+        servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        # Obtener la IP privada de la computadora
+        hostname = socket.gethostname()
+        ip_privada = socket.gethostbyname(hostname)
+        # Enlazar el socket a la dirección y puerto
+        servidor.bind((ip_privada, 8080))
+        # Mostrar la IP privada y el puerto
+        print(f"Servidor iniciado en IP: {ip_privada}, Puerto: 8080")
+        # Escuchar conexiones entrantes
+        servidor.listen(1)
+        print("Esperando conexiones...")
+        # Aceptar una conexión
+        self.conexion, direccion = servidor.accept()
+        print(f"Conectado a {direccion}")
+    
+    def mi_metodo(self):
+        #abro Escucha
+        while True:
+            datos = self.conexion.recv(1024)
+            if not datos or datos.decode() == chr(0):
+                break
+            if ord(datos.decode()) == Codigos.START : #START
+                self.start()
+            if ord(datos.decode()) == Codigos.STOP : #Terminar pero puede volver a empezar
+                self.stop(self.conexion) #arreglar esto
+                break
+            if ord(datos.decode()) == Codigos.RESTART : #Restart 
+                self.stop(self.conexion)
+            if ord(datos.decode()) == Codigos.CLOSE : #Temino totalmente el juego 
+                self.stop(self.conexion)
+                
+                
+            print(f"Recibido: {ord(datos.decode())}")
+    
+    def start(self):
+        evento.set()
+    
+    def stop(self): #Arreglar esto 
+        self.conexion.close()
+
+    def iniciar_hilo(self):
+        self.hilo.start()
+
+        
+
+objeto = MiClase()
+objeto.daemon = True
+objeto.iniciar_hilo()
+
+evento.wait()
+#os.system('sudo vbetool dpms off')
+os.system('echo "hola"')
+
+time.sleep(15)
+#os.system('sudo vbetool dpms on')
+os.system('echo "chau"')
 
 STYLE = "style.css"
 
