@@ -10,70 +10,68 @@ import threading
 from enum import Enum
 
 class Codigos(Enum):
-    START = chr(0)
-    RESTART = chr(1)
-    STOP = chr(2)
-    CLOSE = chr(3)
-    TERMINO = chr(4)
+    START   = b'\x00' # Inicia el juego
+    RESTART = b'\x01' # Reinicia el juego
+    STOP    = b'\x02' # Detiene el juego pero puede volver a iniciarse
+    CLOSE   = b'\x03' # Detiene el juego y no puede volver a iniciarse
+    TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
 
 evento = threading.Event()
 
-class MiClase:
-    servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class Socket:
+    servidor = None
     conexion = None
+    
+    hilo = None
+    terminar = None#Le indica al hilo que tiene que terminar
 
     def __init__(self):
-        self.hilo = threading.Thread(target=self.mi_metodo)
-        # Crear un socket TCP/IP
+        self.terminar = threading.Event()
+        
         servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # Obtener la IP privada de la computadora
         hostname = socket.gethostname()
         ip_privada = socket.gethostbyname(hostname)
-        # Enlazar el socket a la dirección y puerto
         servidor.bind((ip_privada, 8080))
-        # Mostrar la IP privada y el puerto
+        
         print(f"Servidor iniciado en IP: {ip_privada}, Puerto: 8080")
-        # Escuchar conexiones entrantes
         servidor.listen(1)
         print("Esperando conexiones...")
-        # Aceptar una conexión
         self.conexion, direccion = servidor.accept()
         print(f"Conectado a {direccion}")
+        
+        self.hilo = threading.Thread(target=self.hiloEscucha)
+        self.hilo.start()
     
-    def mi_metodo(self):
-        #abro Escucha
-        while True:
+    def hiloEscucha(self):#Recomiendo usar eventos en los métodos start, stop y close porque el hilo se detiene para llamar a uno de estos métodos y no va a poder recibir nuevos mensaje hasta que termine la ejecución del método. Tampoco podría detenerse
+        while not self.terminar.is_set():
             datos = self.conexion.recv(1024)
-            if not datos or datos.decode() == chr(0):
-                break
-            if ord(datos.decode()) == Codigos.START : #START
+            
+            if (datos == Codigos.START.value):
                 self.start()
-            if ord(datos.decode()) == Codigos.STOP : #Terminar pero puede volver a empezar
-                self.stop(self.conexion) #arreglar esto
+            elif (datos == Codigos.STOP.value):
+                self.stop()
+            elif (datos == Codigos.RESTART.value):
+                self.stop()
+                self.start()
+            elif (datos == Codigos.CLOSE.value):
+                self.close()#Tené en cuenta que el hilo no va a finalizar hasta que termine de ejecutarse esta función
                 break
-            if ord(datos.decode()) == Codigos.RESTART : #Restart 
-                self.stop(self.conexion)
-            if ord(datos.decode()) == Codigos.CLOSE : #Temino totalmente el juego 
-                self.stop(self.conexion)
-                
-                
-            print(f"Recibido: {ord(datos.decode())}")
     
     def start(self):
         evento.set()
     
-    def stop(self): #Arreglar esto 
+    def stop(self): #Arreglar esto
+        pass
+
+    def close(self):
         self.conexion.close()
+     
+    def notificarTermino(self):#Este método se encarga de notificar al sistema que el juego terminó
+        self.conexion.sendall(Codigos.TERMINO.value)
 
-    def iniciar_hilo(self):
-        self.hilo.start()
-
-        
-
-objeto = MiClase()
+objeto = Socket()
 objeto.daemon = True
-objeto.iniciar_hilo()
 
 evento.wait()
 #os.system('sudo vbetool dpms off')
