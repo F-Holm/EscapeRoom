@@ -39,14 +39,18 @@ class Socket:
         print("Esperando conexiones...")
         self.conexion, direccion = servidor.accept()
         print(f"Conectado a {direccion}")
+        self.conexion.setblocking(False)#hace que el método recv no bloquee el hilo
         
         self.hilo = threading.Thread(target=self.hiloEscucha)
         self.hilo.start()
     
     def hiloEscucha(self):#Recomiendo usar eventos en los métodos start, stop y close porque el hilo se detiene para llamar a uno de estos métodos y no va a poder recibir nuevos mensaje hasta que termine la ejecución del método. Tampoco podría detenerse
         while not self.terminar.is_set():
-            datos = self.conexion.recv(1024)
-            
+            try:
+                datos = self.conexion.recv(1024)
+            except BlockingIOError:
+                continue
+                        
             if (datos == Codigos.START.value):
                 self.start()
             elif (datos == Codigos.STOP.value):
