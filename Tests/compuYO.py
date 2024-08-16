@@ -1,4 +1,12 @@
 import socket
+from enum import Enum
+
+class Codigos(Enum):
+    START = b'\x00'
+    RESTART = b'\x01'
+    STOP = b'\x02'
+    CLOSE = b'\x03'
+    TERMINO = b'\x04'
 
 # Crear un socket TCP/IP
 cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -11,8 +19,8 @@ cliente.connect((ip_servidor, 8080))
 while True:
     mensaje = int(input("Ingrese un mensaje: "))
     if (mensaje == ""): continue
-    cliente.sendall(chr(mensaje).encode())
-    if mensaje == chr(0):
+    cliente.sendall(Codigos.START.value)
+    if mensaje == "0":
         break
 
 # Cerrar la conexión

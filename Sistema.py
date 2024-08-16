@@ -8,7 +8,7 @@ from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
 import serial, time, threading
 import socket
 from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
-from Codigos import Codigos, CodigosArduino
+from Codigos import Codigos
 from Puertos import Puertos
 
 sistema = None
@@ -17,21 +17,25 @@ root = tk.Tk()
 root.title("Escape room")
 
 class JuegoIra:
-    arduino = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
-    
+    arduino = None
     hilo = None
-    terminar = threading.Event()
-    termino = threading.Event()
+    terminar = None
+    termino = None
+    
+    def __init__(self):
+        self.arduino = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
+        self.terminar = threading.Event()
+        self.termino = threading.Event()
 
     def start(self):
-        self.arduino.write(CodigosArduino.START.value)
+        self.arduino.write(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.arduino.write(CodigosArduino.STOP.value)
+        self.arduino.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -45,7 +49,7 @@ class JuegoIra:
         self.closeArduino()
 
     def restart(self):
-        self.arduino.write(CodigosArduino.RESTART.value)
+        self.arduino.write(Codigos.RESTART.value)
 
     def closeArduino(self):
         self.arduino.close()
@@ -63,12 +67,16 @@ class JuegoIra:
                 self.termino.set()
 
 class JuegoTrivia:    
-    #socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    #socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))
-
+    socket = None
     hilo = None
-    terminar = threading.Event()
-    termino = threading.Event()
+    terminar = None
+    termino = None
+    
+    def __init__(self):
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))
+        self.terminar = threading.Event()
+        self.termino = threading.Event()
     
     def enviarMensaje(self, codigo):
         self.socket.sendall(codigo.value.encode())
@@ -109,7 +117,7 @@ class JuegoTrivia:
                 self.terminar.set()
                 self.termino.set()
 
-class Sistema:
+class Sistema:#Juegos: JuegoIra(), JuegoTrivia()
     niveles = [JuegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 

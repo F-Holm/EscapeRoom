@@ -1,4 +1,12 @@
 import socket
+from enum import Enum
+
+class Codigos(Enum):
+    START = b'\x00'
+    RESTART = b'\x01'
+    STOP = b'\x02'
+    CLOSE = b'\x03'
+    TERMINO = b'\x04'
 
 # Crear un socket TCP/IP
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -24,9 +32,9 @@ print(f"Conectado a {direccion}")
 # Recibir datos
 while True:
     datos = conexion.recv(1024)
-    if not datos or datos.decode() == chr(0):
+    if not datos:
         break
-    print(f"Recibido: {ord(datos.decode())}")
+    print(datos == Codigos.START.value)
 
 # Cerrar la conexión
 conexion.close()
