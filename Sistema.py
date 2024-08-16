@@ -10,112 +10,13 @@ import socket
 from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
 from Codigos import Codigos
 from Puertos import Puertos
+from JuegoIra import JuegoIra
+from JuegoTrivia import JuegoTrivia
 
 sistema = None
 
 root = tk.Tk()
 root.title("Escape room")
-
-class JuegoIra:
-    arduino = None
-    hilo = None
-    terminar = None
-    termino = None
-    
-    def __init__(self):
-        self.arduino = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
-        self.terminar = threading.Event()
-        self.termino = threading.Event()
-
-    def start(self):
-        self.arduino.write(Codigos.START.value)
-        self.terminar.clear()
-        self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloArduino)
-        self.hilo.start()
-
-    def cerrarHilo(self):
-        self.arduino.write(Codigos.STOP.value)
-        if self.hilo != None and self.hilo.is_alive():
-            self.terminar.set()
-            self.hilo.join()
-
-    def stop(self):
-        self.cerrarHilo()
-        sistema.siguienteNivel()
-    
-    def close(self):
-        self.cerrarHilo()
-        self.closeArduino()
-
-    def restart(self):
-        self.arduino.write(Codigos.RESTART.value)
-
-    def closeArduino(self):
-        self.arduino.close()
-    
-    def hiloArduino(self):
-        while not self.terminar.is_set():
-            if self.arduino.in_waiting > 0:
-                try:
-                    self.arduino.readline().decode('utf-8').strip()  # Decodificar y eliminar saltos de línea
-                except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
-                if not self.terminar.is_set():
-                    root.after(500, lambda: sistema.siguienteNivel())
-                self.terminar.set()
-                self.termino.set()
-
-class JuegoTrivia:    
-    socket = None
-    hilo = None
-    terminar = None
-    termino = None
-    
-    def __init__(self):
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))
-        self.terminar = threading.Event()
-        self.termino = threading.Event()
-    
-    def enviarMensaje(self, codigo):
-        self.socket.sendall(codigo.value.encode())
-
-    def start(self):
-        self.enviarMensaje(Codigos.START.value)
-        self.terminar.clear()
-        self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloSocket)
-        self.hilo.start()
-
-    def cerrarHilo(self):
-        self.enviarMensaje(Codigos.STOP.value)
-        if self.hilo != None and self.hilo.is_alive():
-            self.terminar.set()
-            self.hilo.join()
-
-    def stop(self):
-        self.cerrarHilo()
-        sistema.siguienteNivel()
-    
-    def close(self):
-        self.cerrarHilo()
-        self.closeSocket()
-
-    def restart(self):
-        self.enviarMensaje(Codigos.RESTART.value)
-
-    def closeSocket(self):
-        self.socket.close()
-    
-    def hiloSocket(self):
-        while not self.terminar.is_set():
-            datos = socket.recv(1024)
-            if datos.decode() == Codigos.TERMINO.value:
-                if not self.terminar.is_set():
-                    root.after(500, lambda: sistema.siguienteNivel())
-                self.terminar.set()
-                self.termino.set()
 
 class Sistema:#Juegos: JuegoIra(), JuegoTrivia()
     niveles = [JuegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
