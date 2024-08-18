@@ -2,17 +2,22 @@ from enum import Enum
 import serial
 from Puertos import Puertos
 
-class Efectos(Enum):
-    RAYO = b'\x00' + b'\x00'
+class EfectosLedsRGB(Enum):
+    RAYO           = b'\x00' + b'\x00'
 
 class EfectosNeoPixel(Enum):
     CIELO_INFIERNO = b'\x01' + b'\x00'
-    CIELO = b'\x01' + b'\x01'
+    CIELO          = b'\x01' + b'\x01'
+
+class EfectosGlobales(Enum):
+    RAYO           = b'\x02' + b'\x00'
 
 class Colores(Enum):
-    ROJO = b'\xFF' + b'\x00' + b'\x00'
-    VERDE = b'\x00' + b'\xFF' + b'\x00'
-    AZUL = b'\x00' + b'\x00' + b'\xFF'
+    NEGRO          = b'\x00' + b'\x00' + b'\x00'
+    BLANCO         = b'\xFF' + b'\xFF' + b'\xFF'
+    ROJO           = b'\xFF' + b'\x00' + b'\x00'
+    VERDE          = b'\x00' + b'\xFF' + b'\x00'
+    AZUL           = b'\x00' + b'\x00' + b'\xFF'
 
 arduino = None
 

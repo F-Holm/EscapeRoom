@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
 
 class App(tk.Tk):
     def __init__(self, rows, buttons_per_row, row_texts):
@@ -31,7 +32,8 @@ class App(tk.Tk):
             row_label.pack(fill='x')
             
             for j in range(buttons_per_row[i]):
-                button = tk.Button(row_frame, text=f"Botón {i+1}-{j+1}\nCtrl+{j+1}", command=lambda i=i, j=j: self.button_action(i, j))
+                button_text = f"Botón {i+1}-{j+1}\nCtrl+{j+1}"
+                button = tk.Button(row_frame, text=button_text, command=lambda i=i, j=j, text=button_text: self.button_action(i, j, text))
                 button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
             
             # Línea divisoria entre filas
@@ -55,8 +57,18 @@ class App(tk.Tk):
         self.attributes("-fullscreen", self.fullscreen)
         return "break"
     
-    def button_action(self, row, col):
-        print(f"Botón {row+1}-{col+1} presionado")
+    def button_action(self, row, col, text):
+        if row == 0:  # Solo para botones de la primera fila
+            self.show_confirmation_dialog(text)
+        else:
+            print(f"Botón {row+1}-{col+1} presionado")
+    
+    def show_confirmation_dialog(self, text):
+        response = messagebox.askquestion("Confirmación", f"¿Seguro que quieres {text}?")
+        if response == 'yes':
+            print(f"Confirmado: {text}")
+        else:
+            print("Cancelado")
 
 if __name__ == "__main__":
     rows = 3  # Número de filas

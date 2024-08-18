@@ -2,24 +2,45 @@ import pygame
 from enum import Enum
 from time import sleep
 
+class Sonido:
+    def __init__(self, sonido, loop, canal):
+        self.sonido = sonido
+        self.loop = loop
+        self.canal = canal
+
 class Sonidos(Enum):
-    HIMNO_URSS = "Sonidos/Himno nacional de la Unión de Repúblicas Socialistas Soviéticas.mp3"
-    JIJIJIJA = "Sonidos/JIJIJIJA.mp3"
+    HIMNO_URSS = Sonido("Sonidos/Himno nacional de la Unión de Repúblicas Socialistas Soviéticas.mp3", 1, 0)
+    JIJIJIJA = Sonido("Sonidos/JIJIJIJA.mp3", 0, 1)
+
+CANTIDAD_CANALES = 2
 
 pygame.mixer.init()
-pygame.mixer.set_num_channels(10)#Cambiar el numero una vez que sepamos cunatos canales vamos a necesitar
+pygame.mixer.set_num_channels(CANTIDAD_CANALES)#Cambiar el numero una vez que sepamos cunatos canales vamos a necesitar
 
-def reproducirSonido(sonido, loop, canal):#enum sonido, bool loop, int canal
-    if loop:
-        pygame.mixer.Channel(canal).play(pygame.mixer.Sound(sonido.value), -1)
+def reproducirSonido(sonido):#enum sonido, bool loop, int canal
+    if sonido.value.loop:
+        pygame.mixer.Channel(sonido.value.canal).play(pygame.mixer.Sound(sonido.value.sonido), -1)
     else:
-        pygame.mixer.Channel().play(pygame.mixer.Sound(sonido.value), -1)
+        pygame.mixer.Channel(sonido.value.canal).play(pygame.mixer.Sound(sonido.value.sonido))
 
-def detenerSonido(canal):
-    pygame.mixer.Channel(canal).stop()
+def detenerSonido(sonido):
+    pygame.mixer.Channel(sonido.value.canal).stop()
 
-def delay(segundos):
-    sleep(segundos)
+def detenerTodosLosSonidos():
+    for i in range(CANTIDAD_CANALES):
+        canal = pygame.mixer.Channel(i)
+        if (canal.get_busy()):
+            canal.stop()
+
+def toggleSonido(sonido):
+    canal = pygame.mixer.Channel(sonido.value.canal)
+    if canal.get_busy():
+        canal.stop()
+    else:
+        reproducirSonido(sonido)
+
+#def delay(segundos):
+#    sleep(segundos)
 
 def closePygame():
     pygame.quit()
