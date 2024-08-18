@@ -7,3 +7,4 @@ class Niveles(Enum):
     JUEGO_IRA = "Juego Ira"
     JUEGO_RFID = "Juego RFID"
     JUEGO_TRIVIA = "Juego Trivia"
+    FINAL = "Etapa Final"

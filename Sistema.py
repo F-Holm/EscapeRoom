@@ -1,15 +1,6 @@
-from enum import Enum
 import sys
-import tkinter as tk
-from tkinter import messagebox, ttk
-from tkinter import *
-from time import sleep
-from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos, detenerTodosLosSonidos
-import serial, time, threading
-import socket
-from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, closeLED, EfectosNeoPixel, conectarLEDS, EfectosGlobales
-from Codigos import Codigos
-from Puertos import Puertos
+from Sonido import closePygame, iniciarPygame
+from Led import closeLED, conectarLEDS
 from JuegoIra import JuegoIra
 from JuegoTrivia import JuegoTrivia
 from variablesGlobales import sistema, root
@@ -47,6 +38,11 @@ class Sistema:
             self.stop()()
             self.nivelActual = 0
     
+    def reiniciarJuego(self):
+        self.stop()
+        self.nivelActual = 0
+        self.start
+    
     def terminarJuego(self):
         for nivel in self.niveles:
             nivel.close()
@@ -60,5 +56,7 @@ def closeTTK():
     root.destroy()
 
 def iniciarSistema():
+    global sistema
     sistema = Sistema()
     conectarLEDS()
+    iniciarPygame()

@@ -60,6 +60,8 @@ class App(tk.Tk):
         elif accion == 2:
             text = "ir al siguiente nivel"
         elif accion == 3:
+            text = "reiniciar el juego"
+        elif accion == 4:
             text = "terminar el juego"
         else:
             return
@@ -72,6 +74,8 @@ class App(tk.Tk):
                 sistema.nivelAnterior()
             elif accion == 2:
                 sistema.siguienteNivel()
+            elif accion == 3:
+                sistema.reiniciarJuego()
             elif accion == 3:
                 sistema.terminarJuego()
 
@@ -107,8 +111,12 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(2))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
-        button_text = "Terminar Escape Room"
+        button_text = "Reiniciar Escape Room"
         button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(3))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Terminar Escape Room"
+        button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(4))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         self.separadorHorizontal()
@@ -218,7 +226,7 @@ class App(tk.Tk):
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         button_text = "Himno de la URSS"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HIMNO_URSS))#Sonido, Loop, Canal
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HIMNO_URSS))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
         button_text = "JIJIJIJA"

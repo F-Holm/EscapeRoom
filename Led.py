@@ -22,6 +22,7 @@ class Colores(Enum):
 arduino = None
 
 def conectarLEDS():
+    global arduino
     arduino = serial.Serial(Puertos.LEDS.value, 9600, timeout=1)
 
 def cambiarColor(color):

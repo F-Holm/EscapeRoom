@@ -1,13 +1,5 @@
-from enum import Enum
-import sys
-import tkinter as tk
-from tkinter import messagebox, ttk
-from tkinter import *
 from time import sleep
-from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
-import serial, time, threading
-import socket
-from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
+import serial, threading
 from Codigos import Codigos
 from Puertos import Puertos
 from variablesGlobales import sistema, root
@@ -54,7 +46,7 @@ class JuegoIra:
         while not self.terminar.is_set():
             if self.arduino.in_waiting > 0:
                 try:
-                    self.arduino.readline().decode('utf-8').strip()  # Decodificar y eliminar saltos de línea
+                    self.arduino.readline()
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
                 if not self.terminar.is_set():

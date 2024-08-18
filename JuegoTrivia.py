@@ -1,13 +1,5 @@
-from enum import Enum
-import sys
-import tkinter as tk
-from tkinter import messagebox, ttk
-from tkinter import *
-from time import sleep
-from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
-import serial, time, threading
+import threading
 import socket
-from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
 from Codigos import Codigos
 from Puertos import Puertos
 from variablesGlobales import sistema, root

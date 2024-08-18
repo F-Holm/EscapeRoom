@@ -1,6 +1,5 @@
 import pygame
 from enum import Enum
-from time import sleep
 
 class Sonido:
     def __init__(self, sonido, loop, canal):
@@ -14,10 +13,11 @@ class Sonidos(Enum):
 
 CANTIDAD_CANALES = 2
 
-pygame.mixer.init()
-pygame.mixer.set_num_channels(CANTIDAD_CANALES)#Cambiar el numero una vez que sepamos cunatos canales vamos a necesitar
+def iniciarPygame():
+    pygame.mixer.init()
+    pygame.mixer.set_num_channels(CANTIDAD_CANALES)
 
-def reproducirSonido(sonido):#enum sonido, bool loop, int canal
+def reproducirSonido(sonido):
     if sonido.value.loop:
         pygame.mixer.Channel(sonido.value.canal).play(pygame.mixer.Sound(sonido.value.sonido), -1)
     else:
@@ -38,9 +38,6 @@ def toggleSonido(sonido):
         canal.stop()
     else:
         reproducirSonido(sonido)
-
-#def delay(segundos):
-#    sleep(segundos)
 
 def closePygame():
     pygame.quit()
