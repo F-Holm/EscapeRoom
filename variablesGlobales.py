@@ -1,2 +1,0 @@
-sistema = None
-root = None
