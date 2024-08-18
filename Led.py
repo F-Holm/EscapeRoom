@@ -14,7 +14,10 @@ class Colores(Enum):
     VERDE = b'\x00' + b'\xFF' + b'\x00'
     AZUL = b'\x00' + b'\x00' + b'\xFF'
 
-arduino = serial.Serial(Puertos.LEDS.value, 9600, timeout=1)
+arduino = None
+
+def conectarLEDS():
+    arduino = serial.Serial(Puertos.LEDS.value, 9600, timeout=1)
 
 def cambiarColor(color):
     arduino.write(color.value)

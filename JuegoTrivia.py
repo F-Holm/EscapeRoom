@@ -10,7 +10,7 @@ import socket
 from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
 from Codigos import Codigos
 from Puertos import Puertos
-from Sistema import sistema, root
+from variablesGlobales import sistema, root
 
 class JuegoTrivia:    
     socket = None

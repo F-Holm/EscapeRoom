@@ -7,19 +7,15 @@ from time import sleep
 from Sonido import reproducirSonido, detenerSonido, delay, closePygame, Sonidos
 import serial, time, threading
 import socket
-from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel
+from Led import cambiarColor, efecto, Efectos, Colores, closeLED, EfectosNeoPixel, conectarLEDS
 from Codigos import Codigos
 from Puertos import Puertos
 from JuegoIra import JuegoIra
 from JuegoTrivia import JuegoTrivia
-
-sistema = None
-
-root = tk.Tk()
-root.title("Escape room")
+from variablesGlobales import sistema, root
 
 class Sistema:#Juegos: JuegoIra(), JuegoTrivia()
-    niveles = [JuegoIra()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+    niveles = []#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
     nivelActual = 0
 
     def start(self):
@@ -61,6 +57,9 @@ def closeTTK():
     root.destroy()
 
 sistema = Sistema()
+#conectarLEDS()
+root = tk.Tk()
+root.title("Escape room")
 
 juegoAnterior = ttk.Button(root, text="Nivel anterior\n<--", command=sistema.nivelAnterior)
 juegoAnterior.grid(row=0, column=0, padx=10, pady=10)
