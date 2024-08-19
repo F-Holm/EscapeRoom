@@ -137,7 +137,6 @@ class Sistema:
 
     def __init__(self):#Juegos: JuegoIra(), JuegoTrivia()
         self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
-        root.actualizarNivel(self.nivelActual)
 
     def start(self):
         self.niveles[self.nivelActual].start()
@@ -218,6 +217,7 @@ class App(tk.Tk):
         
         #self.crearSwitch()
         self.separadorVertical()
+        self.actualizarNivel(0)
     
     def separadorVertical(self):
         separator = ttk.Separator(self, orient='vertical')
