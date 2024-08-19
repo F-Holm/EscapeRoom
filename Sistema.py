@@ -2,13 +2,31 @@ import sys
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import serial, threading
+import serial, threading, socket
 from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame
 from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, EfectosNeoPixel, EfectosGlobales, closeLED, conectarLEDS
 from Codigos import Codigos
 from Puertos import Puertos
+from Niveles import Niveles, getNivel
 
 sistema = None
+root = None
+
+class NivelTest:
+    def __init__(self):
+        pass
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def restart(self):
+        pass
+
+    def close(self):
+        pass
 
 class JuegoIra:
     arduino = None
@@ -59,11 +77,6 @@ class JuegoIra:
                     root.after(500, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
-
-import threading
-import socket
-from Codigos import Codigos
-from Puertos import Puertos
 
 class JuegoTrivia:    
     socket = None
@@ -118,13 +131,13 @@ class JuegoTrivia:
 
 
 
-
 class Sistema:
     niveles = None
     nivelActual = 0
 
     def __init__(self):#Juegos: JuegoIra(), JuegoTrivia()
-        self.niveles = []#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+        root.actualizarNivel(self.nivelActual)
 
     def start(self):
         self.niveles[self.nivelActual].start()
@@ -142,6 +155,7 @@ class Sistema:
             self.start()
         else:
             self.restart()
+        root.actualizarNivel(self.nivelActual)
 
     def siguienteNivel(self):
         if self.nivelActual != len(self.niveles) - 1:
@@ -151,6 +165,7 @@ class Sistema:
         else:
             self.stop()()
             self.nivelActual = 0
+        root.actualizarNivel(self.nivelActual)
     
     def reiniciarJuego(self):
         self.stop()
@@ -404,8 +419,13 @@ class App(tk.Tk):
         
         #self.separadorHorizontal()
 
-    def actualizarNivel(self):
-        pass
+    def actualizarNivel(self, nivel):
+        texto = "Nivel Actual: " + getNivel(nivel).value + "\n\n Niveles: \n"
+        for i in range(6):
+            texto += getNivel(i).value
+            if i != 5:
+                texto += "\n"
+        self.update_left_text(texto)
 
 
 if __name__ == "__main__":
