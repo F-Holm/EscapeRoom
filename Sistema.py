@@ -162,7 +162,7 @@ class Sistema:
             self.nivelActual += 1
             self.start()
         else:
-            self.stop()()
+            self.stop()
             self.nivelActual = 0
         root.actualizarNivel(self.nivelActual)
     
@@ -198,7 +198,7 @@ class App(tk.Tk):
         super().__init__()
         self.title("Escape Room")
         self.fullscreen = False
-        self.geometry("1000x600")
+        self.geometry("1200x600")
         
         self.bind("<F11>", self.toggle_fullscreen)
         
@@ -419,9 +419,27 @@ class App(tk.Tk):
         
         #self.separadorHorizontal()
 
+    def maxLargoNivel(self):
+        max = 0
+        for i in range(len(Niveles)):
+            if len(getNivel(i).value) > max:
+                max = len(getNivel(i).value)
+        return max + 10 + len("Nivel Actual: ")#10 = 2*espacio = 2*5
+
+    def rellenar(self, texto):
+        maxLargo = self.maxLargoNivel()
+        while len(texto) < maxLargo:
+            if maxLargo - len(texto) % 2 == 0:
+                texto = " " + texto + " "
+            else:
+                texto = " " + texto
+        return texto
+
     def actualizarNivel(self, nivel):
-        texto = "Nivel Actual: " + getNivel(nivel).value + "\n\n Niveles: \n"
-        for i in range(6):
+        espacio = "     "
+        texto = espacio + "Nivel Actual: " + getNivel(nivel).value + espacio
+        texto = self.rellenar(texto) + "\n\n Niveles: \n"
+        for i in range(len(Niveles)):
             texto += getNivel(i).value
             if i != 5:
                 texto += "\n"
