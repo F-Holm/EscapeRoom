@@ -69,6 +69,8 @@ class Socket:
         pass
 
     def close(self):
+        #self.stop()
+        self.terminar.set()
         self.conexion.close()
      
     def notificarTermino(self):#Este método se encarga de notificar al sistema que el juego terminó
@@ -77,13 +79,12 @@ class Socket:
 objeto = Socket()
 objeto.daemon = True
 
+os.system('sudo vbetool dpms off')
+#os.system('echo "hola"')
 evento.wait()
-#os.system('sudo vbetool dpms off')
-os.system('echo "hola"')
 
-time.sleep(15)
-#os.system('sudo vbetool dpms on')
-os.system('echo "chau"')
+os.system('sudo vbetool dpms on')
+#os.system('echo "chau"')
 
 STYLE = "style.css"
 
@@ -229,6 +230,8 @@ def ganar():
     mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
     mensaje.exec()
     QApplication.quit()
+    os.system('sudo vbetool dpms off')
+    objeto.notificarTermino()
 
 class PasswordDialog(QDialog):
     def __init__(self, correct_password, parent=None):
