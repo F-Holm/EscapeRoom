@@ -32,6 +32,9 @@ def detenerTodosLosSonidos():
         if (canal.get_busy()):
             canal.stop()
 
+def reproduciendo(sonido):
+    return pygame.mixer.Channel(sonido.value.canal).get_busy()
+
 def toggleSonido(sonido):
     canal = pygame.mixer.Channel(sonido.value.canal)
     if canal.get_busy():
