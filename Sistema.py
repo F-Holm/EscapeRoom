@@ -46,7 +46,7 @@ class NivelBoton:
         self.hilo.start()
 
     def cerrarHilo(self):
-        arduino.write(Codigos.STOP.value)
+        arduino.write(Codigos.STOP_BOTON.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -58,7 +58,7 @@ class NivelBoton:
         self.cerrarHilo()
 
     def restart(self):
-        arduino.write(Codigos.RESTART.value)
+        arduino.write(Codigos.RESTART_BOTON.value)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
@@ -175,7 +175,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), JuegoTrivia(), NivelTest()]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
 
     def start(self):
         self.niveles[self.nivelActual].start()

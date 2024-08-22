@@ -1,19 +1,19 @@
 import socket
-from enum import Enum
+#from enum import Enum
 
-class Codigos(Enum):
-    START = b'\x00'
-    RESTART = b'\x01'
-    STOP = b'\x02'
-    CLOSE = b'\x03'
-    TERMINO = b'\x04'
+#class Codigos(Enum):
+#    START = b'\x00'
+#    RESTART = b'\x01'
+#    STOP = b'\x02'
+#    CLOSE = b'\x03'
+#    TERMINO = b'\x04'
 
 # Crear un socket TCP/IP
 servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Obtener la IP privada de la computadora
-hostname = socket.gethostname()
-ip_privada = socket.gethostbyname(hostname)
+#hostname = socket.gethostname()
+ip_privada = "192.168.1.10"
 
 # Enlazar el socket a la dirección y puerto
 servidor.bind((ip_privada, 8080))
@@ -32,9 +32,10 @@ print(f"Conectado a {direccion}")
 # Recibir datos
 while True:
     datos = conexion.recv(1024)
-    if not datos:
+    print(datos)
+    conexion.sendall(datos)
+    if datos == "0" or not datos:
         break
-    print(datos == Codigos.START.value)
 
 # Cerrar la conexión
 conexion.close()
