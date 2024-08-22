@@ -54,7 +54,6 @@ class JuegoIra:
 
     def stop(self):
         self.cerrarHilo()
-        sistema.siguienteNivel()
     
     def close(self):
         self.cerrarHilo()
@@ -70,11 +69,12 @@ class JuegoIra:
         while not self.terminar.is_set():
             if self.arduino.in_waiting > 0:
                 try:
-                    self.arduino.readline()
+                    if not (int(self.arduino.readline()) == ord(Codigos.TERMINO.value)):
+                        continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
                 if not self.terminar.is_set():
-                    root.after(500, lambda: sistema.siguienteNivel())
+                    root.after(0, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
 
@@ -89,6 +89,7 @@ class JuegoTrivia:
         self.socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))
         self.terminar = threading.Event()
         self.termino = threading.Event()
+        self.socket.setblocking(False)
     
     def enviarMensaje(self, codigo):
         self.socket.sendall(codigo.value.encode())
@@ -108,7 +109,6 @@ class JuegoTrivia:
 
     def stop(self):
         self.cerrarHilo()
-        sistema.siguienteNivel()
     
     def close(self):
         self.cerrarHilo()
@@ -123,7 +123,7 @@ class JuegoTrivia:
     def hiloSocket(self):
         while not self.terminar.is_set():
             datos = socket.recv(1024)
-            if datos.decode() == Codigos.TERMINO.value:
+            if datos == Codigos.TERMINO.value:
                 if not self.terminar.is_set():
                     root.after(500, lambda: sistema.siguienteNivel())
                 self.terminar.set()
@@ -135,8 +135,8 @@ class Sistema:
     niveles = None
     nivelActual = 0
 
-    def __init__(self):#Juegos: JuegoIra(), JuegoTrivia()
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+    def __init__(self):
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), JuegoIra(), NivelTest(), NivelTest()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
 
     def start(self):
         self.niveles[self.nivelActual].start()
