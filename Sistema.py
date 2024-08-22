@@ -11,6 +11,7 @@ from Niveles import Niveles, getNivel
 
 sistema = None
 root = None
+arduino = None
 
 class NivelTest:
     def __init__(self):
@@ -28,26 +29,24 @@ class NivelTest:
     def close(self):
         pass
 
-class JuegoIra:
-    arduino = None
+class NivelBoton:
     hilo = None
     terminar = None
     termino = None
     
     def __init__(self):
-        self.arduino = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
         self.terminar = threading.Event()
         self.termino = threading.Event()
 
     def start(self):
-        self.arduino.write(Codigos.START.value)
+        arduino.write(Codigos.START_BOTON.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.arduino.write(Codigos.STOP.value)
+        arduino.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -57,19 +56,59 @@ class JuegoIra:
     
     def close(self):
         self.cerrarHilo()
-        self.closeArduino()
 
     def restart(self):
-        self.arduino.write(Codigos.RESTART.value)
-
-    def closeArduino(self):
-        self.arduino.close()
+        arduino.write(Codigos.RESTART.value)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if self.arduino.in_waiting > 0:
+            if arduino.in_waiting > 0:
                 try:
-                    if not (int(self.arduino.readline()) == ord(Codigos.TERMINO.value)):
+                    if not (int(arduino.readline()) == ord(Codigos.TERMINO.value)):
+                        continue
+                except Exception as e:
+                    print(f"Error leyendo desde el puerto serial: {e}")
+                if not self.terminar.is_set():
+                    root.after(0, lambda: sistema.siguienteNivel())
+                self.terminar.set()
+                self.termino.set()
+
+class JuegoIra:
+    hilo = None
+    terminar = None
+    termino = None
+    
+    def __init__(self):
+        self.terminar = threading.Event()
+        self.termino = threading.Event()
+
+    def start(self):
+        arduino.write(Codigos.START.value)
+        self.terminar.clear()
+        self.termino.clear()
+        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo.start()
+
+    def cerrarHilo(self):
+        arduino.write(Codigos.STOP.value)
+        if self.hilo != None and self.hilo.is_alive():
+            self.terminar.set()
+            self.hilo.join()
+
+    def stop(self):
+        self.cerrarHilo()
+    
+    def close(self):
+        self.cerrarHilo()
+
+    def restart(self):
+        arduino.write(Codigos.RESTART.value)
+    
+    def hiloArduino(self):
+        while not self.terminar.is_set():
+            if arduino.in_waiting > 0:
+                try:
+                    if not (int(arduino.readline()) == ord(Codigos.TERMINO.value)):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -136,7 +175,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]#Agregá niveles utilizando las clases correspondientes -> [Nivle1(), Nivle2(), Nivel3("qwerty"), ...]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), JuegoTrivia(), NivelTest()]
 
     def start(self):
         self.niveles[self.nivelActual].start()
@@ -174,20 +213,29 @@ class Sistema:
     def terminarJuego(self):
         for nivel in self.niveles:
             nivel.close()
+        #closeArduinoBotonIra()
         #closeLED()
         closePygame()
         closeTTK()
         sys.exit()
 
-def closeTTK():
-    root.quit()
-    root.destroy()
-
 def iniciarSistema():
     global sistema
     sistema = Sistema()
     #conectarLEDS()
+    #iniciarArduinoBotonIra()
     iniciarPygame()
+
+def closeTTK():
+    root.quit()
+    root.destroy()
+
+def closeArduinoBotonIra():
+    arduino.close()
+
+def iniciarArduinoBotonIra():
+    global arduino
+    arduino = serial.Serial(Puertos.BOTON_IRA.value, 9600, timeout=1)
 
 
 
