@@ -17,12 +17,12 @@ unsigned long int tiempo1;
 unsigned long int tiempo2;
 unsigned long int diferencia;
 
-int estadoJugador1 = 0;
-int estadoJugador2 = 0;
+bool estadoJugador1 = false;
+bool estadoJugador2 = false;
 
-int ledStateRed = 0;
-int ledStateYellow = 0;
-int ledStateGreen = 0;
+bool ledStateRed = false;
+bool ledStateYellow = false;
+bool ledStateGreen = false;
 
 enum Codigos {
   START = 0,
@@ -55,12 +55,12 @@ void terminarJuego(){
   tiempo2 = 1000000;
   diferencia = 1000000;
 
-  int estadoJugador1 = 0;
-  int estadoJugador2 = 0;
+  int estadoJugador1 = false;
+  int estadoJugador2 = false;
 
-  int ledStateRed = 0;
-  int ledStateYellow = 0;
-  int ledStateGreen = 0;
+  int ledStateRed = false;
+  int ledStateYellow = false;
+  int ledStateGreen = false;
 
   digitalWrite(REDled, LOW);
   digitalWrite(YELLOWled, LOW);
@@ -91,27 +91,27 @@ void recibirInfo(){
 }
 
 void empezar(){
-  ledStateRed = 1;
+  ledStateRed = true;
   digitalWrite(REDled, ledStateRed);
-  ledStateYellow = 0;
+  ledStateYellow = false;
   digitalWrite(YELLOWled, ledStateYellow);
 }
 
 void perder(){
-  ledStateYellow = 1;
+  ledStateYellow = true;
   digitalWrite(YELLOWled, ledStateYellow);
-  ledStateRed = 0;
+  ledStateRed = false;
   digitalWrite(REDled, ledStateRed);
 }
 
 void ganarJ1(){
   tiempo1=millis();
-  estadoJugador1 = 1;
+  estadoJugador1 = true;
 }
 
 void ganarJ2(){
   tiempo2=millis();
-  estadoJugador2 = 1;
+  estadoJugador2 = true;
 }
 
 void calcularDiferencia(){
@@ -122,9 +122,9 @@ void calcularDiferencia(){
 }
 
 void ganar(){
-  ledStateGreen = 1;
+  ledStateGreen = true;
   digitalWrite(GREENled, ledStateGreen);
-  ledStateRed = 0;
+  ledStateRed = false;
   digitalWrite(REDled, ledStateRed);
   
   delay(3000);
@@ -137,8 +137,8 @@ void perderXTiempo(){
   perder();
   tiempo1=10;
   tiempo2=100001;
-  estadoJugador1=0;
-  estadoJugador2=0;
+  estadoJugador1 = false;
+  estadoJugador2 = false;
 }
 
 void loop()
@@ -178,6 +178,4 @@ void loop()
       }
     }
   }
-
-  delay(100); 
 }
