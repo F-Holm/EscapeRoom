@@ -12,6 +12,8 @@
 #define YELLOWled 22
 #define GREENled 21
 
+#define boton 25
+
 //variables
 unsigned long int tiempo1;
 unsigned long int tiempo2;
@@ -29,7 +31,8 @@ enum Codigos {
   RESTART = 1,
   STOP = 2,
   CLOSE = 3,
-  TERMINO = 4
+  TERMINO = 4,
+  START_BOTON = 5
 };
 
 void setup()
@@ -40,12 +43,14 @@ void setup()
   pinMode(botonEmpezar2, INPUT_PULLUP);
   pinMode(botonGanar2, INPUT_PULLUP);
   pinMode(botonPerder, INPUT_PULLUP);
+  pinMode(boton, INPUT_PULLUP);
   pinMode(REDled, OUTPUT);
   pinMode(YELLOWled, OUTPUT);
   pinMode(GREENled, OUTPUT);
 }
 
 bool listoEmpezar = false;
+bool iniciarBoton = false;
 
 void terminarJuego(){
   listoEmpezar = false;
@@ -84,7 +89,8 @@ void recibirInfo(){
       case Codigos::RESTART://reiniciar
         terminarJuego();
         listoEmpezar = true;
-      default:
+      case Codigos::START_BOTON://inicia el juego del boton
+        iniciarBoton = true;
         break;
     }
   }
