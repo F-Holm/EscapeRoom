@@ -13,6 +13,7 @@ servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Obtener la IP privada de la computadora
 #hostname = socket.gethostname()
+#ip_privada = socket.gethostbyname(hostname)
 ip_privada = "192.168.1.10"
 
 # Enlazar el socket a la dirección y puerto
@@ -31,9 +32,9 @@ print(f"Conectado a {direccion}")
 
 # Recibir datos
 while True:
-    datos = conexion.recv(1024)
+    datos = conexion.recv(1024).decode()
     print(datos)
-    conexion.sendall(datos)
+    conexion.sendall(datos.encode())
     if datos == "0" or not datos:
         break
 

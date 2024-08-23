@@ -13,14 +13,15 @@ cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Conectar al servidor
 ip_servidor = "192.168.1.10"
+#ip_servidor = input("Ingrese la ip del servidor")
 cliente.connect((ip_servidor, 8080))
 
 # Enviar datos
 while True:
-    mensaje = int(input("Ingrese un mensaje: "))
+    mensaje = (input("Ingrese un mensaje: "))
     if (mensaje == ""): continue
-    cliente.sendall(mensaje)
-    print(cliente.recv(1024))
+    cliente.sendall(mensaje.encode())
+    print(cliente.recv(1024).decode())
     if mensaje == "0":
         break
 
