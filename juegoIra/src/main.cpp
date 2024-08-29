@@ -12,8 +12,6 @@
 #define YELLOWled 22
 #define GREENled 21
 
-#define boton 25
-
 //variables
 unsigned long int tiempo1;
 unsigned long int tiempo2;
@@ -31,11 +29,7 @@ enum Codigos {
   RESTART = 1,
   STOP = 2,
   CLOSE = 3,
-  TERMINO = 4,
-  START_BOTON = 5,
-  RESTART_BOTON = 6,
-  STOP_BOTON = 7,
-  TERMINO_BOTON = 8
+  TERMINO = 4
 };
 
 void setup()
@@ -46,23 +40,16 @@ void setup()
   pinMode(botonEmpezar2, INPUT_PULLUP);
   pinMode(botonGanar2, INPUT_PULLUP);
   pinMode(botonPerder, INPUT_PULLUP);
-  pinMode(boton, INPUT_PULLUP);
   pinMode(REDled, OUTPUT);
   pinMode(YELLOWled, OUTPUT);
   pinMode(GREENled, OUTPUT);
 }
 
 bool listoEmpezar = false;
-bool iniciarBoton = false;
-
-void notificarTerminoBoton(){
-  Serial.print(Codigos::TERMINO_BOTON);
-}
 
 void terminarJuego(){
   listoEmpezar = false;
   
-
   tiempo1 = 1;
   tiempo2 = 1000000;
   diferencia = 1000000;
@@ -80,7 +67,7 @@ void terminarJuego(){
 }
 
 void notificarTermino(){
-  iniciarBoton = false;
+  listoEmpezar = false;
   Serial.print(Codigos::TERMINO);
 }
 
@@ -97,14 +84,6 @@ void recibirInfo(){
       case Codigos::RESTART://reiniciar
         terminarJuego();
         listoEmpezar = true;
-      case Codigos::START_BOTON://inicia el juego del boton
-        iniciarBoton = true;
-        break;
-      case Codigos::RESTART_BOTON://reinicia el juego del boton
-        break;
-      case Codigos::STOP_BOTON://termina el juego del boton
-        iniciarBoton = false;
-        break;
     }
   }
 }
@@ -162,14 +141,12 @@ void loop()
 {
   recibirInfo();
 
-  if (iniciarBoton){
-    if (digitalRead(boton)) notificarTerminoBoton();
-  } else if (listoEmpezar){
-    int botonEmpezarState1 = !digitalRead(botonEmpezar1);
-    int botonPerderState = !digitalRead(botonPerder);
-    int botonGanarState1 = !digitalRead(botonGanar1);
-    int botonEmpezarState2 = !digitalRead(botonEmpezar2);
-    int botonGanarState2 = !digitalRead(botonGanar2);
+  if (listoEmpezar){
+    bool botonEmpezarState1 = !digitalRead(botonEmpezar1);
+    bool botonPerderState = !digitalRead(botonPerder);
+    bool botonGanarState1 = !digitalRead(botonGanar1);
+    bool botonEmpezarState2 = !digitalRead(botonEmpezar2);
+    bool botonGanarState2 = !digitalRead(botonGanar2);
 
 
     if (botonEmpezarState1 && botonEmpezarState2){
