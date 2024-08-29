@@ -84,6 +84,7 @@ void recibirInfo(){
       case Codigos::RESTART://reiniciar
         terminarJuego();
         listoEmpezar = true;
+        break;
     }
   }
 }
