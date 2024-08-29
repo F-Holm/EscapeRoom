@@ -30,11 +30,8 @@ class Socket:
         self.terminar = threading.Event()
         
         servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        hostname = socket.gethostname()
-        ip_privada = socket.gethostbyname(hostname)
-        servidor.bind((ip_privada, 8080))
+        servidor.bind(("192.168.1.10", 8080))
         
-        print(f"Servidor iniciado en IP: {ip_privada}, Puerto: 8080")
         servidor.listen(1)
         print("Esperando conexiones...")
         self.conexion, direccion = servidor.accept()
