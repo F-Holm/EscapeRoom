@@ -9,7 +9,8 @@
 
 #define NR_OF_READERS 2
 
-#define boton 11
+#define boton 1
+#define ledBoton 3
 
 byte ssPins[] = {SS_1_PIN, SS_2_PIN};
  
@@ -45,6 +46,13 @@ int contadorParejasCorrectas = 0; // Contador de parejas correctas
 
 bool juegoBotonIniciado = false;
 bool juegoRFIDIniciado = false;
+
+unsigned long int anterior = 0;
+bool encendido = false;
+byte cantParpadeos = 0;
+int r;
+int g;
+int b;
 
 void recibirDatos(){
   if (Serial.available() > 0){
@@ -95,19 +103,18 @@ void cambiarColorUniforme(int r, int g, int b){
 }
 
 // Función para parpadear los LEDs en rojo
-void parpadear(int r, int g, int b) {
-  cambiarColorUniforme(r, g, b);
-  delay(400);
-  cambiarColorUniforme(0, 0, 0);
-  delay(400);
-  cambiarColorUniforme(r, g, b);
-  delay(400);
-  cambiarColorUniforme(0, 0, 0);
-  delay(400);
-
-  for (int i= 0; i<contadorParejasCorrectas; i++){
-    pixels.setPixelColor(i, pixels.Color(0, 255, 0)); // Enciende el LED correspondiente en verde
-    pixels.show();
+void parpadear() {
+  if(cantParpadeos == 0) return;
+  if(millis() - anterior < 400) return;
+  anterior = millis();
+  if (encendido)
+  {
+    encendido = false;
+    cambiarColorUniforme(0, 0, 0);
+    cantParpadeos--;
+    if(cant==0) cambiarColorUniforme(0, 255, 0);
+  }else{
+    cambiarColorUniforme(r, g, b);
   }
 }
  
@@ -147,21 +154,28 @@ void verificarCombinacion() {
         tags[1] = "";
         return; // Salimos de la función
       } else { // si la pareja ya se ingresó
-        parpadear(255, 96, 0); // se supone que parpadea en NARANJA
+        r = 255;
+        g = 96;
+        b = 0;
+        cantParpadeos = 2;
       }
     }
   }
   // Si se leyeron ambos tags pero no corresponden a una pareja válida
   else if (tags[0] != "" && tags[1] != "") {
-    parpadear(255, 0, 0); // Parpadear LEDs en rojo al fallar
+    cantParpadeos = 2;
+    r = 255;
+    g = 0;
+    b = 0;
     // probar si aca hace falta que vuelva a poner en verde o se ponen solos
     // Reseteamos las variables después de una combinación incorrecta
     tags[0] = "";
     tags[1] = "";
   }
 }
- 
+
 void loop() {
+  parpadear();
   recibirDatos();
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
@@ -179,4 +193,7 @@ void loop() {
     verificarCombinacion();
     if (contadorParejasCorrectas == 5) terminoRFID();
   } else if (JuegoBotonIniciado && digitalRead(boton)) terminoBoton();
+  else if (juegoBotonIniciado){
+    digitalWrite()
+  }
 }
