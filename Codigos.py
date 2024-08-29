@@ -9,3 +9,4 @@ class Codigos(Enum):
     START_BOTON = b'\x05'  # Indica que debe iniciarse el juego del botón
     RESTART_BOTON = b'\x06'# Indica que debe reiniciarse el juego del botón
     STOP_BOTON = b'\x07'   # Indica que debe terminarse el juego del botón
+    TERMINO_BOTON = b'\x08'# Indica que terminó el juego del botón. Esto se manda desde el juego al sistema

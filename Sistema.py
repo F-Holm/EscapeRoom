@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import serial, threading, socket
-from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame
+from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame, reproduciendo, reproducirSonido
 from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, EfectosNeoPixel, EfectosGlobales, closeLED, conectarLEDS
 from Codigos import Codigos
 from Puertos import Puertos
@@ -11,7 +11,7 @@ from Niveles import Niveles, getNivel
 
 sistema = None
 root = None
-arduino = None
+arduinoBotonRFID = None
 
 class NivelTest:
     def __init__(self):
@@ -37,16 +37,18 @@ class NivelBoton:
     def __init__(self):
         self.terminar = threading.Event()
         self.termino = threading.Event()
+        global arduinoBotonRFID
+        arduinoBotonRFID = serial.Serial(Puertos.BOTON_RFID.value, 9600, timeout=1)
 
     def start(self):
-        arduino.write(Codigos.START_BOTON.value)
+        arduinoBotonRFID.write(Codigos.START_BOTON.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        arduino.write(Codigos.STOP_BOTON.value)
+        arduinoBotonRFID.write(Codigos.STOP_BOTON.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -58,13 +60,58 @@ class NivelBoton:
         self.cerrarHilo()
 
     def restart(self):
-        arduino.write(Codigos.RESTART_BOTON.value)
+        arduinoBotonRFID.write(Codigos.RESTART_BOTON.value)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if arduino.in_waiting > 0:
+            if arduinoBotonRFID.in_waiting > 0:
                 try:
-                    if not (int(arduino.readline()) == ord(Codigos.TERMINO.value)):
+                    if not (int(arduinoBotonRFID.readline()) == ord(Codigos.TERMINO_BOTON.value)):
+                        continue
+                except Exception as e:
+                    print(f"Error leyendo desde el puerto serial: {e}")
+                if not self.terminar.is_set():
+                    root.after(0, lambda: sistema.siguienteNivel())
+                self.terminar.set()
+                self.termino.set()
+
+class JuegoRFID:
+    hilo = None
+    terminar = None
+    termino = None
+    
+    def __init__(self):
+        self.terminar = threading.Event()
+        self.termino = threading.Event()
+
+    def start(self):
+        arduinoBotonRFID.write(Codigos.START.value)
+        self.terminar.clear()
+        self.termino.clear()
+        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo.start()
+
+    def cerrarHilo(self):
+        arduinoBotonRFID.write(Codigos.STOP.value)
+        if self.hilo != None and self.hilo.is_alive():
+            self.terminar.set()
+            self.hilo.join()
+
+    def stop(self):
+        self.cerrarHilo()
+    
+    def close(self):
+        self.cerrarHilo()
+        arduinoBotonRFID.close()
+
+    def restart(self):
+        arduinoBotonRFID.write(Codigos.RESTART.value)
+    
+    def hiloArduino(self):
+        while not self.terminar.is_set():
+            if arduinoBotonRFID.in_waiting > 0:
+                try:
+                    if not (int(arduinoBotonRFID.readline()) == ord(Codigos.TERMINO.value)):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -77,20 +124,22 @@ class JuegoIra:
     hilo = None
     terminar = None
     termino = None
+    arduinoIra = None
     
     def __init__(self):
         self.terminar = threading.Event()
         self.termino = threading.Event()
+        self.arduinoIra = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
 
     def start(self):
-        arduino.write(Codigos.START.value)
+        self.arduinoIra.write(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        arduino.write(Codigos.STOP.value)
+        self.arduinoIra.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -100,15 +149,16 @@ class JuegoIra:
     
     def close(self):
         self.cerrarHilo()
+        self.arduinoIra()
 
     def restart(self):
-        arduino.write(Codigos.RESTART.value)
+        self.arduinoIra.write(Codigos.RESTART.value)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if arduino.in_waiting > 0:
+            if self.arduinoIra.in_waiting > 0:
                 try:
-                    if not (int(arduino.readline()) == ord(Codigos.TERMINO.value)):
+                    if not (int(self.arduinoIra.readline()) == ord(Codigos.TERMINO.value)):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -179,7 +229,9 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), JuegoTrivia(), NivelTest()]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        #conectarLEDS()
+        iniciarPygame()
 
     def start(self):
         self.niveles[self.nivelActual].start()
@@ -217,7 +269,6 @@ class Sistema:
     def terminarJuego(self):
         for nivel in self.niveles:
             nivel.close()
-        #closeArduinoBotonIra()
         #closeLED()
         closePygame()
         closeTTK()
@@ -226,24 +277,10 @@ class Sistema:
 def iniciarSistema():
     global sistema
     sistema = Sistema()
-    #conectarLEDS()
-    #iniciarArduinoBotonIra()
-    iniciarPygame()
 
 def closeTTK():
     root.quit()
     root.destroy()
-
-def closeArduinoBotonIra():
-    arduino.close()
-
-def iniciarArduinoBotonIra():
-    global arduino
-    arduino = serial.Serial(Puertos.BOTON_IRA.value, 9600, timeout=1)
-
-
-
-
 
 class App(tk.Tk):
     def __init__(self):
@@ -496,7 +533,6 @@ class App(tk.Tk):
             if i != 5:
                 texto += "\n"
         self.update_left_text(texto)
-
 
 if __name__ == "__main__":
     root = App()
