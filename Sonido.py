@@ -10,8 +10,9 @@ class Sonido:
 class Sonidos(Enum):
     HIMNO_URSS = Sonido("Sonidos/Himno nacional de la Unión de Repúblicas Socialistas Soviéticas.mp3", 1, 0)
     JIJIJIJA = Sonido("Sonidos/JIJIJIJA.mp3", 0, 1)
+    DESPERTADOR = Sonido("Sonidos/homecoming.mp3", 1, 2)
 
-CANTIDAD_CANALES = 2
+CANTIDAD_CANALES = 3
 
 def iniciarPygame():
     pygame.mixer.init()

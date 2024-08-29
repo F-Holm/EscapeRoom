@@ -505,6 +505,10 @@ class App(tk.Tk):
         button_text = "JIJIJIJA"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.JIJIJIJA))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Despertador"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.DESPERTADOR))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         #self.separadorHorizontal()
 
