@@ -498,16 +498,24 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=detenerTodosLosSonidos)
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Himno de la URSS"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HIMNO_URSS))
+        button_text = "Risa Diabólica"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_DIABOLICA))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
-        button_text = "JIJIJIJA"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.JIJIJIJA))
+        button_text = "Grito"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.GRITO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
         button_text = "Despertador"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.DESPERTADOR))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Trueno"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.TRUENO))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Musica Fondo"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.MUSICA_FONDO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         #self.separadorHorizontal()

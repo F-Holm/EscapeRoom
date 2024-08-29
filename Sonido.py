@@ -8,11 +8,13 @@ class Sonido:
         self.canal = canal
 
 class Sonidos(Enum):
-    HIMNO_URSS = Sonido("Sonidos/Himno nacional de la Unión de Repúblicas Socialistas Soviéticas.mp3", 1, 0)
-    JIJIJIJA = Sonido("Sonidos/JIJIJIJA.mp3", 0, 1)
+    RISA_DIABOLICA = Sonido("Sonidos/risaDiabolica.mp3", 0, 0)
+    GRITO = Sonido("Sonidos/grito.mp3", 0, 1)
     DESPERTADOR = Sonido("Sonidos/homecoming.mp3", 1, 2)
+    TRUENO = Sonido("Sonidos/trueno.mp3", 0, 3)
+    MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 4)
 
-CANTIDAD_CANALES = 3
+CANTIDAD_CANALES = 5
 
 def iniciarPygame():
     pygame.mixer.init()
