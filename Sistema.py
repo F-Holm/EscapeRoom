@@ -131,7 +131,7 @@ class JuegoTrivia:
         self.socket.setblocking(False)
     
     def enviarMensaje(self, codigo):
-        self.socket.sendall(codigo.value.encode())
+        self.socket.sendall(codigo)
 
     def start(self):
         self.enviarMensaje(Codigos.START.value)
@@ -161,10 +161,14 @@ class JuegoTrivia:
     
     def hiloSocket(self):
         while not self.terminar.is_set():
-            datos = socket.recv(1024)
+            datos = None
+            try:
+                datos = self.socket.recv(1024)
+            except BlockingIOError:
+                continue
             if datos == Codigos.TERMINO.value:
                 if not self.terminar.is_set():
-                    root.after(500, lambda: sistema.siguienteNivel())
+                    root.after(0, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
 
@@ -175,7 +179,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), JuegoTrivia(), NivelTest()]
 
     def start(self):
         self.niveles[self.nivelActual].start()
@@ -495,6 +499,5 @@ class App(tk.Tk):
 
 
 if __name__ == "__main__":
-    iniciarSistema()
     root = App()
     root.mainloop()
