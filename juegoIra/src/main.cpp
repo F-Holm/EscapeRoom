@@ -32,7 +32,10 @@ enum Codigos {
   STOP = 2,
   CLOSE = 3,
   TERMINO = 4,
-  START_BOTON = 5
+  START_BOTON = 5,
+  RESTART_BOTON = 6,
+  STOP_BOTON = 7,
+  TERMINO_BOTON = 8
 };
 
 void setup()
@@ -51,6 +54,10 @@ void setup()
 
 bool listoEmpezar = false;
 bool iniciarBoton = false;
+
+void notificarTerminoBoton(){
+  Serial.print(Codigos::TERMINO_BOTON);
+}
 
 void terminarJuego(){
   listoEmpezar = false;
@@ -73,6 +80,7 @@ void terminarJuego(){
 }
 
 void notificarTermino(){
+  iniciarBoton = false;
   Serial.print(Codigos::TERMINO);
 }
 
@@ -91,6 +99,11 @@ void recibirInfo(){
         listoEmpezar = true;
       case Codigos::START_BOTON://inicia el juego del boton
         iniciarBoton = true;
+        break;
+      case Codigos::RESTART_BOTON://reinicia el juego del boton
+        break;
+      case Codigos::STOP_BOTON://termina el juego del boton
+        iniciarBoton = false;
         break;
     }
   }
@@ -122,9 +135,7 @@ void ganarJ2(){
 
 void calcularDiferencia(){
   diferencia=tiempo1-tiempo2;
-  if(diferencia<0){
-    diferencia=diferencia*-1;
-  }
+  if(diferencia<0) diferencia=diferencia*-1;
 }
 
 void ganar(){
@@ -151,7 +162,9 @@ void loop()
 {
   recibirInfo();
 
-  if (listoEmpezar){
+  if (iniciarBoton){
+    if (digitalRead(boton)) notificarTerminoBoton();
+  } else if (listoEmpezar){
     int botonEmpezarState1 = !digitalRead(botonEmpezar1);
     int botonPerderState = !digitalRead(botonPerder);
     int botonGanarState1 = !digitalRead(botonGanar1);
@@ -159,23 +172,23 @@ void loop()
     int botonGanarState2 = !digitalRead(botonGanar2);
 
 
-    if (botonEmpezarState1 == HIGH && botonEmpezarState2 == HIGH){
+    if (botonEmpezarState1 && botonEmpezarState2){
       empezar();
     }
 
-    if (botonPerderState == HIGH){
+    if (botonPerderState){
       perder();
     }
 
-    if ((botonGanarState1 == HIGH) && (ledStateYellow == LOW) && (estadoJugador1 == LOW)){
+    if (botonGanarState1 && !ledStateYellow && !estadoJugador1){
       ganarJ1();
     }
 
-    if ((botonGanarState2 == HIGH) && (ledStateYellow == LOW) && (estadoJugador2 == LOW)){
+    if (botonGanarState2 && !ledStateYellow && !estadoJugador2){
       ganarJ2();
     }
 
-    if (estadoJugador1==HIGH && estadoJugador2==HIGH){
+    if (estadoJugador1 && estadoJugador2){
       calcularDiferencia();
       if(diferencia<=1000){
         ganar();
