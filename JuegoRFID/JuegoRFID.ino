@@ -49,10 +49,18 @@ bool juegoRFIDIniciado = false;
 
 unsigned long int anterior = 0;
 bool encendido = false;
-byte cantParpadeos = 0;
+int cantParpadeos = 0;
 int r;
 int g;
 int b;
+
+void setParpadear(int _cant, int _r, int _g, int _b){
+  anterior = millis();
+  cantParpadeos = _cant;
+  r = _r;
+  g = _g;
+  b = _b;
+}
 
 void recibirDatos(){
   if (Serial.available() > 0){
@@ -93,6 +101,7 @@ void terminoRFID(){
 void setVariables(){
   for (int i = 0;i < 5;i++) estadoParejas[i] = false;
   contadorParejasCorrectas = 0;
+  cantParpadeos = 0;
 }
 
 void cambiarColorUniforme(int r, int g, int b){
@@ -154,19 +163,13 @@ void verificarCombinacion() {
         tags[1] = "";
         return; // Salimos de la función
       } else { // si la pareja ya se ingresó
-        r = 255;
-        g = 96;
-        b = 0;
-        cantParpadeos = 2;
+        setParpadear(2, 255, 96, 0);
       }
     }
   }
   // Si se leyeron ambos tags pero no corresponden a una pareja válida
   else if (tags[0] != "" && tags[1] != "") {
-    cantParpadeos = 2;
-    r = 255;
-    g = 0;
-    b = 0;
+    setParpadear(2, 255, 0, 0);
     // probar si aca hace falta que vuelva a poner en verde o se ponen solos
     // Reseteamos las variables después de una combinación incorrecta
     tags[0] = "";
@@ -177,6 +180,7 @@ void verificarCombinacion() {
 void loop() {
   parpadear();
   recibirDatos();
+
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
       if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
@@ -192,8 +196,9 @@ void loop() {
     }
     verificarCombinacion();
     if (contadorParejasCorrectas == 5) terminoRFID();
-  } else if (JuegoBotonIniciado && digitalRead(boton)) terminoBoton();
-  else if (juegoBotonIniciado){
+  } else if (juegoBotonIniciado && digitalRead(boton)){
+    terminoBoton();
+  } else if (juegoBotonIniciado){
     digitalWrite()
   }
 }
