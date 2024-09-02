@@ -3,8 +3,39 @@
  
 #define PIN 8
 #define NUMPIXELS 300
+
+#define RED = 3;
+#define GREEN = 5;
+#define BLUE = 6;
  
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+unsigned int red = 0;
+unsigned int green = 0;
+unsigned int blue = 0;
+
+struct EstapaEfecto
+{
+};
+
+struct Efectos
+{
+};
+
+void setup() {
+  pinMode(RED, OUTPUT);
+  pinMode(GREEN, OUTPUT);
+  pinMode(BLUE, OUTPUT);
+
+  analogWrite(RED, red);
+  analogWrite(GREEN, green);
+  analogWrite(BLUE, blue);
+
+  pixel.begin(); 
+  pixel.show();
+
+  Serial.begin(9600);
+}
 
 void rojo(){
   for (int i = 0; i < NUMPIXELS; i++) {
@@ -30,16 +61,14 @@ void relampago(){
   blanco();
   delay(25);
 }
+
 void rojoVariable(int cantRojo){
   for (int i = 0; i < NUMPIXELS; i++) {
     pixel.setPixelColor(i, pixel.Color(cantRojo, 0, 0)); 
   }
   pixel.show(); 
 }
-//190
-//140
-//100
-//50
+
 void apagado(){
     for (int i = 0; i < NUMPIXELS; i++) {
     pixel.setPixelColor(i, pixel.Color(0, 0, 0)); 
@@ -62,29 +91,16 @@ void cielo(){
   pixel.show(); 
 }
 
-// pines de cada color
-const int redPin = 3;
-const int greenPin = 5;
-const int bluePin = 6;
-
-// cantidad de juegos completados
-//int juegosCompletados = 0;
-
-// valor de cada color
-int red = 0;
-int green = 0;
-int blue = 0;
-
 void cambiarColor(int r, int g, int b){
-  analogWrite(redPin, r); red = r;
-  analogWrite(greenPin, g); green = g;
-  analogWrite(bluePin, b); blue = b;
+  analogWrite(RED, r); red = r;
+  analogWrite(GREEN, g); green = g;
+  analogWrite(BLUE, b); blue = b;
 }
 
 void cambiarColorSinGuardar(int r, int g, int b){
-  analogWrite(redPin, r);
-  analogWrite(greenPin, g);
-  analogWrite(bluePin, b);
+  analogWrite(RED, r);
+  analogWrite(GREEN, g);
+  analogWrite(BLUE, b);
 }
 
 void rayo(){
@@ -97,20 +113,7 @@ void rayo(){
   cambiarColorSinGuardar(red, green, blue);
 }
 
-void setup() {
-  pinMode(redPin, OUTPUT);
-  pinMode(greenPin, OUTPUT);
-  pinMode(bluePin, OUTPUT);
 
-  analogWrite(redPin, red);
-  analogWrite(greenPin, green);
-  analogWrite(bluePin, blue);
-
-  pixel.begin(); 
-  pixel.show();
-
-  Serial.begin(9600);
-}
 
 void loop(){
   if (Serial.available() > 0) {
