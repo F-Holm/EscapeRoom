@@ -9,6 +9,8 @@ import socket
 import threading
 from enum import Enum
 
+STYLE = "style.css"
+
 class Codigos(Enum):
     START   = b'\x00' # Inicia el juego
     RESTART = b'\x01' # Reinicia el juego
@@ -17,7 +19,42 @@ class Codigos(Enum):
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
 
+
+os.system('sudo vbetool dpms off')
+score = 0
+easy_correct = 0    
+current_question = None
+
+class Question:
+    def __init__(self, text, options, correct_answer):
+        self.text = text
+        self.options = options
+        self.correct_answer = correct_answer
+
+easy_questions = [
+    Question("¿Cuál es la capital de Francia?", ["a) París", "b) Madrid", "c) Roma", "d) Londres"], "a"),
+    Question("¿Cuál es una comida tradicional argentina?", ["a) sushi", "b) pizza", "c) asado", "d) hamburguesa"], "c"),
+    Question("¿Cuál es el capitán de la selección argentina?", ["a) Di Maria", "b) Messi", "c) Dibu", "d) Paredes"], "b"),
+    Question("¿Cuáles son los colores del uniforme del Instituto Politécnico Modelo?", ["a) verde y blanco", "b) rojo y verde", "c) azul y gris", "d) naranja"], "c"),
+    Question("¿Quién es el presidente de Argentina actualmente?", ["a) Rodriguez", "b) Perez", "c) Fiore", "d) Milei"], "d"),
+    Question("¿Cuánto es 2 + 2?", ["a) 4", "b) 6", "c) 7", "d) 3"], "a"),
+    Question("¿Cuál es la capital de Argentina?", ["a) Mendoza", "b) Santa Fe", "c) Buenos Aires", "d) Londres"], "c")
+]
+
+hard_questions = [
+    Question("¿Cuál es la distancia desde \nBuenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "e"),
+    Question("¿Cuál es el elemento más abundante\n en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "h"),
+    Question("¿Cuál es la cantidad aproximada de galaxias\n en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "l"),
+    Question("¿Cuál es el resultado de elevar e \n(la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "f"),
+    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
+]
+
+dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque vive para comer, revienta."]
+
+preguntasFacil = easy_questions
+preguntasDificil = hard_questions
 evento = threading.Event()
+
 
 class Socket:
     servidor = None
@@ -60,10 +97,10 @@ class Socket:
                 break
     
     def start(self):
-        evento.set()
+        main()
     
     def stop(self): #Arreglar esto
-        pass
+        QApplication.quit()
 
     def close(self):
         #self.stop()
@@ -76,14 +113,6 @@ class Socket:
 objeto = Socket()
 objeto.daemon = True
 
-os.system('sudo vbetool dpms off')
-#os.system('echo "hola"')
-evento.wait()
-
-os.system('sudo vbetool dpms on')
-#os.system('echo "chau"')
-
-STYLE = "style.css"
 
 def load_stylesheet():
     with open(STYLE, "r") as file:
@@ -110,42 +139,10 @@ class CustomDialog(QDialog):
         
         self.setLayout(layout)
 
+
 def bienvenida():
     dialog = CustomDialog("¡Bienvenido a la trivia!", "¡Bienvenido a la trivia!\nResponde las siguientes preguntas y gana MUCHISIMAS monedas de chocolate:")
     dialog.exec()
-
-score = 0
-easy_correct = 0    
-current_question = None
-
-class Question:
-    def __init__(self, text, options, correct_answer):
-        self.text = text
-        self.options = options
-        self.correct_answer = correct_answer
-
-easy_questions = [
-    Question("¿Cuál es la capital de Francia?", ["a) París", "b) Madrid", "c) Roma", "d) Londres"], "a"),
-    Question("¿Cuál es una comida tradicional argentina?", ["a) sushi", "b) pizza", "c) asado", "d) hamburguesa"], "c"),
-    Question("¿Cuál es el capitán de la selección argentina?", ["a) Di Maria", "b) Messi", "c) Dibu", "d) Paredes"], "b"),
-    Question("¿Cuáles son los colores del uniforme del Instituto Politécnico Modelo?", ["a) verde y blanco", "b) rojo y verde", "c) azul y gris", "d) naranja"], "c"),
-    Question("¿Quién es el presidente de Argentina actualmente?", ["a) Rodriguez", "b) Perez", "c) Fiore", "d) Milei"], "d"),
-    Question("¿Cuánto es 2 + 2?", ["a) 4", "b) 6", "c) 7", "d) 3"], "a"),
-    Question("¿Cuál es la capital de Argentina?", ["a) Mendoza", "b) Santa Fe", "c) Buenos Aires", "d) Londres"], "c")
-]
-
-hard_questions = [
-    Question("¿Cuál es la distancia desde \nBuenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "e"),
-    Question("¿Cuál es el elemento más abundante\n en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "h"),
-    Question("¿Cuál es la cantidad aproximada de galaxias\n en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "l"),
-    Question("¿Cuál es el resultado de elevar e \n(la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "f"),
-    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
-]
-
-dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque vive para comer, revienta."]
-
-preguntasFacil = easy_questions
-preguntasDificil = hard_questions
 
 def glitch_effect(label, original_text):
     glitch_text = ''.join(random.choice(['@', '#', '%', '&', '*', original_text[i]]) for i in range(len(original_text)))
@@ -153,7 +150,7 @@ def glitch_effect(label, original_text):
     QTimer.singleShot(200, lambda: label.setText(original_text))
 
 def comunicarScore(score):
-    #mandar score
+    # mandar score
     pass
 
 def verificarRta(answer, question_display, answer_buttons):
@@ -324,6 +321,11 @@ class PasswordDialog(QDialog):
 def main():
     global current_question
 
+
+    evento.wait()
+    os.system('sudo vbetool dpms on')
+
+    
     app = QApplication(sys.argv)
     app.setOverrideCursor(Qt.BlankCursor)
 
@@ -367,5 +369,4 @@ def main():
     ventanaPreguntas.show()
     sys.exit(app.exec_())
 
-if __name__ == "__main__":
-    main()
+
