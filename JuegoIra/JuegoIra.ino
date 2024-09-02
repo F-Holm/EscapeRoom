@@ -153,7 +153,7 @@ void perderXTiempo(){
 
 void loop()
 {
-  recibirInfo();
+  /*recibirInfo();
   if (ledGanar && tiempoLedGanar - millis() > 5000){
     setLeds(0, 0, 0);
     ledGanar = false;
@@ -188,5 +188,11 @@ void loop()
       if(diferencia<=1000) ganar();
       else perderXTiempo();
     }
-  }
+  }*/
+  bool botonEmpezarState1 = !digitalRead(BOTON_EMPEZAR_1);
+  bool botonPerderState1 = !digitalRead(BOTON_PERDER_1);
+  bool botonPerderState2 = !digitalRead(BOTON_PERDER_2);
+  bool botonGanarState1 = !digitalRead(BOTON_GANAR_1);
+  bool botonEmpezarState2 = !digitalRead(BOTON_EMPEZAR_2);
+  bool botonGanarState2 = !digitalRead(BOTON_GANAR_2);
 }
