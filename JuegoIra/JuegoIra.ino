@@ -41,6 +41,7 @@ enum Codigos {
 
 void setup()
 {
+  listoEmpezar = true;
   Serial.begin(9600);
 
   pinMode(BOTON_EMPEZAR_1, INPUT_PULLUP);
@@ -155,11 +156,13 @@ void perderXTiempo(){
 
 void loop()
 {
-  /*recibirInfo();
+  //recibirInfo();
+  
   if (ledGanar && tiempoLedGanar - millis() > 5000){
     setLeds(0, 0, 0);
     ledGanar = false;
   }
+
   if (listoEmpezar){
     bool botonEmpezarState1 = !digitalRead(BOTON_EMPEZAR_1);
     bool botonPerderState1 = !digitalRead(BOTON_PERDER_1);
@@ -177,11 +180,11 @@ void loop()
       perder();
     }
 
-    if (botonGanarState1 && !estadoJugador1 && !botonEmpezarState1 && !botonEmpezarState2){
+    if (botonGanarState1 && !estadoJugador1 && !perdio){
       ganarJ1();
     }
 
-    if (botonGanarState2 && !estadoJugador2  && !botonEmpezarState1 && !botonEmpezarState2){
+    if (botonGanarState2 && !estadoJugador2  && !perdio){
       ganarJ2();
     }
 
@@ -190,22 +193,5 @@ void loop()
       if(diferencia<=1000) ganar();
       else perderXTiempo();
     }
-  }*/
-  bool botonEmpezarState1 = !digitalRead(BOTON_EMPEZAR_1);
-  bool botonPerderState1 = !digitalRead(BOTON_PERDER_1);
-  bool botonPerderState2 = !digitalRead(BOTON_PERDER_2);
-  bool botonGanarState1 = !digitalRead(BOTON_GANAR_1);
-  bool botonEmpezarState2 = !digitalRead(BOTON_EMPEZAR_2);
-  bool botonGanarState2 = !digitalRead(BOTON_GANAR_2);
-
-  if (botonPerderState1) Serial.println("Perdió 1");
-  if (botonPerderState2) Serial.println("Perdió 2");
-  if (botonEmpezarState1) Serial.println("Empezó 1");
-  if (botonEmpezarState2) Serial.println("Empezó 2");
-  if (botonGanarState1) Serial.println("Ganó 1");
-  if (botonGanarState2) Serial.println("Ganó 2");
-  setLed1(0, 0, 255);
-  setLed2(0, 255, 0);
-  delay(3000);
-  setLeds(255, 0, 0);
+  }
 }
