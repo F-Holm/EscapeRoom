@@ -152,20 +152,28 @@ def glitch_effect(label, original_text):
     label.setText(glitch_text)
     QTimer.singleShot(200, lambda: label.setText(original_text))
 
+def comunicarScore(score):
+    #mandar score
+    pass
+
 def verificarRta(answer, question_display, answer_buttons):
     global score
     global easy_correct
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
+        comunicarScore(score)
         msg_box = CustomDialog("Respuesta", "¡Correcto!")
         msg_box.exec()
     elif score > 0 :
         score = 0
+        comunicarScore(score)
         msg_box = CustomDialog("Respuesta", "¡Incorrecto! \n " + random.choice(dichos))
-        msg_box.exec()  
+        msg_box.exec() 
+
     else :
         score = 0
+        comunicarScore(score)
         msg_box = CustomDialog("Respuesta", "¡Incorrecto!")
         msg_box.exec()
 
