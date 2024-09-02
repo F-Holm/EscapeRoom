@@ -41,7 +41,7 @@ enum Codigos {
   TERMINO_BOTON = 8
 };
 
-bool estadoParejas[5] = {false, false, false, false, false}; // Estado de cada pareja (si fue ingresada o no)
+bool estadoParejas[NUMPIXELS] = {false, false, false, false, false}; // Estado de cada pareja (si fue ingresada o no)
 int contadorParejasCorrectas = 0; // Contador de parejas correctas
 
 bool juegoBotonIniciado = false;
@@ -91,6 +91,7 @@ void recibirDatos(){
 void terminoBoton(){
   Serial.print(Codigos::TERMINO_BOTON);
   juegoBotonIniciado = false;
+  digitalWrite(ledBoton, LOW);
 }
 
 void terminoRFID(){
@@ -99,14 +100,24 @@ void terminoRFID(){
 }
 
 void setVariables(){
-  for (int i = 0;i < 5;i++) estadoParejas[i] = false;
+  for (int i = 0;i < NUMPIXELS;i++) estadoParejas[i] = false;
   contadorParejasCorrectas = 0;
   cantParpadeos = 0;
 }
 
-void cambiarColorUniforme(int r, int g, int b){
-  for(int i = 0; i < 5; i++){ // apago todo los neopixel
-    pixels.setPixelColor(i, r, g, b);
+void cambiarColorUniforme(int _r, int _g, int _b){
+  for(int i = 0; i < NUMPIXELS; i++){ // apago todo los neopixel
+    pixels.setPixelColor(i, _r, _g, _b);
+  }
+  pixels.show();
+}
+
+void setRespuestasCorrectasNeopixel(){
+  cantParpadeos = 0;
+  for (int i = 0; i < NUMPIXELS; i++){
+    if (i < contadorParejasCorrectas) pixels.setPixelColor(i, pixels.Color(0, 255, 0));
+    else pixels.setPixelColor(i, pixels.Color(0, 0, 0));
+
   }
   pixels.show();
 }
@@ -121,18 +132,23 @@ void parpadear() {
     encendido = false;
     cambiarColorUniforme(0, 0, 0);
     cantParpadeos--;
-    if(cantParpadeos==0) cambiarColorUniforme(0, 255, 0);
-  }else{
+    if(cantParpadeos == 0){
+      setRespuestasCorrectasNeopixel();
+    }
+  }
+  else{
+    encendido = true;
     cambiarColorUniforme(r, g, b);
   }
 }
- 
+
 void setup() {
+  setVariables();
   pinMode(boton, INPUT_PULLUP);//No se si es INPUT o INPUT_PULLUP
   pinMode(ledBoton, OUTPUT);
   
   Serial.begin(9600); // Initialize serial communications with the PC
-  while (!Serial); // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
+  //while (!Serial); // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
 
   SPI.begin(); // Init SPI bus
 
@@ -141,24 +157,26 @@ void setup() {
     mfrc522[reader].PCD_DumpVersionToSerial();
   }
 
+  
+
   pixels.begin();
   //pruebaLEDs();
-  cambiarColorUniforme(0,0,0);
+  cambiarColorUniforme(0, 0, 0);
 }
  
 void verificarCombinacion() {
-  for (int i = 0; i < 5; i++) {
+  //Serial.println(tags[0] + "     " + tags[1]);
+  for (int i = 0; i < NUMPIXELS; i++) {
   // Comprobar si los tags leídos corresponden a una pareja y si no han sido utilizados
-    if ((tags[0] == parejas[i][0] && tags[1] == parejas[i][1]) || (tags[1] == parejas[i][1] && tags[0] == parejas[i][0])) {
+    if ((tags[0] == parejas[i][0] && tags[1] == parejas[i][1]) || (tags[0] == parejas[i][1] && tags[1] == parejas[i][0])) {
       if (!estadoParejas[i]) { // Si la pareja no ha sido ingresada
         estadoParejas[i] = true; // Marcamos la pareja como ingresada
         contadorParejasCorrectas++; // Aumentamos el contador
-
+        //Serial.println("true");
         // Encender el LED correspondiente
-        for (int i=0; i < contadorParejasCorrectas; i++) {
-          pixels.setPixelColor(i, pixels.Color(0, 255, 0)); // Enciende el LED correspondiente en verde
-          pixels.show();
-        }
+        
+        setRespuestasCorrectasNeopixel();
+
         // Reseteamos las variables después de una combinación correcta
         tags[0] = "";
         tags[1] = "";
@@ -180,12 +198,13 @@ void verificarCombinacion() {
 
 void loop() {
   parpadear();
-  recibirDatos();
+  //recibirDatos();
+  juegoRFIDIniciado = true;
 
+  //if (tags[0] == "" && tags[1] == "") Serial.println(tags[0] + "\t" + tags[1]);
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
       if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
-      
         tags[reader]="";
         for (byte i = 0; i < mfrc522[reader].uid.size; i++) {
           tags[reader] += String(mfrc522[reader].uid.uidByte[i] < 0x10 ? "0" : "");
@@ -196,11 +215,10 @@ void loop() {
       }
     }
     verificarCombinacion();
-    if (contadorParejasCorrectas == 5) terminoRFID();
+    if (contadorParejasCorrectas == NUMPIXELS) terminoRFID();
   } else if (juegoBotonIniciado && digitalRead(boton)){
     terminoBoton();
   } else if (juegoBotonIniciado){
-    //digitalWrite()
+    digitalWrite(ledBoton, HIGH);
   }
-  //digitalWrite(ledBoton, !digitalRead(boton));
 }
