@@ -13,12 +13,6 @@
 #define PIN_NEOPIXEL 10
 #define CANT_PIXELES 2
 
-
-//variables
-unsigned long int tiempo1;
-unsigned long int tiempo2;
-unsigned long int diferencia;
-
 bool estadoJugador1 = false;
 bool estadoJugador2 = false;
 
@@ -74,10 +68,6 @@ void setLeds(int r, int g, int b){
 void terminarJuego(){
   listoEmpezar = false;
   perdio = true;
-  
-  tiempo1 = 1;
-  tiempo2 = 1000000;
-  diferencia = 1000000;
 
   int estadoJugador1 = false;
   int estadoJugador2 = false;
@@ -120,20 +110,13 @@ void perder(){
 }
 
 void ganarJ1(){
-  tiempo1=millis();
   estadoJugador1 = true;
   setLed1(0, 255, 0);
 }
 
 void ganarJ2(){
-  tiempo2=millis();
   estadoJugador2 = true;
   setLed2(0, 255, 0);
-}
-
-void calcularDiferencia(){
-  diferencia=tiempo1-tiempo2;
-  if(diferencia<0) diferencia=diferencia*-1;
 }
 
 void ganar(){
@@ -146,19 +129,11 @@ void ganar(){
   notificarTermino();
 }
 
-void perderXTiempo(){
-  perder();
-  tiempo1=10;
-  tiempo2=100001;
-  estadoJugador1 = false;
-  estadoJugador2 = false;
-}
-
 void loop()
 {
   //recibirInfo();
   
-  if (ledGanar && tiempoLedGanar - millis() > 5000){
+  if (ledGanar && millis() - tiempoLedGanar > 5000){
     setLeds(0, 0, 0);
     ledGanar = false;
   }
@@ -189,9 +164,7 @@ void loop()
     }
 
     if (estadoJugador1 && estadoJugador2){
-      calcularDiferencia();
-      if(diferencia<=1000) ganar();
-      else perderXTiempo();
+      ganar();
     }
   }
 }
