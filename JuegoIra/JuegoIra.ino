@@ -1,16 +1,18 @@
 #include <Adafruit_NeoPixel.h>
 
 //puertos arduino
-#define BOTON_EMPEZAR_1 25
-#define BOTON_EMPEZAR_2 14
-#define BOTON_GANAR_1 27
-#define BOTON_GANAR_2 12
+#define BOTON_EMPEZAR_1 7
+#define BOTON_EMPEZAR_2 4
 
-#define BOTON_PERDER_1 26
-#define BOTON_PERDER_2 28
+#define BOTON_GANAR_1 5
+#define BOTON_GANAR_2 6
 
-#define PIN_NEOPIXEL 23
+#define BOTON_PERDER_1 8
+#define BOTON_PERDER_2 9
+
+#define PIN_NEOPIXEL 10
 #define CANT_PIXELES 2
+
 
 //variables
 unsigned long int tiempo1;
@@ -195,4 +197,15 @@ void loop()
   bool botonGanarState1 = !digitalRead(BOTON_GANAR_1);
   bool botonEmpezarState2 = !digitalRead(BOTON_EMPEZAR_2);
   bool botonGanarState2 = !digitalRead(BOTON_GANAR_2);
+
+  if (botonPerderState1) Serial.println("Perdió 1");
+  if (botonPerderState2) Serial.println("Perdió 2");
+  if (botonEmpezarState1) Serial.println("Empezó 1");
+  if (botonEmpezarState2) Serial.println("Empezó 2");
+  if (botonGanarState1) Serial.println("Ganó 1");
+  if (botonGanarState2) Serial.println("Ganó 2");
+  setLed1(0, 0, 255);
+  setLed2(0, 255, 0);
+  delay(3000);
+  setLeds(255, 0, 0);
 }
