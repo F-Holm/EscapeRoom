@@ -1,6 +1,6 @@
 #include <Adafruit_NeoPixel.h>
 
-//puertos esp
+//puertos arduino
 #define BOTON_EMPEZAR_1 25
 #define BOTON_EMPEZAR_2 14
 #define BOTON_GANAR_1 27
@@ -70,6 +70,7 @@ void setLeds(int r, int g, int b){
 
 void terminarJuego(){
   listoEmpezar = false;
+  perdio = true;
   
   tiempo1 = 1;
   tiempo2 = 1000000;
