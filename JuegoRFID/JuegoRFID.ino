@@ -9,8 +9,8 @@
 
 #define NR_OF_READERS 2
 
-#define boton 1
-#define ledBoton 3
+#define boton 3
+#define ledBoton 1
 
 byte ssPins[] = {SS_1_PIN, SS_2_PIN};
  
@@ -89,12 +89,12 @@ void recibirDatos(){
 }
 
 void terminoBoton(){
-  Serial.print(Codigos.TERMINO_BOTON);
+  Serial.print(Codigos::TERMINO_BOTON);
   juegoBotonIniciado = false;
 }
 
 void terminoRFID(){
-  Serial.print(Codigos.TERMINO_RFID);
+  Serial.print(Codigos::TERMINO_RFID);
   juegoRFIDIniciado = false;
 }
 
@@ -121,7 +121,7 @@ void parpadear() {
     encendido = false;
     cambiarColorUniforme(0, 0, 0);
     cantParpadeos--;
-    if(cant==0) cambiarColorUniforme(0, 255, 0);
+    if(cantParpadeos==0) cambiarColorUniforme(0, 255, 0);
   }else{
     cambiarColorUniforme(r, g, b);
   }
@@ -129,6 +129,7 @@ void parpadear() {
  
 void setup() {
   pinMode(boton, INPUT_PULLUP);//No se si es INPUT o INPUT_PULLUP
+  pinMode(ledBoton, OUTPUT);
   
   Serial.begin(9600); // Initialize serial communications with the PC
   while (!Serial); // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
@@ -168,7 +169,7 @@ void verificarCombinacion() {
     }
   }
   // Si se leyeron ambos tags pero no corresponden a una pareja válida
-  else if (tags[0] != "" && tags[1] != "") {
+  if (tags[0] != "" && tags[1] != "") {
     setParpadear(2, 255, 0, 0);
     // probar si aca hace falta que vuelva a poner en verde o se ponen solos
     // Reseteamos las variables después de una combinación incorrecta
@@ -199,6 +200,7 @@ void loop() {
   } else if (juegoBotonIniciado && digitalRead(boton)){
     terminoBoton();
   } else if (juegoBotonIniciado){
-    digitalWrite()
+    //digitalWrite()
   }
+  //digitalWrite(ledBoton, !digitalRead(boton));
 }
