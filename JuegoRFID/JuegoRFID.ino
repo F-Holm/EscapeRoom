@@ -10,7 +10,7 @@
 #define NR_OF_READERS 2
 
 #define boton 3
-#define ledBoton 1
+#define ledBoton 2
 
 byte ssPins[] = {SS_1_PIN, SS_2_PIN};
  
