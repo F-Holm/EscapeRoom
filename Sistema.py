@@ -41,14 +41,14 @@ class NivelBoton:
         arduinoBotonRFID = serial.Serial(Puertos.BOTON_RFID.value, 9600, timeout=1)
 
     def start(self):
-        arduinoBotonRFID.write(Codigos.START_BOTON.value)
+        arduinoBotonRFID.write(Codigos.BOTON_START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        arduinoBotonRFID.write(Codigos.STOP_BOTON.value)
+        arduinoBotonRFID.write(Codigos.BOTON_STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -60,13 +60,13 @@ class NivelBoton:
         self.cerrarHilo()
 
     def restart(self):
-        arduinoBotonRFID.write(Codigos.RESTART_BOTON.value)
+        arduinoBotonRFID.write(Codigos.BOTON_RESTART.value)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
             if arduinoBotonRFID.in_waiting > 0:
                 try:
-                    if not (int(arduinoBotonRFID.readline()) == ord(Codigos.TERMINO_BOTON.value)):
+                    if not (int(arduinoBotonRFID.readline()) == ord(Codigos.BOTON_TERMINO.value)):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
