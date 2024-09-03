@@ -30,15 +30,20 @@ const String parejas[5][2] = {
 };
 
 enum Codigos {
-  START_RFID = 0,
-  RESTART_RFID = 1,
-  STOP_RFID = 2,
+  RFID_START = 0,
+  RFID_RESTART = 1,
+  RFID_STOP = 2,
   CLOSE = 3,
-  TERMINO_RFID = 4,
-  START_BOTON = 5,
-  RESTART_BOTON = 6,
-  STOP_BOTON = 7,
-  TERMINO_BOTON = 8
+  RFID_TERMINO = 4,
+  BOTON_START = 160,
+  BOTON_RESTART = 161,
+  BOTON_STOP = 162,
+  BOTON_TERMINO = 163,
+  PAREJAS_0 = 192,
+  PAREJAS_1 = 193,
+  PAREJAS_2 = 194,
+  PAREJAS_3 = 195,
+  PAREJAS_4 = 196
 };
 
 bool estadoParejas[NUMPIXELS] = {false, false, false, false, false}; // Estado de cada pareja (si fue ingresada o no)
@@ -89,13 +94,13 @@ void recibirDatos(){
 }
 
 void terminoBoton(){
-  Serial.print(Codigos::TERMINO_BOTON);
+  Serial.print(Codigos::BOTON_TERMINO);
   juegoBotonIniciado = false;
   digitalWrite(ledBoton, LOW);
 }
 
 void terminoRFID(){
-  Serial.print(Codigos::TERMINO_RFID);
+  Serial.print(Codigos::RFID_TERMINO);
   juegoRFIDIniciado = false;
 }
 
@@ -143,7 +148,6 @@ void parpadear() {
 }
 
 void setup() {
-  setVariables();
   pinMode(boton, INPUT_PULLUP);//No se si es INPUT o INPUT_PULLUP
   pinMode(ledBoton, OUTPUT);
   
@@ -198,10 +202,9 @@ void verificarCombinacion() {
 
 void loop() {
   parpadear();
-  //recibirDatos();
+  recibirDatos();
   juegoRFIDIniciado = true;
 
-  //if (tags[0] == "" && tags[1] == "") Serial.println(tags[0] + "\t" + tags[1]);
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
       if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
