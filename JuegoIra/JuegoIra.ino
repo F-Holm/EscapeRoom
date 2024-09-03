@@ -30,12 +30,15 @@ enum Codigos {
   RESTART = 1,
   STOP = 2,
   CLOSE = 3,
-  TERMINO = 4
+  TERMINO = 4,
+  JUGANDO = 176,
+  PERDIERON = 177,
+  TERMINO_J1 = 178,
+  TERMINO_J2 = 179
 };
 
 void setup()
 {
-  listoEmpezar = true;
   Serial.begin(9600);
 
   pinMode(BOTON_EMPEZAR_1, INPUT_PULLUP);
@@ -86,6 +89,7 @@ void recibirInfo(){
     switch (info){
       case Codigos::START://iniciar
         listoEmpezar = true;
+        perdio = true;
         break;
       case Codigos::RESTART://reiniciar
         terminarJuego();
@@ -102,21 +106,25 @@ void empezar(){
   ledGanar = false;
   setLeds(0, 0, 255);
   perdio = false;
+  Serial.print(Codigos::PERDIERON)
 }
 
 void perder(){
   setLeds(255, 0, 0);
   perdio = true;
+  Serial.print(Codigos::PERDIERON);
 }
 
 void ganarJ1(){
   estadoJugador1 = true;
   setLed1(0, 255, 0);
+  Serial.print(Codigos::TERMINO_J1);
 }
 
 void ganarJ2(){
   estadoJugador2 = true;
   setLed2(0, 255, 0);
+  Serial.print(Codigos::TERMINO_J2)
 }
 
 void ganar(){
@@ -131,7 +139,7 @@ void ganar(){
 
 void loop()
 {
-  //recibirInfo();
+  recibirInfo();
   
   if (ledGanar && millis() - tiempoLedGanar > 5000){
     setLeds(0, 0, 0);
@@ -151,7 +159,7 @@ void loop()
       empezar();
     }
 
-    if (botonPerderState1 || botonPerderState2){
+    if (botonPerderState1 || botonPerderState2 || perdio){
       perder();
     }
 
