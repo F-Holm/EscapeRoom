@@ -39,6 +39,7 @@ enum Codigos {
 
 void setup()
 {
+  listoEmpezar = true; perdio = true;//Para tests
   Serial.begin(9600);
 
   pinMode(BOTON_EMPEZAR_1, INPUT_PULLUP);
@@ -74,8 +75,6 @@ void terminarJuego(){
 
   int estadoJugador1 = false;
   int estadoJugador2 = false;
-
-  setLeds(0, 0, 0);
 }
 
 void notificarTermino(){
@@ -106,25 +105,28 @@ void empezar(){
   ledGanar = false;
   setLeds(0, 0, 255);
   perdio = false;
-  Serial.print(Codigos::PERDIERON)
+  Serial.print(Codigos::JUGANDO);
 }
 
 void perder(){
-  setLeds(255, 0, 0);
   perdio = true;
+  estadoJugador1 = false;
+  estadoJugador2 = false;
   Serial.print(Codigos::PERDIERON);
 }
 
 void ganarJ1(){
+  Serial.println("\nGANO 1");
   estadoJugador1 = true;
   setLed1(0, 255, 0);
   Serial.print(Codigos::TERMINO_J1);
 }
 
 void ganarJ2(){
+  Serial.println("\nGANO 2");
   estadoJugador2 = true;
   setLed2(0, 255, 0);
-  Serial.print(Codigos::TERMINO_J2)
+  Serial.print(Codigos::TERMINO_J2);
 }
 
 void ganar(){
@@ -132,18 +134,19 @@ void ganar(){
   ledGanar = true;
   tiempoLedGanar = millis();
   perdio = false;
-
+  Serial.println("\nGANARON");
   terminarJuego();
   notificarTermino();
 }
 
 void loop()
 {
-  recibirInfo();
+  /*recibirInfo();
   
   if (ledGanar && millis() - tiempoLedGanar > 5000){
     setLeds(0, 0, 0);
     ledGanar = false;
+    perdio = true;
   }
 
   if (listoEmpezar){
@@ -159,7 +162,17 @@ void loop()
       empezar();
     }
 
-    if (botonPerderState1 || botonPerderState2 || perdio){
+    if (perdio && botonEmpezarState1 && !botonEmpezarState2){
+      setLed1(0, 0, 255);
+      setLed2(255, 0, 0);
+    } else if (perdio && !botonEmpezarState1 && botonEmpezarState2){
+      setLed2(0, 0, 255);
+      setLed1(255, 0, 0);
+    } else if (perdio && !botonEmpezarState1 && !botonEmpezarState2) {
+      setLeds(255, 0, 0);
+    }
+
+    if (botonPerderState1 && !estadoJugador1 || botonPerderState2 && !estadoJugador2){
       perder();
     }
 
@@ -167,12 +180,20 @@ void loop()
       ganarJ1();
     }
 
-    if (botonGanarState2 && !estadoJugador2  && !perdio){
+    if (botonGanarState2 && !estadoJugador2 && !perdio){
       ganarJ2();
     }
 
     if (estadoJugador1 && estadoJugador2){
       ganar();
     }
-  }
+  }*/
+
+  //Tests
+  if (!digitalRead(BOTON_EMPEZAR_1)) Serial.println("Empezó 1");
+  if (!digitalRead(BOTON_PERDER_1)) Serial.println("Perdió 1");
+  if (!digitalRead(BOTON_PERDER_2)) Serial.println("Perdió 2");
+  if (!digitalRead(BOTON_GANAR_1)) Serial.println("Ganó 1");
+  if (!digitalRead(BOTON_EMPEZAR_2)) Serial.println("Empezó 2");
+  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");
 }
