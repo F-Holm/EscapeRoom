@@ -14,12 +14,23 @@ unsigned int red = 0;
 unsigned int green = 0;
 unsigned int blue = 0;
 
-struct EstapaEfecto
+
+
+
+
+
+
+struct EtapaEfecto
 {
+  unsigned int intervalo;
 };
 
-struct Efectos
+struct Efecto
 {
+  unsigned int anterior;
+  EtapaEfecto rayo[] = {EtapaEfecto(r, g, b, i)};
+  EtapaEfecto cielo[];
+  EtapaEfecto cieloInfierno[];
 };
 
 void setup() {
@@ -52,14 +63,16 @@ void blanco(){
 }
 
 void relampago(){
+  
   rojo();
-  delay(3000);
+  if(millis() - anterior >= 3000)  //delay(3000);
   blanco();
   delay(25);
   rojo();
   delay(50);
   blanco();
   delay(25);
+  int anterior = millis();
 }
 
 void rojoVariable(int cantRojo){
