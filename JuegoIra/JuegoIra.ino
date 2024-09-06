@@ -39,7 +39,7 @@ enum Codigos {
 
 void setup()
 {
-  listoEmpezar = true; perdio = true;//Para tests
+  //listoEmpezar = true; perdio = true;//Para tests
   Serial.begin(9600);
 
   pinMode(BOTON_EMPEZAR_1, INPUT_PULLUP);
@@ -116,14 +116,12 @@ void perder(){
 }
 
 void ganarJ1(){
-  Serial.println("\nGANO 1");
   estadoJugador1 = true;
   setLed1(0, 255, 0);
   Serial.print(Codigos::TERMINO_J1);
 }
 
 void ganarJ2(){
-  Serial.println("\nGANO 2");
   estadoJugador2 = true;
   setLed2(0, 255, 0);
   Serial.print(Codigos::TERMINO_J2);
@@ -134,14 +132,13 @@ void ganar(){
   ledGanar = true;
   tiempoLedGanar = millis();
   perdio = false;
-  Serial.println("\nGANARON");
   terminarJuego();
   notificarTermino();
 }
 
 void loop()
 {
-  /*recibirInfo();
+  recibirInfo();
   
   if (ledGanar && millis() - tiempoLedGanar > 5000){
     setLeds(0, 0, 0);
@@ -187,13 +184,13 @@ void loop()
     if (estadoJugador1 && estadoJugador2){
       ganar();
     }
-  }*/
+  }
 
   //Tests
-  if (!digitalRead(BOTON_EMPEZAR_1)) Serial.println("Empezó 1");
+  /*if (!digitalRead(BOTON_EMPEZAR_1)) Serial.println("Empezó 1");
   if (!digitalRead(BOTON_PERDER_1)) Serial.println("Perdió 1");
   if (!digitalRead(BOTON_PERDER_2)) Serial.println("Perdió 2");
   if (!digitalRead(BOTON_GANAR_1)) Serial.println("Ganó 1");
   if (!digitalRead(BOTON_EMPEZAR_2)) Serial.println("Empezó 2");
-  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");
+  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");*/
 }
