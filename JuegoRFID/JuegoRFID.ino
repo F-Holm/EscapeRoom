@@ -38,12 +38,11 @@ enum Codigos {
 struct Boton{
   int anterior;
   bool encendido;
-  int intervalo;
+  int intervalo = 400;
   bool iniciado;
 
-  void setParpadear(int _intervalo){
+  void setParpadear(){
     anterior = millis();
-    intervalo = _intervalo;
     encendido = true;
     digitalWrite(LED_BOTON, HIGH);
   }
@@ -81,7 +80,7 @@ struct RFID{
   int r;
   int g;
   int b;
-  int intervalo;
+  int intervalo = 400;
   bool iniciado;
 
   bool estadoParejas[NUMPIXELS] = {false, false, false, false, false}; // Estado de cada pareja (si fue ingresada o no)
@@ -102,13 +101,12 @@ struct RFID{
     terminarParpadeo();
   }
 
-  void setParpadear(int _cant, int _intervalo, int _r, int _g, int _b){
+  void setParpadear(int _cant, int _r, int _g, int _b){
     anterior = millis();
     cantParpadeos = _cant;
     r = _r;
     g = _g;
     b = _b;
-    intervalo = _intervalo;
     encendido = true;
     cambiarColorUniforme(r, g, b);
   }
@@ -141,7 +139,7 @@ struct RFID{
     cambiarColorUniforme(0, 0, 0);
   }
 
-  void terminoRFID(){
+  void termino(){
     Serial.print(Codigos::RFID_TERMINO);
     iniciado = false;
   }
@@ -153,7 +151,7 @@ struct RFID{
     pixels.show();
   }
 
-  void setRespuestasCorrectas(){
+  void setRespuestasCorrectasNeopixel(){
     rfid.cantParpadeos = 0;
     for (int i = 0; i < NUMPIXELS; i++){
       if (i < contadorParejasCorrectas) pixels.setPixelColor(i, pixels.Color(0, 255, 0));
@@ -179,7 +177,7 @@ struct RFID{
           tags[1] = "";
           return; // Salimos de la función
         } else { // si la pareja ya se ingresó
-          setParpadear(2, 400, 255, 96, 0);
+          setParpadear(2, 255, 96, 0);
         }
       }
     }
@@ -236,18 +234,18 @@ void setup() {
   }
 
   pixels.begin();
-  //pruebaLEDs();
-  cambiarColorUniforme(0, 0, 0);
+
+  rfid.cambiarColorUniforme(0, 0, 0);
 }
 
 
 void loop() {
-  parpadear();
   recibirDatos();
-  //juegoRFIDIniciado = true;
+  //rfid.iniciado = true;
 
-  if (juegoRFIDIniciado){
-    Serial.print(contadorParejasCorrectas + 192);
+  if (rfid.iniciado){
+    rfid.parpadear();
+    Serial.print(rfid.contadorParejasCorrectas + Codigos::PAREJAS_BASE);
 
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
 
@@ -264,8 +262,8 @@ void loop() {
       }
     }
     verificarCombinacion();
-    if (rfid.contadorParejasCorrectas == NUMPIXELS) terminoRFID();
-  } else if (boton.iniciado && digitalRead(boton)){
+    if (rfid.contadorParejasCorrectas == NUMPIXELS) rfid.termino();
+  } else if (boton.iniciado && digitalRead(BOTON)){
     boton.termino();
   } else if (boton.iniciado){
     boton.parpadear();
