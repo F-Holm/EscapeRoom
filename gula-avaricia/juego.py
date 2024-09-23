@@ -18,9 +18,16 @@ class Codigos(Enum):
     CLOSE   = b'\x03' # Detiene el juego y no puede volver a iniciarse
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
+def apagarPantalla():
+    #os.system('sudo vbetool dpms off')
+    os.system('echo "hola"')
 
+def prenderPantalla():
+    #os.system('sudo vbetool dpms on')
+    os.system('echo "chau"')
 
-os.system('sudo vbetool dpms off')
+apagarPantalla()
+
 score = 0
 easy_correct = 0    
 current_question = None
@@ -67,7 +74,7 @@ class Socket:
         self.terminar = threading.Event()
         
         servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        servidor.bind(("192.168.1.10", 8080))
+        servidor.bind(("192.168.123.1", 8083))
         
         servidor.listen(1)
         print("Esperando conexiones...")
@@ -97,6 +104,7 @@ class Socket:
                 break
     
     def start(self):
+        print("Iniciando juego")
         main()
     
     def stop(self): #Arreglar esto
@@ -112,6 +120,8 @@ class Socket:
 
 objeto = Socket()
 objeto.daemon = True
+
+
 
 
 def load_stylesheet():
@@ -318,14 +328,15 @@ class PasswordDialog(QDialog):
         flash()
 
 
+
+
 def main():
     global current_question
 
 
-    evento.wait()
-    os.system('sudo vbetool dpms on')
+    # evento.wait()
+    prenderPantalla()
 
-    
     app = QApplication(sys.argv)
     app.setOverrideCursor(Qt.BlankCursor)
 
