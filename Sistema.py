@@ -70,10 +70,12 @@ class NivelBoton:
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
+                    continue
                 if not self.terminar.is_set():
                     root.after(0, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
+                print("Terminó hilo")
 
 class JuegoRFID:
     hilo = None
@@ -115,6 +117,7 @@ class JuegoRFID:
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
+                    continue
                 if not self.terminar.is_set():
                     root.after(0, lambda: sistema.siguienteNivel())
                 self.terminar.set()
@@ -229,7 +232,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), NivelTest(), NivelBoton(), NivelTest(), JuegoRFID(), NivelTest(), NivelTest()]
         #conectarLEDS()
         iniciarPygame()
 
