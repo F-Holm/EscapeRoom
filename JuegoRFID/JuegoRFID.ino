@@ -82,21 +82,43 @@ void recibirDatos(){
         juegoRFIDIniciado = false;
         break;
       case Codigos::BOTON_START://iniciar
+        setParpadeoBoton();
         juegoBotonIniciado = true;
         break;
       case Codigos::BOTON_RESTART://reiniciar
         break;
       case Codigos::BOTON_STOP://detener
-        juegoBotonIniciado = false;
+        detenerBoton();
         break;
     }
   }
 }
 
-void terminoBoton(){
-  Serial.print(Codigos::BOTON_TERMINO);
+unsigned int anteriorParpadeoBoton = 0;
+bool encendidoBoton = false;
+unsigned int anteriorBoton = 0;
+
+void setParpadeoBoton(){
+  digitalWrite(ledBoton, HIGH);
+  encendidoBoton = true;
+  anteriorParpadeoBoton = millis();
+}
+
+void parpadeoBoton(){
+  if (millis() - anteriorParpadeoBoton >= 400){
+    encendido = !encendido;
+    digitalWrite(ledBoton, encendido);
+  }
+}
+
+void detenerBoton(){
   juegoBotonIniciado = false;
   digitalWrite(ledBoton, LOW);
+}
+
+void terminoBoton(){
+  detenerBoton();
+  Serial.print(Codigos::BOTON_TERMINO);
 }
 
 void terminoRFID(){
@@ -225,6 +247,6 @@ void loop() {
   } else if (juegoBotonIniciado && !digitalRead(boton)){
     terminoBoton();
   } else if (juegoBotonIniciado){
-    digitalWrite(ledBoton, HIGH);
+    parpadeoBoton();
   }
 }
