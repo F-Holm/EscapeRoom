@@ -25,7 +25,7 @@ class Codigos(Enum):
     RFID_3_PAREJAS = b'\xC3'
     RFID_4_PAREJAS = b'\xC4'
     
-    TRIVIA_0_MONEDAS = b'\xD0' # Cuantas monedas le deberíamos dar
+    TRIVIA_0_MONEDAS = b'\xD0' # Cuantas monedas le deberíamos dar (trivia)
     TRIVIA_1_MONEDAS = b'\xD1'
     TRIVIA_2_MONEDAS = b'\xD2'
     TRIVIA_3_MONEDAS = b'\xD3'

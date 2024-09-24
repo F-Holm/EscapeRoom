@@ -75,53 +75,6 @@ class NivelBoton:
                     root.after(0, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
-                print("Terminó hilo")
-
-class JuegoRFID:
-    hilo = None
-    terminar = None
-    termino = None
-    
-    def __init__(self):
-        self.terminar = threading.Event()
-        self.termino = threading.Event()
-
-    def start(self):
-        arduinoBotonRFID.write(Codigos.START.value)
-        self.terminar.clear()
-        self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloArduino)
-        self.hilo.start()
-
-    def cerrarHilo(self):
-        arduinoBotonRFID.write(Codigos.STOP.value)
-        if self.hilo != None and self.hilo.is_alive():
-            self.terminar.set()
-            self.hilo.join()
-
-    def stop(self):
-        self.cerrarHilo()
-    
-    def close(self):
-        self.cerrarHilo()
-        arduinoBotonRFID.close()
-
-    def restart(self):
-        arduinoBotonRFID.write(Codigos.RESTART.value)
-    
-    def hiloArduino(self):
-        while not self.terminar.is_set():
-            if arduinoBotonRFID.in_waiting > 0:
-                try:
-                    if not (int(arduinoBotonRFID.readline()) == ord(Codigos.TERMINO.value)):
-                        continue
-                except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
-                    continue
-                if not self.terminar.is_set():
-                    root.after(0, lambda: sistema.siguienteNivel())
-                self.terminar.set()
-                self.termino.set()
 
 class JuegoIra:
     hilo = None
@@ -157,18 +110,102 @@ class JuegoIra:
     def restart(self):
         self.arduinoIra.write(Codigos.RESTART.value)
     
+    def analizarCodigo(self, codigo):
+        if codigo == ord(Codigos.IRA_JUGANDO.value):
+            root.actualizarEstado("Jugando")
+            return False
+        elif codigo == ord(Codigos.IRA_PERDIERON.value):
+            root.actualizarEstado("Perdieron")
+            return False
+        elif codigo == ord(Codigos.IRA_TERMINO_JUGADOR_1.value):
+            root.actualizarEstado("Terminó Jugador 1")
+            return False
+        elif codigo == ord(Codigos.IRA_TERMINO_JUGADOR_2.value):
+            root.actualizarEstado("Terminó Jugador 2")
+            return False
+        elif codigo == ord(Codigos.TERMINO.value):
+            if not self.terminar.is_set():
+                root.after(0, lambda: sistema.siguienteNivel())
+            self.terminar.set()
+            self.termino.set()
+            return False
+        return True
+
     def hiloArduino(self):
         while not self.terminar.is_set():
             if self.arduinoIra.in_waiting > 0:
                 try:
-                    if not (int(self.arduinoIra.readline()) == ord(Codigos.TERMINO.value)):
+                    if self.analizarCodigo(int(self.arduinoIra.readline())):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
-                if not self.terminar.is_set():
-                    root.after(0, lambda: sistema.siguienteNivel())
-                self.terminar.set()
-                self.termino.set()
+                    continue
+
+class JuegoRFID:
+    hilo = None
+    terminar = None
+    termino = None
+    
+    def __init__(self):
+        self.terminar = threading.Event()
+        self.termino = threading.Event()
+
+    def start(self):
+        arduinoBotonRFID.write(Codigos.START.value)
+        self.terminar.clear()
+        self.termino.clear()
+        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo.start()
+
+    def cerrarHilo(self):
+        arduinoBotonRFID.write(Codigos.STOP.value)
+        if self.hilo != None and self.hilo.is_alive():
+            self.terminar.set()
+            self.hilo.join()
+
+    def stop(self):
+        self.cerrarHilo()
+    
+    def close(self):
+        self.cerrarHilo()
+        arduinoBotonRFID.close()
+
+    def restart(self):
+        arduinoBotonRFID.write(Codigos.RESTART.value)
+    
+    def analizarCodigo(self, codigo):
+        if codigo == ord(Codigos.RFID_0_PAREJAS.value):
+            root.actualizarEstado("0 Parejas Correctas")
+            return False
+        elif codigo == ord(Codigos.RFID_1_PAREJAS.value):
+            root.actualizarEstado("1 Parejas Correctas")
+            return False
+        elif codigo == ord(Codigos.RFID_2_PAREJAS.value):
+            root.actualizarEstado("2 Parejas Correctas")
+            return False
+        elif codigo == ord(Codigos.RFID_3_PAREJAS.value):
+            root.actualizarEstado("3 Parejas Correctas")
+            return False
+        elif codigo == ord(Codigos.RFID_4_PAREJAS.value):
+            root.actualizarEstado("4 Parejas Correctas")
+            return False
+        elif codigo == ord(Codigos.TERMINO.value):
+            if not self.terminar.is_set():
+                root.after(0, lambda: sistema.siguienteNivel())
+            self.terminar.set()
+            self.termino.set()
+            return False
+        return True
+
+    def hiloArduino(self):
+        while not self.terminar.is_set():
+            if arduinoBotonRFID.in_waiting > 0:
+                try:
+                    if self.analizarCodigo(int(arduinoBotonRFID.readline())):
+                        continue
+                except Exception as e:
+                    print(f"Error leyendo desde el puerto serial: {e}")
+                    continue
 
 class JuegoTrivia:    
     socket = None
@@ -212,18 +249,38 @@ class JuegoTrivia:
     def closeSocket(self):
         self.socket.close()
     
+    def analizarCodigo(self, codigo):
+        if codigo == (Codigos.TRIVIA_0_MONEDAS.value):
+            root.mostrarMonedas("0")
+            return False
+        elif codigo == (Codigos.TRIVIA_1_MONEDAS.value):
+            root.mostrarMonedas("1")
+            return False
+        elif codigo == (Codigos.TRIVIA_2_MONEDAS.value):
+            root.mostrarMonedas("2")
+            return False
+        elif codigo == (Codigos.TRIVIA_3_MONEDAS.value):
+            root.mostrarMonedas("3")
+            return False
+        elif codigo == (Codigos.TRIVIA_4_MONEDAS.value):
+            root.mostrarMonedas("4")
+            return False
+        elif codigo == ord(Codigos.TERMINO.value):
+            if not self.terminar.is_set():
+                root.after(0, lambda: sistema.siguienteNivel())
+            self.terminar.set()
+            self.termino.set()
+            return False
+        return True
+
     def hiloSocket(self):
         while not self.terminar.is_set():
             datos = None
             try:
                 datos = self.socket.recv(1024)
+                self.analizarCodigo(datos)
             except BlockingIOError:
                 continue
-            if datos == Codigos.TERMINO.value:
-                if not self.terminar.is_set():
-                    root.after(0, lambda: sistema.siguienteNivel())
-                self.terminar.set()
-                self.termino.set()
 
 
 
@@ -231,8 +288,8 @@ class Sistema:
     niveles = None
     nivelActual = 0
 
-    def __init__(self):
-        self.niveles = [NivelTest(), NivelTest(), NivelBoton(), NivelTest(), JuegoRFID(), NivelTest(), NivelTest()]
+    def __init__(self):#NivelTest(), NivelTest(), NivelBoton(), JuegoIra(), JuegoRFID(), NivelTest(), NivelTest()
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         #conectarLEDS()
         iniciarPygame()
 
@@ -311,15 +368,18 @@ class App(tk.Tk):
         self.separadorVertical()
         self.actualizarNivel(0)
     
+    texto = ""
+
     def separadorVertical(self):
         separator = ttk.Separator(self, orient='vertical')
         separator.pack(side='left', fill='y')
     
     def configurarColumnaIzquierda(self):
         self.left_frame = tk.Frame(self, width=100, bg='lightgrey')
+        self.left_frame.pack_propagate(False)  # Evita que el frame ajuste su tamaño automáticamente
         self.left_frame.pack(side='left', fill='y')
         
-        self.left_label = tk.Label(self.left_frame, text="Texto en la columna izquierda", bg='lightgrey')
+        self.left_label = tk.Label(self.left_frame, text="Texto en la columna izquierda", bg='lightgrey', anchor='center')
         self.left_label.pack(fill='both', expand=True)
     
     def toggle_fullscreen(self, event=None):
@@ -365,8 +425,8 @@ class App(tk.Tk):
         separator = ttk.Separator(self.main_frame, orient='horizontal')
         separator.pack(fill='x', pady=5)
     
-    def update_left_text(self, texto):
-        self.left_label.config(text=texto)
+    def update_left_text(self, etapa):
+        self.left_label.config(text=(self.texto + etapa))
     
     def escaperoom(self):
         row_frame = tk.Frame(self.main_frame)
@@ -530,24 +590,19 @@ class App(tk.Tk):
                 max = len(getNivel(i).value)
         return max + 10 + len("Nivel Actual: ")#10 = 2*espacio = 2*5
 
-    def rellenar(self, texto):
-        maxLargo = self.maxLargoNivel()
-        while len(texto) < maxLargo:
-            if maxLargo - len(texto) % 2 == 0:
-                texto = " " + texto + " "
-            else:
-                texto = " " + texto
-        return texto
-
     def actualizarNivel(self, nivel):
-        espacio = "     "
-        texto = espacio + "Nivel Actual: " + getNivel(nivel).value + espacio
-        texto = self.rellenar(texto) + "\n\n Niveles: \n"
+        self.texto = "Nivel Actual: " + getNivel(nivel).value + "\n\nNiveles:\n"
         for i in range(len(Niveles)):
-            texto += getNivel(i).value
+            self.texto += getNivel(i).value
             if i != 5:
-                texto += "\n"
-        self.update_left_text(texto)
+                self.texto += "\n"
+        self.update_left_text("")
+    
+    def actualizarEstado(self, estado):
+        self.update_left_text("\n\nEstado: " + estado)
+
+    def mostrarMonedas(self, monedas):
+        messagebox.showinfo("Notificación", "Ganaron " + monedas + " monedas")
 
 if __name__ == "__main__":
     root = App()
