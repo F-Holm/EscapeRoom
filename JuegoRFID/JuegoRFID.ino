@@ -108,6 +108,7 @@ void setVariables(){
   for (int i = 0;i < NUMPIXELS;i++) estadoParejas[i] = false;
   contadorParejasCorrectas = 0;
   cantParpadeos = 0;
+  enviarParejasCorrectas();
 }
 
 void cambiarColorUniforme(int _r, int _g, int _b){
@@ -167,7 +168,11 @@ void setup() {
   //pruebaLEDs();
   cambiarColorUniforme(0, 0, 0);
 }
- 
+
+void enviarParejasCorrectas(){
+  Serial.print(Codigos::PAREJAS_0 + contadorParejasCorrectas);
+}
+
 void verificarCombinacion() {
   for (int i = 0; i < NUMPIXELS; i++) {
   // Comprobar si los tags leídos corresponden a una pareja y si no han sido utilizados
@@ -176,7 +181,7 @@ void verificarCombinacion() {
         estadoParejas[i] = true; // Marcamos la pareja como ingresada
         contadorParejasCorrectas++; // Aumentamos el contador
         // Encender el LED correspondiente
-        
+        enviarParejasCorrectas();
         setRespuestasCorrectasNeopixel();
 
         // Reseteamos las variables después de una combinación correcta
