@@ -265,6 +265,21 @@ class JuegoTrivia:
         elif codigo == (Codigos.TRIVIA_4_MONEDAS.value):
             root.mostrarMonedas("4")
             return False
+        elif codigo == (Codigos.TRIVIA_PREGUNTA_1.value):
+            root.actualizarEstado("Pregunta 1")
+            return False
+        elif codigo == (Codigos.TRIVIA_PREGUNTA_2.value):
+            root.actualizarEstado("Pregunta 2")
+            return False
+        elif codigo == (Codigos.TRIVIA_PREGUNTA_3.value):
+            root.actualizarEstado("Pregunta 3")
+            return False
+        elif codigo == (Codigos.TRIVIA_PREGUNTA_4.value):
+            root.actualizarEstado("Pregunta 4")
+            return False
+        elif codigo == (Codigos.TRIVIA_PREGUNTA_5.value):
+            root.actualizarEstado("Pregunta 5")
+            return False
         elif codigo == ord(Codigos.TERMINO.value):
             if not self.terminar.is_set():
                 root.after(0, lambda: sistema.siguienteNivel())
