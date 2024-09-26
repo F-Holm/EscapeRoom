@@ -10,6 +10,8 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
+IPLOCAL= "192.168.0.7"
+PUERTO= 8083
 
 class Codigos(Enum):
     START   = b'\x00' # Inicia el juego
@@ -60,8 +62,7 @@ dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque
 
 preguntasFacil = easy_questions
 preguntasDificil = hard_questions
-evento = threading.Event()
-
+empezar = threading.Event()
 
 class Socket:
     servidor = None
@@ -74,7 +75,7 @@ class Socket:
         self.terminar = threading.Event()
         
         servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        servidor.bind(("192.168.123.1", 8083))
+        servidor.bind((IPLOCAL, PUERTO))
         
         servidor.listen(1)
         print("Esperando conexiones...")
@@ -89,9 +90,9 @@ class Socket:
         while not self.terminar.is_set():
             try:
                 datos = self.conexion.recv(1024)
+                print(datos)
             except BlockingIOError:
                 continue
-                        
             if (datos == Codigos.START.value):
                 self.start()
             elif (datos == Codigos.STOP.value):
@@ -103,15 +104,24 @@ class Socket:
                 self.close()#Tené en cuenta que el hilo no va a finalizar hasta que termine de ejecutarse esta función
                 break
     
+    segundaJugada = False
+
     def start(self):
-        print("Iniciando juego")
-        main()
+        if empezar.is_set():
+            # llamada.start() necesito empezar hilo que llame a main para que no bloquee el hilo principal
+            self.segundaJugada = True
+        else:    
+            empezar.set()
     
     def stop(self): #Arreglar esto
         QApplication.quit()
+        if self.segundaJugada:
+            pass
+            # llamada.join() necesito poder detener el hilo que llame a main 
+        apagarPantalla()
 
     def close(self):
-        #self.stop()
+        self.stop()
         self.terminar.set()
         self.conexion.close()
      
@@ -120,7 +130,6 @@ class Socket:
 
 objeto = Socket()
 objeto.daemon = True
-
 
 
 
@@ -160,7 +169,7 @@ def glitch_effect(label, original_text):
     QTimer.singleShot(200, lambda: label.setText(original_text))
 
 def comunicarScore(score):
-    # mandar score
+    # mandar score HABLAR CON EL PELADO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     pass
 
 def verificarRta(answer, question_display, answer_buttons):
@@ -242,7 +251,7 @@ def ganar():
     mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
     mensaje.exec()
     QApplication.quit()
-    os.system('sudo vbetool dpms off')
+    apagarPantalla()
     objeto.notificarTermino()
 
 class PasswordDialog(QDialog):
@@ -330,11 +339,12 @@ class PasswordDialog(QDialog):
 
 
 
+
 def main():
     global current_question
 
 
-    # evento.wait()
+    empezar.wait()
     prenderPantalla()
 
     app = QApplication(sys.argv)
@@ -380,4 +390,5 @@ def main():
     ventanaPreguntas.show()
     sys.exit(app.exec_())
 
+main()
 
