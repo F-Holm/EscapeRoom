@@ -10,8 +10,8 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.0.7"
-PUERTO= 8083
+IPLOCAL= "192.168.123.1"
+PUERTO= 8080
 
 class Codigos(Enum):
     START   = b'\x00' # Inicia el juego
@@ -104,20 +104,12 @@ class Socket:
                 self.close()#Tené en cuenta que el hilo no va a finalizar hasta que termine de ejecutarse esta función
                 break
     
-    segundaJugada = False
-
-    def start(self):
-        if empezar.is_set():
-            # llamada.start() necesito empezar hilo que llame a main para que no bloquee el hilo principal
-            self.segundaJugada = True
-        else:    
-            empezar.set()
+    def start(self):    
+        empezar.set()
     
     def stop(self): #Arreglar esto
         QApplication.quit()
-        if self.segundaJugada:
-            pass
-            # llamada.join() necesito poder detener el hilo que llame a main 
+        sys.exit()
         apagarPantalla()
 
     def close(self):
@@ -343,8 +335,8 @@ class PasswordDialog(QDialog):
 def main():
     global current_question
 
-
     empezar.wait()
+    empezar.clear()
     prenderPantalla()
 
     app = QApplication(sys.argv)
