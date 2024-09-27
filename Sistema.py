@@ -40,7 +40,7 @@ class Inicio:
         reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
         while self.reproduciendo.is_set():
             if not (reproduciendo(Sonidos.TEXTO_MAS_LENTO)):
-                self.reproduciendo.clear()
+                sistema.siguienteNivel()
 
     def stop(self):
         self.reproduciendo.clear()
@@ -168,6 +168,8 @@ class JuegoIra:
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
                     continue
+
+
 
 class JuegoRFID:
     hilo = None
@@ -328,17 +330,25 @@ class JuegoTrivia:
 
 
 class Fin:
+    reproduciendo = None
+    
     def __init__(self):
-        pass
+        self.reproduciendo = threading.Event()
 
     def start(self):
-        pass
+        self.reproduciendo.set()
+        reproducirSonido(Sonidos.GANASTE)
+        while self.reproduciendo.is_set():
+            if not (reproduciendo(Sonidos.GANASTE)):
+                sistema.siguienteNivel()
 
     def stop(self):
-        pass
+        self.reproduciendo.clear()
+        detenerSonido(Sonidos.GANASTE)
 
     def restart(self):
-        pass
+        detenerSonido(Sonidos.GANASTE)
+        reproducirSonido(Sonidos.GANASTE)
 
     def close(self):
         pass
@@ -436,7 +446,7 @@ class App(tk.Tk):
         separator.pack(side='left', fill='y')
     
     def configurarColumnaIzquierda(self):
-        self.left_frame = tk.Frame(self, width=100, bg='lightgrey')
+        self.left_frame = tk.Frame(self, width=250, bg='lightgrey')
         self.left_frame.pack_propagate(False)  # Evita que el frame ajuste su tamaño automáticamente
         self.left_frame.pack(side='left', fill='y')
         
