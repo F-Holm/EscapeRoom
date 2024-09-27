@@ -10,7 +10,7 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.0.7"
+IPLOCAL= "192.168.123.1"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -33,6 +33,7 @@ apagarPantalla()
 score = 0
 easy_correct = 0    
 current_question = None
+termino = False
 
 class Question:
     def __init__(self, text, options, correct_answer):
@@ -182,6 +183,7 @@ def glitch_effect(label, original_text):
 def verificarRta(answer, question_display, answer_buttons):
     global score
     global easy_correct
+    global termino
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
@@ -203,12 +205,15 @@ def verificarRta(answer, question_display, answer_buttons):
     score_msg = CustomDialog("Puntuación", f"Puntuación Total : \n {score} monedas de chocolate.")
     score_msg.exec()
     
-    if score != 0:
+    if score != 0 and termino != True:
         seguirJugando()
 
     if score == 0 and easy_correct >= 2:
         easy_correct = 0
-    cargarPregunta(question_display, answer_buttons)
+    if termino == False:
+        cargarPregunta(question_display, answer_buttons)
+    elif termino:
+        pass
 
 def cargarPregunta(question_display, answer_buttons):
     global current_question
@@ -255,6 +260,8 @@ def seguirJugando():
 
 def ganar():
     global score
+    global termino
+    termino=True
     objeto.comunicarScore(4)
     objeto.comunicarScore(score)
     objeto.notificarTermino()
@@ -352,6 +359,8 @@ class PasswordDialog(QDialog):
 
 def main():
     global current_question
+    global termino
+    global seguir
 
     empezar.wait()
     empezar.clear()
@@ -396,9 +405,12 @@ def main():
     glitch_timer = QTimer()
     glitch_timer.timeout.connect(lambda: glitch_effect(question_display, current_question.text))
     glitch_timer.start(3000)  # Cada 3 segundos se ejecuta el efecto de glitch
-
+    
     ventanaPreguntas.show()
-    sys.exit(app.exec_())
-
+    if termino == False:
+        sys.exit(app.exec_())
+    if termino == True:
+        ventanaPreguntas.close()
+        print("Termino el Juego")
 while True:
     main() 
