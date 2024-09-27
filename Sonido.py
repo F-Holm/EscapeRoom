@@ -13,8 +13,15 @@ class Sonidos(Enum):
     DESPERTADOR = Sonido("Sonidos/homecoming.mp3", 1, 2)
     TRUENO = Sonido("Sonidos/trueno.mp3", 0, 3)
     MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 4)
+    
+    GANASTE = Sonido("Sonidos/ganaste.m4a", 0, 5)
+    HORA = Sonido("Sonidos/hora.m4a", 0, 6)
+    PERDISTE = Sonido("Sonidos/perdiste.m4a", 0, 7)
+    RISA_MALA = Sonido("Sonidos/risa_mala.m4a", 0, 8)
+    RISA_MALA_2 = Sonido("Sonidos/risa_mala_2.m4a", 0, 9)
+    TEXTO_MAS_LENTO = Sonido("Sonidos/texto_mas_lento.m4a", 0, 10)
 
-CANTIDAD_CANALES = 5
+CANTIDAD_CANALES = 11
 
 def iniciarPygame():
     pygame.mixer.init()
@@ -27,7 +34,9 @@ def reproducirSonido(sonido):
         pygame.mixer.Channel(sonido.value.canal).play(pygame.mixer.Sound(sonido.value.sonido))
 
 def detenerSonido(sonido):
-    pygame.mixer.Channel(sonido.value.canal).stop()
+    canal = pygame.mixer.Channel(sonido.value.canal)
+    if (canal.get_busy()):
+        canal.stop()
 
 def detenerTodosLosSonidos():
     for i in range(CANTIDAD_CANALES):

@@ -3,7 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import serial, threading, socket
-from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame, reproduciendo, reproducirSonido
+from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame, reproduciendo, reproducirSonido, detenerSonido
 from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, EfectosNeoPixel, EfectosGlobales, closeLED, conectarLEDS
 from Codigos import Codigos
 from Puertos import Puertos
@@ -29,6 +29,30 @@ class NivelTest:
     def close(self):
         pass
 
+class Inicio:
+    reproduciendo = None
+    
+    def __init__(self):
+        self.reproduciendo = threading.Event()
+
+    def start(self):
+        self.reproduciendo.set()
+        reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
+        while self.reproduciendo.is_set():
+            if not (reproduciendo(Sonidos.TEXTO_MAS_LENTO)):
+                self.reproduciendo.clear()
+
+    def stop(self):
+        self.reproduciendo.clear()
+        detenerSonido(Sonidos.TEXTO_MAS_LENTO)
+
+    def restart(self):
+        detenerSonido(Sonidos.TEXTO_MAS_LENTO)
+        reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
+
+    def close(self):
+        pass
+
 class NivelBoton:
     hilo = None
     terminar = None
@@ -46,6 +70,7 @@ class NivelBoton:
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
+        reproducirSonido(Sonidos.DESPERTADOR)
 
     def cerrarHilo(self):
         arduinoBotonRFID.write(Codigos.BOTON_STOP.value)
@@ -55,12 +80,15 @@ class NivelBoton:
 
     def stop(self):
         self.cerrarHilo()
+        detenerSonido(Sonidos.DESPERTADOR)
     
     def close(self):
         self.cerrarHilo()
 
     def restart(self):
         arduinoBotonRFID.write(Codigos.BOTON_RESTART.value)
+        detenerSonido(Sonidos.DESPERTADOR)
+        reproducirSonido(Sonidos.DESPERTADOR)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
@@ -299,11 +327,29 @@ class JuegoTrivia:
 
 
 
+class Fin:
+    def __init__(self):
+        pass
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+    def restart(self):
+        pass
+
+    def close(self):
+        pass
+
+
+
 class Sistema:
     niveles = None
     nivelActual = 0
 
-    def __init__(self):#NivelTest(), NivelTest(), NivelBoton(), JuegoIra(), JuegoRFID(), NivelTest(), NivelTest()
+    def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
         self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         #conectarLEDS()
         iniciarPygame()
