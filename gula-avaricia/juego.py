@@ -10,7 +10,7 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.123.1"
+IPLOCAL= "192.168.0.7"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -44,18 +44,18 @@ easy_questions = [
     Question("¿Cuál es la capital de Francia?", ["a) París", "b) Madrid", "c) Roma", "d) Londres"], "a"),
     Question("¿Cuál es una comida tradicional argentina?", ["a) sushi", "b) pizza", "c) asado", "d) hamburguesa"], "c"),
     Question("¿Cuál es el capitán de la selección argentina?", ["a) Di Maria", "b) Messi", "c) Dibu", "d) Paredes"], "b"),
-    Question("¿Cuáles son los colores del uniforme del Instituto Politécnico Modelo?", ["a) verde y blanco", "b) rojo y verde", "c) azul y gris", "d) naranja"], "c"),
+    Question("¿Cuáles son los colores del uniforme del\nInstituto Politécnico Modelo?", ["a) verde y blanco", "b) rojo y verde", "c) azul y gris", "d) naranja"], "c"),
     Question("¿Quién es el presidente de Argentina actualmente?", ["a) Rodriguez", "b) Perez", "c) Fiore", "d) Milei"], "d"),
     Question("¿Cuánto es 2 + 2?", ["a) 4", "b) 6", "c) 7", "d) 3"], "a"),
     Question("¿Cuál es la capital de Argentina?", ["a) Mendoza", "b) Santa Fe", "c) Buenos Aires", "d) Londres"], "c")
 ]
 
 hard_questions = [
-    Question("¿Cuál es la distancia desde \nBuenos Aires hasta Tokio?", ["a) 17353 km.", "b) 17352 km.", "c) 17354 km.", "d) 17355 km."], "e"),
-    Question("¿Cuál es el elemento más abundante\n en la corteza terrestre?", ["a) Hierro", "b) Oxígeno", "c) Hidrogeno", "d) Aluminio"], "h"),
-    Question("¿Cuál es la cantidad aproximada de galaxias\n en el universo observable?", ["a) 10^6", "b) 10^8", "c) 10^10", "d) 10^12"], "l"),
-    Question("¿Cuál es el resultado de elevar e \n(la base de los logaritmos naturales) a la potencia de pi (π)?", ["a) e^e", "b) π^e", "c) ln(π)", "d) no se puede calcular"], "f"),
-    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) en unidades SI?", ["a) 6.67 x 10^-11 N·m^2/kg^2", "b)9.81 m/s^2", "c) 3.00 x 10^8 m/s", "d) 1.38 x 10^-23 J/K"], "f")
+    Question("¿Cuál es la distancia desde \nBuenos Aires hasta Tokio?", ["a) 10 m .", "b) 90 cm.", "c) a la vuelta", "d) 10 cuadras"], "e"),
+    Question("¿Cuál es el elemento más abundante\n en la corteza terrestre?", ["a) chocolate", "b) carne", "c) banana", "d) billetes"], "h"),
+    Question("¿Cuál es la cantidad aproximada de galaxias\n en el universo observable?", ["a) muchas", "b) 1", "c) un par", "d) pocas"], "l"),
+    Question("¿Cuál es el resultado de elevar e \n(la base de los logaritmos naturales) \na la potencia de pi (π)?", ["a) 1", "b) 2", "c) 3", "d) 4"], "f"),
+    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) \nen unidades SI?", ["a) un numero", "b) sustantivo", "c) adjetivo", "d) verbo"], "f")
 ]
 
 dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque vive para comer, revienta."]
@@ -108,17 +108,33 @@ class Socket:
         empezar.set()
     
     def stop(self): #Arreglar esto
+        apagarPantalla()
         QApplication.quit()
         sys.exit()
-        apagarPantalla()
+
 
     def close(self):
         self.stop()
         self.terminar.set()
         self.conexion.close()
+        sys.exit()
      
     def notificarTermino(self):#Este método se encarga de notificar al sistema que el juego terminó
         self.conexion.sendall(Codigos.TERMINO.value)
+
+    def comunicarScore(self,score):
+        if score == 0:
+            print("Score: 0")
+            self.conexion.sendall(b'\xD0') 
+        elif score == 1:
+            print("Score: 1")
+            self.conexion.sendall(b'\xD1')
+        elif score == 2:
+            print("Score: 2")
+            self.conexion.sendall(b'\xD2')
+        elif score == 4:
+            print("Score: 4")
+            self.conexion.sendall(b'\xD4') # GANO Y EL SIGUIENTE CODIGO SON LA CANTIDAD DE MONEDAS A ENTREGAR
 
 objeto = Socket()
 objeto.daemon = True
@@ -130,7 +146,7 @@ def load_stylesheet():
         return file.read()
 
 class CustomDialog(QDialog):
-    def __init__(self, title, message, parent=None):
+    def __init__(self, title, message, show_ok_button=True, parent=None):
         super().__init__(parent)
         self.setWindowTitle(title)
         self.setStyleSheet(load_stylesheet())
@@ -144,15 +160,16 @@ class CustomDialog(QDialog):
         self.message_label.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.message_label)
         
-        self.ok_button = QPushButton("OK")
-        self.ok_button.clicked.connect(self.accept)
-        layout.addWidget(self.ok_button)
-        
+        if show_ok_button:
+            self.ok_button = QPushButton("OK")
+            self.ok_button.clicked.connect(self.accept)
+            layout.addWidget(self.ok_button)
+            
         self.setLayout(layout)
 
 
 def bienvenida():
-    dialog = CustomDialog("¡Bienvenido a la trivia!", "¡Bienvenido a la trivia!\nResponde las siguientes preguntas y gana MUCHISIMAS monedas de chocolate:")
+    dialog = CustomDialog("¡Bienvenido a la trivia!", "¡Bienvenido a la trivia!\nResponde las siguientes preguntas y gana \nMUCHISIMAS\n monedas de chocolate")
     dialog.exec()
 
 def glitch_effect(label, original_text):
@@ -160,9 +177,7 @@ def glitch_effect(label, original_text):
     label.setText(glitch_text)
     QTimer.singleShot(200, lambda: label.setText(original_text))
 
-def comunicarScore(score):
-    # mandar score HABLAR CON EL PELADO ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-    pass
+
 
 def verificarRta(answer, question_display, answer_buttons):
     global score
@@ -170,18 +185,18 @@ def verificarRta(answer, question_display, answer_buttons):
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
-        comunicarScore(score)
+        objeto.comunicarScore(score)
         msg_box = CustomDialog("Respuesta", "¡Correcto!")
         msg_box.exec()
     elif score > 0 :
         score = 0
-        comunicarScore(score)
+        objeto.comunicarScore(score)
         msg_box = CustomDialog("Respuesta", "¡Incorrecto! \n " + random.choice(dichos))
         msg_box.exec() 
 
     else :
         score = 0
-        comunicarScore(score)
+        objeto.comunicarScore(score)
         msg_box = CustomDialog("Respuesta", "¡Incorrecto!")
         msg_box.exec()
 
@@ -240,11 +255,14 @@ def seguirJugando():
 
 def ganar():
     global score
-    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
+    objeto.comunicarScore(4)
+    objeto.comunicarScore(score)
+    objeto.notificarTermino()
+    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.", show_ok_button=False)
     mensaje.exec()
     QApplication.quit()
-    apagarPantalla()
-    objeto.notificarTermino()
+    #apagarPantalla()
+
 
 class PasswordDialog(QDialog):
     def __init__(self, correct_password, parent=None):
@@ -382,5 +400,5 @@ def main():
     ventanaPreguntas.show()
     sys.exit(app.exec_())
 
-main()
-
+while True:
+    main() 
