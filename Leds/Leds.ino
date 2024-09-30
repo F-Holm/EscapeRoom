@@ -1,30 +1,27 @@
 #include <Adafruit_NeoPixel.h>
 
-#define PIN 8
-#define NUMPIXELS 300
+#define PIN_1 8
+#define PIN_2 9
+#define PIN_3 10
+#define NUMPIXELS_1 300
+#define NUMPIXELS_2 92
+#define NUMPIXELS_3 200
 
 #define RED 3
 #define GREEN 5
 #define BLUE 6
 
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
+
+Adafruit_NeoPixel pixels_1 = Adafruit_NeoPixel(NUMPIXELS_1, PIN_1, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels_2 = Adafruit_NeoPixel(NUMPIXELS_2, PIN_2, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels_3 = Adafruit_NeoPixel(NUMPIXELS_3, PIN_3, NEO_GRB + NEO_KHZ800);
 
 String color = String('\0') + String('\0') + String('\0');
 
 unsigned long previousMillis = 0;
-String efectoActual = "";
+char efectoActual = "";
 int etapaActual = -1;
 bool efectoActivo = false;
-
-// EFECTOS RGB //
-
-const String RAYO = String('\0') + String('\0');
-
-// EFECTO NEOPIXEL //
-
-const String CIELO_INFIERNO = String('\1') + String('\0');
-const String CIELO = String('\1') + String('\1');
-const String RELAMPAGO = String('\1') + String('\2');
 
 // CAMBIAR COLORES RGB //
 
@@ -56,115 +53,27 @@ void defaultRGB(){
 // CAMBIAR COLORES NEO PIXEL //
 
 void cambiarColorUniformeNeoPixel(int _r, int _g, int _b){
-  for(int i = 0; i < NUMPIXELS; i++){ // apago todo los neopixel
-    pixels.setPixelColor(i, _r, _g, _b);
+  for(int i = 0; i < NUMPIXELS_1; i++){
+    pixels_1.setPixelColor(i, _r, _g, _b);
   }
-  pixels.show();
+  pixels_1.show();
+
+  for(int i = 0; i < NUMPIXELS_2; i++){
+    pixels_2.setPixelColor(i, _r, _g, _b);
+  }
+  pixels_2.show();
+
+  for(int i = 0; i < NUMPIXELS_3; i++){
+    pixels_3.setPixelColor(i, _r, _g, _b);
+  }
+  pixels_3.show();
 }
 
 void defalutNeoPixel(){
   cambiarColorUniformeNeoPixel(0, 0 , 0);
 }
 
-// EFECTOS //
-
-void relampago() {
-  unsigned long currentMillis = millis();
-
-  switch (etapaActual) {
-    case 0:
-      if (currentMillis > 0){
-        cambiarColorUniformeNeoPixel(255, 0, 0);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 1:
-      if (currentMillis - previousMillis >= 3000) {
-        cambiarColorUniformeNeoPixel(255, 255, 255);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 2:
-      if (currentMillis - previousMillis >= 25) {
-        cambiarColorUniformeNeoPixel(255, 0, 0);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 3:
-      if (currentMillis - previousMillis >= 50) {
-        cambiarColorUniformeNeoPixel(255, 255, 255);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 4:
-      if (currentMillis - previousMillis >= 25) {
-        defalutNeoPixel();
-        efectoActivo = false;
-      }
-      break;
-  }
-}
-
-void cieloInfierno() {
-  static unsigned long startMillis = 0;
-  static int msegundos = 0;
-
-  switch (etapaActual){
-    case 0:
-      msegundos = random(1000, 6000);
-      startMillis = millis();
-      break;
-    case 1:
-      if (millis() - startMillis > msegundos){
-        setEfecto(RELAMPAGO);
-      }
-  }
-}
-
-void cielo() {
-  cambiarColorUniformeNeoPixel(80, 255, 80);
-  efectoActivo = false;
-}
-
-void rayo() {
-  unsigned long currentMillis = millis();
-
-  switch (etapaActual) {
-    case 0:
-      if (currentMillis > 0){
-        cambiarColorIntRGB(61, 126, 255);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 1:
-      if (currentMillis - previousMillis >= 400) {
-        cambiarColorIntRGB(0, 0, 0);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 2:
-      if (currentMillis - previousMillis >= 200) {
-        cambiarColorIntRGB(61, 126, 255);
-        etapaActual++;
-        previousMillis = currentMillis;
-      }
-      break;
-    case 3:
-      if (currentMillis - previousMillis >= 400) {
-        defaultRGB();
-        efectoActivo = false;
-      }
-      break;
-  }
-}
-
-void setEfecto(String e){
+void setEfecto(char e){
   efectoActual = e;
   efectoActivo = true;
   etapaActual = 0;
@@ -172,10 +81,8 @@ void setEfecto(String e){
 }
 
 void efecto(){
-  if (efectoActual == RAYO) rayo();
-  else if (efectoActual == CIELO) cielo();
-  else if (efectoActual == CIELO_INFIERNO) cieloInfierno();
-  else if (efectoActual == RELAMPAGO) relampago();
+  switch (efectoActual){
+  }
 }
 
 void setup() {
@@ -185,17 +92,34 @@ void setup() {
 
   defaultRGB();
 
-  pixels.begin();
+  pixels_1.begin();
+  pixels_2.begin();
+  pixels_3.begin();
   cambiarColorUniformeNeoPixel(0, 0, 0);
 
   Serial.begin(9600);
+
+  /*while(true) {
+    while (Serial.available() <= 0);
+    int identificate = Serial.read();
+    if (identificate == 5) Serial.print(8);
+    else continue;
+  }*/
 }
 
 void loop() {
-  if (efectoActivo) efecto();
+  /*if (efectoActivo) efecto();
   if (Serial.available() > 0) {
     String colores = Serial.readString();//Si tiene 2 caracteres, si empieza en 0 es un efecto de luces RGB, si empieza en 1 es un efecto de neopixel. Si tiene 3 caracteres, cada caracter representa un color (RGB).
-    if (colores.length() == 2) setEfecto(colores);
+    if (colores.length() == 1) setEfecto(colores[0]);
     if (colores.length() == 3) cambiarColorRGB(colores);
-  }
+  }*/
+  cambiarColorUniformeNeoPixel(255, 0, 0);
 }
+
+/*void ambientacionNueva(){
+  for(int i = 0; i < NUMPIXELS; i++){ 
+    pixels.setPixelColor(i, _r, _g, _b);
+  }
+  pixels.show();
+}*/
