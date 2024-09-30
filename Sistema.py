@@ -4,14 +4,13 @@ from tkinter import ttk
 from tkinter import messagebox
 import serial, threading, socket
 from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame, reproduciendo, reproducirSonido, detenerSonido
-from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, EfectosNeoPixel, EfectosGlobales, closeLED, conectarLEDS
+from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, EfectosNeoPixel, EfectosGlobales, closeLED
 from Codigos import Codigos
-from Puertos import Puertos
+from Puertos import Puertos, IRA_ARDUINO, BOTON_RFID_ARDUINO, LEDS_ARDUINO
 from Niveles import Niveles, getNivel
 
 sistema = None
 root = None
-arduinoBotonRFID = None
 
 class NivelTest:
     def __init__(self):
@@ -61,11 +60,9 @@ class NivelBoton:
     def __init__(self):
         self.terminar = threading.Event()
         self.termino = threading.Event()
-        global arduinoBotonRFID
-        arduinoBotonRFID = serial.Serial(Puertos.BOTON_RFID.value, 9600, timeout=1)
 
     def start(self):
-        arduinoBotonRFID.write(Codigos.BOTON_START.value)
+        BOTON_RFID_ARDUINO.write(Codigos.BOTON_START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
@@ -73,7 +70,7 @@ class NivelBoton:
         reproducirSonido(Sonidos.DESPERTADOR)
 
     def cerrarHilo(self):
-        arduinoBotonRFID.write(Codigos.BOTON_STOP.value)
+        BOTON_RFID_ARDUINO.write(Codigos.BOTON_STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -86,15 +83,15 @@ class NivelBoton:
         self.cerrarHilo()
 
     def restart(self):
-        arduinoBotonRFID.write(Codigos.BOTON_RESTART.value)
+        BOTON_RFID_ARDUINO.write(Codigos.BOTON_RESTART.value)
         detenerSonido(Sonidos.DESPERTADOR)
         reproducirSonido(Sonidos.DESPERTADOR)
     
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if arduinoBotonRFID.in_waiting > 0:
+            if BOTON_RFID_ARDUINO.in_waiting > 0:
                 try:
-                    if not (int(arduinoBotonRFID.readline()) == ord(Codigos.BOTON_TERMINO.value)):
+                    if not (int(BOTON_RFID_ARDUINO.readline()) == ord(Codigos.BOTON_TERMINO.value)):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -108,22 +105,20 @@ class JuegoIra:
     hilo = None
     terminar = None
     termino = None
-    arduinoIra = None
     
     def __init__(self):
         self.terminar = threading.Event()
         self.termino = threading.Event()
-        self.arduinoIra = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
 
     def start(self):
-        self.arduinoIra.write(Codigos.START.value)
+        IRA_ARDUINO.write(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        self.arduinoIra.write(Codigos.STOP.value)
+        IRA_ARDUINO.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -133,10 +128,10 @@ class JuegoIra:
     
     def close(self):
         self.cerrarHilo()
-        self.arduinoIra()
+        IRA_ARDUINO.close()
 
     def restart(self):
-        self.arduinoIra.write(Codigos.RESTART.value)
+        self.IRA_ARDUINO.write(Codigos.RESTART.value)
     
     def analizarCodigo(self, codigo):
         if codigo == ord(Codigos.IRA_JUGANDO.value):
@@ -161,9 +156,9 @@ class JuegoIra:
 
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if self.arduinoIra.in_waiting > 0:
+            if self.IRA_ARDUINO.in_waiting > 0:
                 try:
-                    if self.analizarCodigo(int(self.arduinoIra.readline())):
+                    if self.analizarCodigo(int(IRA_ARDUINO.readline())):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -181,14 +176,14 @@ class JuegoRFID:
         self.termino = threading.Event()
 
     def start(self):
-        arduinoBotonRFID.write(Codigos.START.value)
+        BOTON_RFID_ARDUINO.write(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
 
     def cerrarHilo(self):
-        arduinoBotonRFID.write(Codigos.STOP.value)
+        BOTON_RFID_ARDUINO.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
             self.hilo.join()
@@ -198,10 +193,10 @@ class JuegoRFID:
     
     def close(self):
         self.cerrarHilo()
-        arduinoBotonRFID.close()
+        BOTON_RFID_ARDUINO.close()
 
     def restart(self):
-        arduinoBotonRFID.write(Codigos.RESTART.value)
+        BOTON_RFID_ARDUINO.write(Codigos.RESTART.value)
     
     def analizarCodigo(self, codigo):
         if codigo == ord(Codigos.RFID_0_PAREJAS.value):
@@ -229,9 +224,9 @@ class JuegoRFID:
 
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if arduinoBotonRFID.in_waiting > 0:
+            if BOTON_RFID_ARDUINO.in_waiting > 0:
                 try:
-                    if self.analizarCodigo(int(arduinoBotonRFID.readline())):
+                    if self.analizarCodigo(int(BOTON_RFID_ARDUINO.readline())):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -361,7 +356,6 @@ class Sistema:
 
     def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
         self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
-        #conectarLEDS()
         iniciarPygame()
 
     def start(self):
@@ -434,6 +428,7 @@ class App(tk.Tk):
         self.efectosLedsRGB()
         self.coloresLedsRGB()
         self.sonidos()
+        self.sonidos2()
         
         #self.crearSwitch()
         self.separadorVertical()
@@ -577,6 +572,10 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosNeoPixel.CIELO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
+        button_text = "Relámpago"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosNeoPixel.RELAMPAGO))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
         self.separadorHorizontal()
 
     def efectosLedsRGB(self):
@@ -650,6 +649,39 @@ class App(tk.Tk):
 
         button_text = "Musica Fondo"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.MUSICA_FONDO))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Ganaste"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.GANASTE))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Hora"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HORA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Perdiste"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PERDISTE))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        #self.separadorHorizontal()
+    
+    def sonidos2(self):
+        row_frame = tk.Frame(self.main_frame)
+        row_frame.pack(fill='x', expand=True)
+        
+        row_label = tk.Label(row_frame, text="Sonidos")
+        row_label.pack(fill='x')
+        
+        button_text = "Risa Mala"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Risa Mala 2"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA_2))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Texto"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.TEXTO_MAS_LENTO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         #self.separadorHorizontal()

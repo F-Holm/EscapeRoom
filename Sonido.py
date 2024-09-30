@@ -11,7 +11,7 @@ class Sonido:
 class Sonidos(Enum):
     RISA_DIABOLICA = Sonido("Sonidos/risaDiabolica.mp3", 0, 0, 1.0)
     GRITO = Sonido("Sonidos/grito.mp3", 0, 1, 1.0)
-    DESPERTADOR = Sonido("Sonidos/homecoming.mp3", 1, 2, 1.0)
+    DESPERTADOR = Sonido("Sonidos/despertadorSamsung.mp3", 1, 2, 1.0)
     TRUENO = Sonido("Sonidos/trueno.mp3", 0, 3, 1.0)
     MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 4, 1.0)
     

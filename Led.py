@@ -8,6 +8,7 @@ class EfectosLedsRGB(Enum):
 class EfectosNeoPixel(Enum):
     CIELO_INFIERNO = b'\x01' + b'\x00'
     CIELO          = b'\x01' + b'\x01'
+    RELAMPAGO      = b'\x01' + b'\x02'
 
 class EfectosGlobales(Enum):
     RAYO           = b'\x02' + b'\x00'
@@ -19,17 +20,11 @@ class Colores(Enum):
     VERDE          = b'\x00' + b'\xFF' + b'\x00'
     AZUL           = b'\x00' + b'\x00' + b'\xFF'
 
-arduino = None
-
-def conectarLEDS():
-    global arduino
-    arduino = serial.Serial(Puertos.LEDS.value, 9600, timeout=1)
-
 def cambiarColor(color):
-    arduino.write(color.value)
+    LEDS_ARDUINO.write(color.value)
 
 def efecto(efecto):
-    arduino.write(efecto.value)
+    LEDS_ARDUINO.write(efecto.value)
 
 def closeLED():
-    arduino.close()
+    LEDS_ARDUINO.close()

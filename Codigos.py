@@ -8,6 +8,10 @@ class Codigos(Enum):
     STOP = b'\x02' # Detiene el juego pero puede volver a iniciarse
     CLOSE = b'\x03' # Detiene el juego y no puede volver a iniciarse
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se manda desde el juego al sistema
+    IDENTIFICATE = b'\x05' # Indica que el arduino debe identificarse
+    IRA_IDENTIFICACION = b'\x06'
+    BOTON_RFID_IDENTIFICACION = b'\x07'
+    LEDS_IDENTIFICACION = b'\x08'
     
     BOTON_START = b'\xA0' # Indica que debe iniciarse el juego del botón
     BOTON_RESTART = b'\xA1' # Indica que debe reiniciarse el juego del botón
