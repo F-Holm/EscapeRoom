@@ -10,7 +10,7 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.0.7"
+IPLOCAL= "192.168.1.10"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -21,12 +21,12 @@ class Codigos(Enum):
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
 def apagarPantalla():
-    #os.system('sudo vbetool dpms off')
-    os.system('echo "hola"')
+    os.system('sudo vbetool dpms off')
+    #os.system('echo "hola"')
 
 def prenderPantalla():
-    #os.system('sudo vbetool dpms on')
-    os.system('echo "chau"')
+    os.system('sudo vbetool dpms on')
+    #os.system('echo "chau"')
 
 apagarPantalla()
 
@@ -48,7 +48,26 @@ easy_questions = [
     Question("¿Cuáles son los colores del uniforme del\nInstituto Politécnico Modelo?", ["a) verde y blanco", "b) rojo y verde", "c) azul y gris", "d) naranja"], "c"),
     Question("¿Quién es el presidente de Argentina actualmente?", ["a) Rodriguez", "b) Perez", "c) Fiore", "d) Milei"], "d"),
     Question("¿Cuánto es 2 + 2?", ["a) 4", "b) 6", "c) 7", "d) 3"], "a"),
-    Question("¿Cuál es la capital de Argentina?", ["a) Mendoza", "b) Santa Fe", "c) Buenos Aires", "d) Londres"], "c")
+    Question("¿Cuál es la capital de Argentina?", ["a) Mendoza", "b) Santa Fe", "c) Buenos Aires", "d) Londres"], "c"),
+    Question("¿Cuántos planetas hay en el sistema solar?", ["a) 1", "b) 3", "c) 8", "d) 20"], "c"),
+    Question("¿Cuántos jugadores juegan en un equipo en un partido de fútbol profesional?", ["a) 4", "b) 11", "c) 27", "d) 2"], "b"),
+    Question("¿Cuánto es 3 * 3?", ["a) 5", "b) 27", "c) 13", "d) 9"], "d"),
+    Question("¿De dónde se hacen las\nhojas de papel?", ["a) del plástico", "b) del metal", "c) de los árboles", "d) del agua"], "c"),
+    Question("¿En base a qué se alimentan \nlos vehículos nafteros?", ["a) electricidad", "b) viento", "c) nafta", "d) gas"], "c"),
+    Question("¿Qué pesa más, \n1 kg de pluma o 1 kg de plomo?", ["a) pluma", "b) plomo", "c) pesan lo mismo", "d) no se puede medir"], "c"),
+    Question("¿Qué animal no es un felino?", ["a) gato", "b) tigre", "c) perro", "d) león"], "c"),
+    Question("¿Qué se lo conoce como 'bondi'\n en la jerga argentina?", ["a) auto", "b) colectivo", "c) tren", "d) bicicleta"], "b"),
+    Question("¿Cuántos kilómetros\n hay en 1000 metros?", ["a) 1 km", "b) 0.2 km", "c) 20 km", "d) 100 km"], "a"),
+    Question("¿Cuántos centímetros\n hay en un metro?", ["a) 30 cm", "b) 52 cm", "c) 100 cm", "d) 155 cm"], "c"),
+    Question("¿Qué país habla portugués \ncomo lengua natal?", ["a) Argentina", "b) Brasil", "c) España", "d) Chile"], "b"),
+    Question("¿Qué número de camiseta utiliza \nMessi en la selección argentina?", ["a) 1", "b) 10", "c) 23", "d) 4"], "b"),
+    Question("¿Cuántos minutos\n hay en una hora?", ["a) 25 minutos", "b) 45 minutos", "c) 60 minutos", "d) 180 minutos"], "c"),
+    Question("¿Cuántas horas\n hay en un día?", ["a) 5 horas", "b) 24 horas", "c) 13 horas", "d) 48 horas"], "b"),
+    Question("¿Cuántos días tiene un año?", ["a) 365 días", "b) 120 días", "c) 31 días", "d) 666 días"], "a"),
+    Question("¿Cada cuánto tiempo se realizan\n las elecciones en Argentina?", ["a) 1 años", "b) cada mes", "c) 4 años", "d) 30 años"], "c"),
+    Question("¿Qué animal es conocido como el rey de la selva?", ["a) Elefante", "b) León", "c) Tigre", "d) Gorila"], "b"),
+    Question("¿Qué planeta es conocido como \nel planeta rojo?", ["a) Marte", "b) Venus", "c) Júpiter", "d) Saturno"], "a"),
+    Question("¿Cuál es el océano \nmás grande del mundo?", ["a) Atlántico", "b) Índico", "c) Pacífico", "d) Ártico"], "c"),
 ]
 
 hard_questions = [
@@ -56,7 +75,11 @@ hard_questions = [
     Question("¿Cuál es el elemento más abundante\n en la corteza terrestre?", ["a) chocolate", "b) carne", "c) banana", "d) billetes"], "h"),
     Question("¿Cuál es la cantidad aproximada de galaxias\n en el universo observable?", ["a) muchas", "b) 1", "c) un par", "d) pocas"], "l"),
     Question("¿Cuál es el resultado de elevar e \n(la base de los logaritmos naturales) \na la potencia de pi (π)?", ["a) 1", "b) 2", "c) 3", "d) 4"], "f"),
-    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) \nen unidades SI?", ["a) un numero", "b) sustantivo", "c) adjetivo", "d) verbo"], "f")
+    Question("¿Cuál es el valor aproximado de la constante\n de gravitación universal (G) \nen unidades SI?", ["a) un numero", "b) sustantivo", "c) adjetivo", "d) verbo"], "f"),
+    Question("¿Cuál es la velocidad de un elefante en \ncaída libre?", ["a) 5 km/h", "b) un susurro", "c) a paso de tortuga", "d) 1km/h"], "f"),
+    Question("¿Cuál es la temperatura de \nebullición del silencio?", ["a) 1000°C", "b) 478 °C", "c) -273.15°C", "d) depende del día"], "f"),
+    Question("¿Cuántas patas tiene un leon?", ["a) 1", "b) 2", "c) ninguna", "d) 42"], "c"),
+    Question("¿Cuál es la forma geométrica \nde un gato ?", ["a) cuadrado", "b) esférico", "c) triangular", "d) rectangular"], "f")
 ]
 
 dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque vive para comer, revienta."]
@@ -126,9 +149,10 @@ class Socket:
 
 
     def close(self):
+        apagarPantalla()
         self.conexion.close()
         sys.exit()
-        apagarPantalla()
+        
 
 
         
