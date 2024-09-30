@@ -669,8 +669,8 @@ class App(tk.Tk):
         row_frame = tk.Frame(self.main_frame)
         row_frame.pack(fill='x', expand=True)
         
-        row_label = tk.Label(row_frame, text="Sonidos")
-        row_label.pack(fill='x')
+        #row_label = tk.Label(row_frame, text="Sonidos")
+        #row_label.pack(fill='x')
         
         button_text = "Risa Mala"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA))
@@ -697,7 +697,7 @@ class App(tk.Tk):
         self.texto = "Nivel Actual: " + getNivel(nivel).value + "\n\nNiveles:\n"
         for i in range(len(Niveles)):
             self.texto += getNivel(i).value
-            if i != 5:
+            if i != 6:
                 self.texto += "\n"
         self.update_left_text("")
     
