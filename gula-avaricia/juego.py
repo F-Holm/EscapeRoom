@@ -10,7 +10,7 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.123.1"
+IPLOCAL= "192.168.0.7"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -61,8 +61,7 @@ hard_questions = [
 
 dichos = ["La avaricia rompe el saco", "Quien come para vivir, se alimenta;\nque vive para comer, revienta."]
 
-preguntasFacil = easy_questions
-preguntasDificil = hard_questions
+
 empezar = threading.Event()
 
 class Socket:
@@ -109,16 +108,30 @@ class Socket:
         empezar.set()
     
     def stop(self): #Arreglar esto
+        global glitch_timer
+        global app
+        global seguir
+        global ventanaPreguntas
+
         apagarPantalla()
-        QApplication.quit()
-        sys.exit()
+        if glitch_timer is not None:
+            glitch_timer.stop()
+        if seguir is not None:
+            seguir.close()  
+        if ventanaPreguntas is not None:
+            ventanaPreguntas.close()
+        if app is not None:
+            app.quit()
+        
 
 
     def close(self):
-        self.stop()
-        self.terminar.set()
         self.conexion.close()
         sys.exit()
+        apagarPantalla()
+
+
+        
      
     def notificarTermino(self):#Este método se encarga de notificar al sistema que el juego terminó
         self.conexion.sendall(Codigos.TERMINO.value)
@@ -217,6 +230,8 @@ def verificarRta(answer, question_display, answer_buttons):
 
 def cargarPregunta(question_display, answer_buttons):
     global current_question
+    global preguntasFacil
+    global preguntasDificil
 
     if easy_correct < 2:
         current_question = random.choice(preguntasFacil)
@@ -261,14 +276,27 @@ def seguirJugando():
 def ganar():
     global score
     global termino
+    global glitch_timer
+    global app
+    global seguir
+    global ventanaPreguntas
+
     termino=True
     objeto.comunicarScore(4)
     objeto.comunicarScore(score)
     objeto.notificarTermino()
-    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.", show_ok_button=False)
+
+    if glitch_timer is not None:
+        glitch_timer.stop()
+
+    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
     mensaje.exec()
-    QApplication.quit()
-    #apagarPantalla()
+
+    seguir.close()
+    ventanaPreguntas.close()
+
+    QTimer.singleShot(0, lambda: app.quit())
+    apagarPantalla()
 
 
 class PasswordDialog(QDialog):
@@ -361,11 +389,31 @@ def main():
     global current_question
     global termino
     global seguir
-
+    global ventanaPreguntas
+    global glitch_timer
+    global app
+    global score
+    global preguntasFacil
+    global preguntasDificil
+    global easy_correct
+    apagarPantalla()
     empezar.wait()
     empezar.clear()
+
+    preguntasFacil = easy_questions
+    preguntasDificil = hard_questions
+
+    easy_correct = 0     
+    score = 0 
+    app = None
+    seguir = None
+    ventanaPreguntas = None
+    current_question = None
+
+
     prenderPantalla()
 
+    
     app = QApplication(sys.argv)
     app.setOverrideCursor(Qt.BlankCursor)
 
@@ -408,9 +456,11 @@ def main():
     
     ventanaPreguntas.show()
     if termino == False:
-        sys.exit(app.exec_())
+        app.exec()
     if termino == True:
-        ventanaPreguntas.close()
         print("Termino el Juego")
+        termino = False
+
 while True:
     main() 
+    print("Reiniciando el juego...")
