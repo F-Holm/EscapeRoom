@@ -35,6 +35,8 @@ enum Codigos {
   RFID_STOP = 2,
   CLOSE = 3,
   RFID_TERMINO = 4,
+  IDENTIFICATE = 5,
+  ID = 7,
   BOTON_START = 160,
   BOTON_RESTART = 161,
   BOTON_STOP = 162,
@@ -189,6 +191,13 @@ void setup() {
   pixels.begin();
   //pruebaLEDs();
   cambiarColorUniforme(0, 0, 0);
+
+  while(true) {
+    while (Serial.available() <= 0);
+    int identificate = Serial.read();
+    if (identificate == Codigos::IDENTIFICATE) Serial.print(Codigos::ID);
+    else continue;
+  }
 }
 
 void enviarParejasCorrectas(){
