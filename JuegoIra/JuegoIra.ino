@@ -31,6 +31,8 @@ enum Codigos {
   STOP = 2,
   CLOSE = 3,
   TERMINO = 4,
+  IDENTIFICATE = 5,
+  ID = 6,
   JUGANDO = 176,
   PERDIERON = 177,
   TERMINO_J1 = 178,
@@ -51,6 +53,13 @@ void setup()
 
   pixel.begin(); 
   pixel.show();
+
+  while(true) {
+    while (Serial.available() <= 0);
+    int identificate = Serial.read();
+    if (identificate == Codigos::IDENTIFICATE) Serial.print(Codigos::ID);
+    else continue;
+  }
 }
 
 void setLed1(int r, int g, int b){
