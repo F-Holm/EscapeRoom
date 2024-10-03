@@ -22,95 +22,99 @@ char efectoActual = "";
 int etapaActual = -1;
 bool efectoActivo = false;
 
-class RGB{
-  public:
-    static void cambiarColor(int r, int g, int b){
-      analogWrite(RED, r);
-      analogWrite(GREEN, g);
-      analogWrite(BLUE, b);
-    }
+// RGB //
 
-    static void cambiarColor(String rgb) {
-      analogWrite(RED, rgb[0]);
-      analogWrite(GREEN, rgb[1]);
-      analogWrite(BLUE, rgb[2]);
-      color = rgb;
-    }
+void RGB_CambiarColor(int r, int g, int b){
+  analogWrite(RED, r);
+  analogWrite(GREEN, g);
+  analogWrite(BLUE, b);
+}
 
-    static void cambiarColorSinGuardar(String rgb) {
-      analogWrite(RED, rgb[0]);
-      analogWrite(GREEN, rgb[1]);
-      analogWrite(BLUE, rgb[2]);
-    }
+void RGB_CambiarColor(String rgb) {
+  analogWrite(RED, rgb[0]);
+  analogWrite(GREEN, rgb[1]);
+  analogWrite(BLUE, rgb[2]);
+  color = rgb;
+}
 
-    static void defaultColor(){
-      analogWrite(RED, color[0]);
-      analogWrite(GREEN, color[1]);
-      analogWrite(BLUE, color[2]);
-    }
-};
+void RGB_CambiarColorSinGuardar(String rgb) {
+  analogWrite(RED, rgb[0]);
+  analogWrite(GREEN, rgb[1]);
+  analogWrite(BLUE, rgb[2]);
+}
 
-class NEOPIXEL{
-  public:
-    static void cambiarColorUniforme(int _r, int _g, int _b){
-      cambiarColorUniforme1(_r, _g, _b);
-      cambiarColorUniforme2(_r, _g, _b);
-      cambiarColorUniforme3(_r, _g, _b);
-    }
+void RGB_Default(){
+  analogWrite(RED, color[0]);
+  analogWrite(GREEN, color[1]);
+  analogWrite(BLUE, color[2]);
+}
 
-    static void cambiarColorUniforme1(int _r, int _g, int _b){
-      for(int i = 0; i < NUMPIXELS_1; i++){
-        pixels_1.setPixelColor(i, _r, _g, _b);
-      }
-      pixels_1.show();
-    }
+// NEOPIXEL //
 
-    static void cambiarColorUniforme2(int _r, int _g, int _b){
-      for(int i = 0; i < NUMPIXELS_2; i++){
-        pixels_2.setPixelColor(i, _r, _b, _g);
-      }
-      pixels_2.show();
-    }
+void NEOPIXEL_CambiarColorUniforme(int _r, int _g, int _b){
+  NEOPIXEL_CambiarColorUniforme1(_r, _g, _b);
+  NEOPIXEL_CambiarColorUniforme2(_r, _g, _b);
+  NEOPIXEL_CambiarColorUniforme3(_r, _g, _b);
+}
 
-    static void cambiarColorUniforme3(int _r, int _g, int _b){
-      for(int i = 0; i < NUMPIXELS_3; i++){
-        pixels_3.setPixelColor(i, _r, _b, _g);
-      }
-      pixels_3.show();
-    }
+void NEOPIXEL_CambiarColorUniforme1(int _r, int _g, int _b){
+  for(int i = 0; i < NUMPIXELS_1; i++){
+    pixels_1.setPixelColor(i, _r, _g, _b);
+  }
+  pixels_1.show();
+}
 
-    static void defalutNeoPixel(){
-      cambiarColorUniforme(0, 0 , 0);
-    }
+void NEOPIXEL_CambiarColorUniforme2(int _r, int _g, int _b){
+  for(int i = 0; i < NUMPIXELS_2; i++){
+    pixels_2.setPixelColor(i, _r, _b, _g);
+  }
+  pixels_2.show();
+}
+
+void NEOPIXEL_CambiarColorUniforme3(int _r, int _g, int _b){
+  for(int i = 0; i < NUMPIXELS_3; i++){
+    pixels_3.setPixelColor(i, _r, _b, _g);
+  }
+  pixels_3.show();
+}
+
+void NEOPIXEL_Defalut(){
+  NEOPIXEL_CambiarColorUniforme(0, 0 , 0);
+}
     
-    static void cambiarColorCantidad1(int pinInicial, int cantidad, int _r, int _g, int _b){
-      for(int i = pinInicial; i < pinInicial+cantidad; i++){
-        pixels_1.setPixelColor(i, _r, _b, _g);
-      }
-      pixels_1.show();
-    }
-    static void cambiarColorCantidad2(int pinInicial, int cantidad, int _r, int _g, int _b){
-      for(int i = pinInicial; i < pinInicial+cantidad; i++){
-        pixels_2.setPixelColor(i, _r, _b, _g);
-      }
-      pixels_2.show();
-    }
-    static void cambiarColorCantidad3(int pinInicial, int cantidad, int _r, int _g, int _b){
-      for(int i = pinInicial; i < pinInicial+cantidad; i++){
-        pixels_3.setPixelColor(i, _r, _b, _g);
-      }
-      pixels_3.show();
-    }
+void NEOPIXEL_CambiarColorCantidad1(int pinInicial, int cantidad, int _r, int _g, int _b){
+  for(int i = pinInicial; i < pinInicial+cantidad; i++){
+    pixels_1.setPixelColor(i, _r, _b, _g);
+  }
+  pixels_1.show();
+}
 
-    static void rojoVariado1(){
-      int segmento=30;
-      for(int i=0; i<NUMPIXELS_1;i=i+segmento){
-        if(i ){
-          cambiarColorCantidad1(i, segmento, 255,0,0);
-        }
-      }
+void NEOPIXEL_CambiarColorCantidad2(int pinInicial, int cantidad, int _r, int _g, int _b){
+  for(int i = pinInicial; i < pinInicial+cantidad; i++){
+    pixels_2.setPixelColor(i, _r, _b, _g);
+  }
+  pixels_2.show();
+}
+
+void NEOPIXEL_CambiarColorCantidad3(int pinInicial, int cantidad, int _r, int _g, int _b){
+  for(int i = pinInicial; i < pinInicial+cantidad; i++){
+    pixels_3.setPixelColor(i, _r, _b, _g);
+  }
+  pixels_3.show();
+}
+
+void NEOPIXEL_RojoVariado1(){
+  int segmento=30;
+  for(int i=0; i<NUMPIXELS_1;i=i+segmento){
+    if(i ){
+      NEOPIXEL_CambiarColorCantidad1(i, segmento, 255,0,0);
     }
-};
+  }
+}
+
+// Efectos //
+
+// Métodos HOLM //
 
 void setEfecto(char e){
   efectoActual = e;
@@ -129,19 +133,19 @@ void setup() {
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
 
-  RGB::defaultColor();
+  RGB_Default();
 
   pixels_1.begin();
   pixels_2.begin();
   pixels_3.begin();
-  NEOPIXEL::cambiarColorUniforme(0, 0, 0);
+  NEOPIXEL_CambiarColorUniforme(0, 0, 0);
 
   Serial.begin(9600);
 
   /*while(true) {
     while (Serial.available() <= 0);
     int identificate = Serial.read();
-    if (identificate == 5) Serial.print(8);
+    if (identificate == 5) { Serial.print(8); break; }
     else continue;
   }*/
 }
@@ -153,6 +157,6 @@ void loop() {
     if (colores.length() == 1) setEfecto(colores[0]);
     if (colores.length() == 3) cambiarColorRGB(colores);
   }*/
-  NEOPIXEL::cambiarColorUniforme(255, 0, 0);
-  //RGB::cambiarColor(255, 0, 0);
+  NEOPIXEL_CambiarColorUniforme(255, 0, 0);
+  RGB_CambiarColor(255, 0, 0);
 }
