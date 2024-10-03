@@ -114,7 +114,7 @@ void NEOPIXEL_RojoVariado1(){
 
 // Efectos //
 
-// Métodos HOLM //
+// Métodos Generales //
 
 void setEfecto(char e){
   efectoActual = e;
