@@ -1,8 +1,8 @@
 #include <Adafruit_NeoPixel.h>
 
 #define PIN_1 11
-#define PIN_2 9
-#define PIN_3 10
+#define PIN_2 10
+#define PIN_3 9
 #define NUMPIXELS_1 300
 #define NUMPIXELS_2 208
 #define NUMPIXELS_3 92
@@ -52,7 +52,6 @@ class RGB{
 
 class NEOPIXEL{
   public:
-
     static void cambiarColorUniforme(int _r, int _g, int _b){
       cambiarColorUniforme1(_r, _g, _b);
       cambiarColorUniforme2(_r, _g, _b);
@@ -81,7 +80,35 @@ class NEOPIXEL{
     }
 
     static void defalutNeoPixel(){
-      NEOPIXEL::cambiarColorUniforme(0, 0 , 0);
+      cambiarColorUniforme(0, 0 , 0);
+    }
+    
+    static void cambiarColorCantidad1(int pinInicial, int cantidad, int _r, int _g, int _b){
+      for(int i = pinInicial; i < pinInicial+cantidad; i++){
+        pixels_1.setPixelColor(i, _r, _b, _g);
+      }
+      pixels_1.show();
+    }
+    static void cambiarColorCantidad2(int pinInicial, int cantidad, int _r, int _g, int _b){
+      for(int i = pinInicial; i < pinInicial+cantidad; i++){
+        pixels_2.setPixelColor(i, _r, _b, _g);
+      }
+      pixels_2.show();
+    }
+    static void cambiarColorCantidad3(int pinInicial, int cantidad, int _r, int _g, int _b){
+      for(int i = pinInicial; i < pinInicial+cantidad; i++){
+        pixels_3.setPixelColor(i, _r, _b, _g);
+      }
+      pixels_3.show();
+    }
+
+    static void rojoVariado1(){
+      int segmento=30;
+      for(int i=0; i<NUMPIXELS_1;i=i+segmento){
+        if(i ){
+          cambiarColorCantidad1(i, segmento, 255,0,0);
+        }
+      }
     }
 };
 
@@ -126,6 +153,6 @@ void loop() {
     if (colores.length() == 1) setEfecto(colores[0]);
     if (colores.length() == 3) cambiarColorRGB(colores);
   }*/
-  NEOPIXEL::cambiarColorUniforme(0, 255, 0);
-  RGB::cambiarColor(255, 0, 0);
+  NEOPIXEL::cambiarColorUniforme(255, 0, 0);
+  //RGB::cambiarColor(255, 0, 0);
 }
