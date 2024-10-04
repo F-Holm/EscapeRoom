@@ -190,5 +190,5 @@ void loop() {
     if (colores.length() == 3) cambiarColorRGB(colores);
   }*/
   NEOPIXEL::cambiarColorUniforme(255, 0, 0);
-  //RGB::cambiarColor(255, 0, 0);
+  RGB::cambiarColor(255, 0, 0);
 }
