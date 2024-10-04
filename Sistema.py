@@ -355,7 +355,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), NivelTest(), NivelTest()]
         iniciarPygame()
 
     def start(self):
@@ -394,7 +394,7 @@ class Sistema:
     def terminarJuego(self):
         for nivel in self.niveles:
             nivel.close()
-        #closeLED()
+        closeLED()
         closePygame()
         closeTTK()
         sys.exit()
