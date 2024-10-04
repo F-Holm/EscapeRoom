@@ -110,6 +110,7 @@ void parpadeoBoton(){
   if (millis() - anteriorParpadeoBoton >= 400){
     encendido = !encendido;
     digitalWrite(ledBoton, encendido);
+    anteriorParpadeoBoton = millis();
   }
 }
 
@@ -126,6 +127,7 @@ void terminoBoton(){
 void terminoRFID(){
   Serial.print(Codigos::RFID_TERMINO);
   juegoRFIDIniciado = false;
+  cambiarColorUniforme(0, 0, 0);
 }
 
 void setVariables(){
@@ -192,16 +194,16 @@ void setup() {
   //pruebaLEDs();
   cambiarColorUniforme(0, 0, 0);
 
-  while(true) {
+  /*while(true) {
     while (Serial.available() <= 0);
     int identificate = Serial.read();
-    if (identificate == Codigos::IDENTIFICATE) Serial.print(Codigos::ID);
+    if (identificate == Codigos::IDENTIFICATE) { Serial.print(Codigos::ID); break; }
     else continue;
-  }
+  }*/
 }
 
 void enviarParejasCorrectas(){
-  Serial.print(Codigos::PAREJAS_0 + contadorParejasCorrectas);
+  if (contadorParejasCorrectas != NUMPIXELS) Serial.print(Codigos::PAREJAS_0 + contadorParejasCorrectas);
 }
 
 void verificarCombinacion() {
