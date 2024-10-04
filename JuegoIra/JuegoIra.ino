@@ -54,12 +54,12 @@ void setup()
   pixel.begin(); 
   pixel.show();
 
-  while(true) {
+  /*while(true) {
     while (Serial.available() <= 0);
     int identificate = Serial.read();
-    if (identificate == Codigos::IDENTIFICATE) Serial.print(Codigos::ID);
+    if (identificate == Codigos::IDENTIFICATE) { Serial.print(Codigos::ID); break; }
     else continue;
-  }
+  }*/
 }
 
 void setLed1(int r, int g, int b){
@@ -84,6 +84,8 @@ void terminarJuego(){
 
   int estadoJugador1 = false;
   int estadoJugador2 = false;
+
+  setLeds(0, 0, 0);
 }
 
 void notificarTermino(){
