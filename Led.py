@@ -1,6 +1,6 @@
 from enum import Enum
 import serial
-from Puertos import Puertos
+from Puertos import Puertos, LEDS_ARDUINO
 
 class EfectosLedsRGB(Enum):
     RAYO           = b'\x00' + b'\x00'

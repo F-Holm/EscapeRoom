@@ -30,9 +30,12 @@ class NivelTest:
 
 class Inicio:
     reproduciendo = None
+    termino = None
+    hilo = None
     
     def __init__(self):
         self.reproduciendo = threading.Event()
+        self.termino = threading.Event()
 
     def start(self):
         self.reproduciendo.set()
@@ -41,6 +44,11 @@ class Inicio:
             if not (reproduciendo(Sonidos.TEXTO_MAS_LENTO)):
                 sistema.siguienteNivel()
 
+    def cerrarHilo(self):
+        if self.hilo != None and self.hilo.is_alive():
+            self.reproduciendo.clear()
+            self.hilo.join()
+    
     def stop(self):
         self.reproduciendo.clear()
         detenerSonido(Sonidos.TEXTO_MAS_LENTO)
@@ -131,7 +139,7 @@ class JuegoIra:
         IRA_ARDUINO.close()
 
     def restart(self):
-        self.IRA_ARDUINO.write(Codigos.RESTART.value)
+        IRA_ARDUINO.write(Codigos.RESTART.value)
     
     def analizarCodigo(self, codigo):
         if codigo == ord(Codigos.IRA_JUGANDO.value):
@@ -156,15 +164,13 @@ class JuegoIra:
 
     def hiloArduino(self):
         while not self.terminar.is_set():
-            if self.IRA_ARDUINO.in_waiting > 0:
+            if IRA_ARDUINO.in_waiting > 0:
                 try:
                     if self.analizarCodigo(int(IRA_ARDUINO.readline())):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
                     continue
-
-
 
 class JuegoRFID:
     hilo = None
@@ -322,8 +328,6 @@ class JuegoTrivia:
             except BlockingIOError:
                 continue
 
-
-
 class Fin:
     reproduciendo = None
     
@@ -355,7 +359,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), Inicio(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         iniciarPygame()
 
     def start(self):
@@ -384,6 +388,7 @@ class Sistema:
         else:
             self.stop()
             self.nivelActual = 0
+            self.start()
         root.actualizarNivel(self.nivelActual)
     
     def reiniciarJuego(self):
