@@ -30,19 +30,22 @@ class NivelTest:
 
 class Inicio:
     reproduciendo = None
-    termino = None
     hilo = None
     
     def __init__(self):
         self.reproduciendo = threading.Event()
-        self.termino = threading.Event()
 
     def start(self):
+        self.hilo = threading.Thread(target=self.hiloSonido)
+        self.hilo.start()
         self.reproduciendo.set()
         reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
+    
+    def hiloSonido(self):
         while self.reproduciendo.is_set():
             if not (reproduciendo(Sonidos.TEXTO_MAS_LENTO)):
-                sistema.siguienteNivel()
+                self.reproduciendo.clear()
+                root.after(0, lambda: sistema.siguienteNivel())
 
     def cerrarHilo(self):
         if self.hilo != None and self.hilo.is_alive():
@@ -50,7 +53,7 @@ class Inicio:
             self.hilo.join()
     
     def stop(self):
-        self.reproduciendo.clear()
+        self.cerrarHilo()
         detenerSonido(Sonidos.TEXTO_MAS_LENTO)
 
     def restart(self):
@@ -330,19 +333,30 @@ class JuegoTrivia:
 
 class Fin:
     reproduciendo = None
+    hilo = None
     
     def __init__(self):
         self.reproduciendo = threading.Event()
 
     def start(self):
+        self.hilo = threading.Thread(target=self.hiloSonido)
+        self.hilo.start()
         self.reproduciendo.set()
-        reproducirSonido(Sonidos.GANASTE)
+        reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
+    
+    def hiloSonido(self):
         while self.reproduciendo.is_set():
             if not (reproduciendo(Sonidos.GANASTE)):
-                sistema.siguienteNivel()
+                self.reproduciendo.clear()
+                root.after(0, lambda: sistema.siguienteNivel())
 
+    def cerrarHilo(self):
+        if self.hilo != None and self.hilo.is_alive():
+            self.reproduciendo.clear()
+            self.hilo.join()
+    
     def stop(self):
-        self.reproduciendo.clear()
+        self.cerrarHilo()
         detenerSonido(Sonidos.GANASTE)
 
     def restart(self):
@@ -359,7 +373,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), Inicio(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()]
         iniciarPygame()
 
     def start(self):
@@ -388,7 +402,7 @@ class Sistema:
         else:
             self.stop()
             self.nivelActual = 0
-            self.start()
+            0, self.start()
         root.actualizarNivel(self.nivelActual)
     
     def reiniciarJuego(self):
