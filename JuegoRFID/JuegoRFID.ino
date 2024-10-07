@@ -68,6 +68,59 @@ void setParpadear(int _cant, int _r, int _g, int _b){
   g = _g;
   b = _b;
 }
+bool efectoInicioActivo = false;
+bool efectoInicioEncendido = false;
+unsigned int efectoInicioAnterior = 0;
+unsigned int efectoInicioContador = 0;
+
+void efectoInicio() {
+  efectoInicioActivo = true;
+  efectoInicioEncendido = true;
+  efectoInicioAnterior = millis();
+  efectoInicioContador = 1;
+  cambiarColorUniforme(255, 255, 255);
+}
+
+void eInicio(){
+  if (millis() - 400 > efectoInicioAnterior){
+    if (efectoInicioEncendido){
+      if (efectoInicioContador == 5) efectoInicioActivo = false;
+      cambiarColorUniforme(0, 0, 0);
+    } else {
+      efectoInicioContador++;
+      cambiarColorUniforme(255, 255, 255);
+    }
+    efectoInicioEncendido = !efectoInicioEncendido;
+    efectoInicioAnterior = millis();
+  }
+}
+
+bool efectoVictoriaActivo = false;
+bool efectoVictoriaEncendido = false;
+unsigned int efectoVictoriaAnterior = 0;
+unsigned int efectoVictoriaContador = 0;
+
+void efectoVictoria() {
+  efectoVictoriaActivo = true;
+  efectoVictoriaEncendido = true;
+  efectoVictoriaAnterior = millis();
+  efectoVictoriaContador = 1;
+  cambiarColorUniforme(0, 255, 0);
+}
+
+void eVictoria(){
+  if (millis() - 200 > efectoVictoriaAnterior){
+    if (efectoVictoriaEncendido){
+      if (efectoVictoriaContador == 3) efectoVictoriaActivo = false;
+      cambiarColorUniforme(0, 0, 0);
+    } else {
+      efectoVictoriaContador++;
+      cambiarColorUniforme(0, 255, 0);
+    }
+    efectoVictoriaEncendido = !efectoVictoriaEncendido;
+    efectoVictoriaAnterior = millis();
+  }
+}
 
 void recibirDatos(){
   if (Serial.available() > 0){
@@ -75,6 +128,7 @@ void recibirDatos(){
     switch (info){
       case Codigos::RFID_START://iniciar
         juegoRFIDIniciado = true;
+
         setVariables();
         break;
       case Codigos::RFID_RESTART://reiniciar
@@ -200,6 +254,8 @@ void setup() {
     if (identificate == Codigos::IDENTIFICATE) { Serial.print(Codigos::ID); break; }
     else continue;
   }*/
+  //efectoVictoria();
+  //efectoInicio();
 }
 
 void enviarParejasCorrectas(){
@@ -240,7 +296,8 @@ void loop() {
   parpadear();
   recibirDatos();
   //juegoRFIDIniciado = true;
-
+  if (efectoVictoriaActivo) eVictoria();
+  if (efectoInicioActivo) eInicio();
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
       if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
@@ -254,7 +311,10 @@ void loop() {
       }
     }
     verificarCombinacion();
-    if (contadorParejasCorrectas == NUMPIXELS) terminoRFID();
+    if (contadorParejasCorrectas == NUMPIXELS){
+      terminoRFID();
+      efectoVictoria();
+    } 
   } else if (juegoBotonIniciado && !digitalRead(boton)){
     terminoBoton();
   } else if (juegoBotonIniciado){
