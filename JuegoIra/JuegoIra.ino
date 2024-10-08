@@ -19,8 +19,9 @@ bool estadoJugador2 = false;
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(CANT_PIXELES, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 
 unsigned int cantToques = 0;//cuantas veces tocó el alambre sin perder
-const unsigned int cantToquesPerdonados = 5;//Puede tocar n veces los alambres sin perder
+const unsigned int cantVidas = 5;//Puede tocar n veces los alambres sin perder
 const unsigned int msGodMode = 200;//Cuantos milisegundos tenés de inmunidad después de tocar un alambre
+unsigned int ultToque = 0;
 
 const unsigned int msDelayEntreNotificaciones = 1000;
 unsigned int tiempoAnteriorNotificacion = millis();
@@ -126,10 +127,16 @@ void empezar(){
 }
 
 void perder(){
-  if (true);
-  perdio = true;
-  estadoJugador1 = false;
-  estadoJugador2 = false;
+  if (millis() - ultToque > msGodMode) {
+    if (cantToques == cantVidas) {
+      perdio = true;
+      estadoJugador1 = false;
+      estadoJugador2 = false;
+    } else {
+      cantToques++;
+      ultToque = millis();
+    }
+  }
 }
 
 void ganarJ1(){
