@@ -343,15 +343,9 @@ class Fin:
 
     def start(self):
         self.hilo = threading.Thread(target=self.hiloSonido)
-        self.hilo.start()
         self.reproduciendo.set()
-        reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
-    
-    def hiloSonido(self):
-        while self.reproduciendo.is_set():
-            if not (reproduciendo(Sonidos.GANASTE)):
-                self.reproduciendo.clear()
-                root.after(0, lambda: sistema.siguienteNivel())
+        reproducirSonido(Sonidos.GANASTE)
+        self.hilo.start()
 
     def cerrarHilo(self):
         if self.hilo != None and self.hilo.is_alive():
@@ -363,8 +357,17 @@ class Fin:
         detenerSonido(Sonidos.GANASTE)
 
     def restart(self):
+        self.cerrarHilo()
         detenerSonido(Sonidos.GANASTE)
         reproducirSonido(Sonidos.GANASTE)
+        self.hilo = threading.Thread(target=self.hiloSonido)
+        self.hilo.start()
+    
+    def hiloSonido(self):
+        while self.reproduciendo.is_set():
+            if not (reproduciendo(Sonidos.GANASTE)):
+                self.reproduciendo.clear()
+                root.after(0, lambda: sistema.siguienteNivel())
 
     def close(self):
         pass
@@ -376,7 +379,7 @@ class Sistema:
     nivelActual = 0
 
     def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), Inicio(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), Inicio(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), Fin()]
         iniciarPygame()
 
     def start(self):
