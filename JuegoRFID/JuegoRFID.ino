@@ -9,14 +9,13 @@
 
 #define NR_OF_READERS 2
 
-#define boton 3
-#define ledBoton 2
+#define BOTON 3
+#define BOTON_LED 2
 
 byte ssPins[] = {SS_1_PIN, SS_2_PIN};
- 
-MFRC522 mfrc522[NR_OF_READERS];
 #define PIN 5
 #define NUMPIXELS 5
+MFRC522 mfrc522[NR_OF_READERS];
 String tags[]={"",""};
 Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800); //nos permite controlar la tira con funciones de la libreria neopixel
 
@@ -68,59 +67,6 @@ void setParpadear(int _cant, int _r, int _g, int _b){
   g = _g;
   b = _b;
 }
-bool efectoInicioActivo = false;
-bool efectoInicioEncendido = false;
-unsigned int efectoInicioAnterior = 0;
-unsigned int efectoInicioContador = 0;
-
-void efectoInicio() {
-  efectoInicioActivo = true;
-  efectoInicioEncendido = true;
-  efectoInicioAnterior = millis();
-  efectoInicioContador = 1;
-  cambiarColorUniforme(255, 255, 255);
-}
-
-void eInicio(){
-  if (millis() - 400 > efectoInicioAnterior){
-    if (efectoInicioEncendido){
-      if (efectoInicioContador == 5) efectoInicioActivo = false;
-      cambiarColorUniforme(0, 0, 0);
-    } else {
-      efectoInicioContador++;
-      cambiarColorUniforme(255, 255, 255);
-    }
-    efectoInicioEncendido = !efectoInicioEncendido;
-    efectoInicioAnterior = millis();
-  }
-}
-
-bool efectoVictoriaActivo = false;
-bool efectoVictoriaEncendido = false;
-unsigned int efectoVictoriaAnterior = 0;
-unsigned int efectoVictoriaContador = 0;
-
-void efectoVictoria() {
-  efectoVictoriaActivo = true;
-  efectoVictoriaEncendido = true;
-  efectoVictoriaAnterior = millis();
-  efectoVictoriaContador = 1;
-  cambiarColorUniforme(0, 255, 0);
-}
-
-void eVictoria(){
-  if (millis() - 200 > efectoVictoriaAnterior){
-    if (efectoVictoriaEncendido){
-      if (efectoVictoriaContador == 3) efectoVictoriaActivo = false;
-      cambiarColorUniforme(0, 0, 0);
-    } else {
-      efectoVictoriaContador++;
-      cambiarColorUniforme(0, 255, 0);
-    }
-    efectoVictoriaEncendido = !efectoVictoriaEncendido;
-    efectoVictoriaAnterior = millis();
-  }
-}
 
 void recibirDatos(){
   if (Serial.available() > 0){
@@ -128,7 +74,7 @@ void recibirDatos(){
     switch (info){
       case Codigos::RFID_START://iniciar
         juegoRFIDIniciado = true;
-
+        setParpadear(5, 255, 255, 255);
         setVariables();
         break;
       case Codigos::RFID_RESTART://reiniciar
@@ -155,22 +101,23 @@ bool encendidoBoton = false;
 unsigned int anteriorBoton = 0;
 
 void setParpadeoBoton(){
-  digitalWrite(ledBoton, HIGH);
+  digitalWrite(BOTON_LED, HIGH);
   encendidoBoton = true;
   anteriorParpadeoBoton = millis();
 }
 
 void parpadeoBoton(){
-  if (millis() - anteriorParpadeoBoton >= 400){
+  unsigned int t = millis();
+  if (t - anteriorParpadeoBoton >= 400){
     encendido = !encendido;
-    digitalWrite(ledBoton, encendido);
-    anteriorParpadeoBoton = millis();
+    digitalWrite(BOTON_LED, encendido);
+    anteriorParpadeoBoton = t;
   }
 }
 
 void detenerBoton(){
   juegoBotonIniciado = false;
-  digitalWrite(ledBoton, LOW);
+  digitalWrite(BOTON_LED, LOW);
 }
 
 void terminoBoton(){
@@ -181,7 +128,8 @@ void terminoBoton(){
 void terminoRFID(){
   Serial.print(Codigos::RFID_TERMINO);
   juegoRFIDIniciado = false;
-  cambiarColorUniforme(0, 0, 0);
+  contadorParejasCorrectas = 0;
+  setParpadear(5, 255, 255, 255);
 }
 
 void setVariables(){
@@ -229,8 +177,8 @@ void parpadear() {
 }
 
 void setup() {
-  pinMode(boton, INPUT_PULLUP);//No se si es INPUT o INPUT_PULLUP
-  pinMode(ledBoton, OUTPUT);
+  pinMode(BOTON, INPUT_PULLUP);//No se si es INPUT o INPUT_PULLUP
+  pinMode(BOTON_LED, OUTPUT);
   
   Serial.begin(9600); // Initialize serial communications with the PC
   //while (!Serial); // Do nothing if no serial port is opened (added for Arduinos based on ATMEGA32U4)
@@ -245,7 +193,7 @@ void setup() {
   
 
   pixels.begin();
-  //pruebaLEDs();
+  
   cambiarColorUniforme(0, 0, 0);
 
   /*while(true) {
@@ -254,8 +202,7 @@ void setup() {
     if (identificate == Codigos::IDENTIFICATE) { Serial.print(Codigos::ID); break; }
     else continue;
   }*/
-  //efectoVictoria();
-  //efectoInicio();
+  setParpadear(5, 255, 255, 255);
 }
 
 void enviarParejasCorrectas(){
@@ -296,8 +243,7 @@ void loop() {
   parpadear();
   recibirDatos();
   //juegoRFIDIniciado = true;
-  if (efectoVictoriaActivo) eVictoria();
-  if (efectoInicioActivo) eInicio();
+  
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
       if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
@@ -311,13 +257,7 @@ void loop() {
       }
     }
     verificarCombinacion();
-    if (contadorParejasCorrectas == NUMPIXELS){
-      terminoRFID();
-      efectoVictoria();
-    } 
-  } else if (juegoBotonIniciado && !digitalRead(boton)){
-    terminoBoton();
-  } else if (juegoBotonIniciado){
-    parpadeoBoton();
-  }
+    if (contadorParejasCorrectas == NUMPIXELS) terminoRFID();
+  } else if (juegoBotonIniciado && !digitalRead(BOTON)) terminoBoton();
+  else if (juegoBotonIniciado) parpadeoBoton();
 }
