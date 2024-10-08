@@ -132,6 +132,7 @@ void perder(){
       perdio = true;
       estadoJugador1 = false;
       estadoJugador2 = false;
+      cantToques = 0;
     } else {
       cantToques++;
       ultToque = millis();
