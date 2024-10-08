@@ -18,6 +18,10 @@ bool estadoJugador2 = false;
 
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(CANT_PIXELES, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 
+unsigned int cantToques = 0;//cuantas veces tocó el alambre sin perder
+const unsigned int cantToquesPerdonados = 5;//Puede tocar n veces los alambres sin perder
+const unsigned int msGodMode = 200;//Cuantos milisegundos tenés de inmunidad después de tocar un alambre
+
 const unsigned int msDelayEntreNotificaciones = 1000;
 unsigned int tiempoAnteriorNotificacion = millis();
 
@@ -119,26 +123,23 @@ void empezar(){
   ledGanar = false;
   setLeds(0, 0, 255);
   perdio = false;
-  Serial.print(Codigos::JUGANDO);
 }
 
 void perder(){
+  if (true);
   perdio = true;
   estadoJugador1 = false;
   estadoJugador2 = false;
-  Serial.print(Codigos::PERDIERON);
 }
 
 void ganarJ1(){
   estadoJugador1 = true;
   setLed1(0, 255, 0);
-  Serial.print(Codigos::TERMINO_J1);
 }
 
 void ganarJ2(){
   estadoJugador2 = true;
   setLed2(0, 255, 0);
-  Serial.print(Codigos::TERMINO_J2);
 }
 
 void ganar(){
@@ -168,20 +169,8 @@ void loop()
     bool botonEmpezarState2 = !digitalRead(BOTON_EMPEZAR_2);
     bool botonGanarState2 = !digitalRead(BOTON_GANAR_2);
 
-    unsigned int t = millis();
-
     if (botonEmpezarState1 && botonEmpezarState2){
       empezar();
-    }
-
-    if (perdio && botonEmpezarState1 && !botonEmpezarState2){
-      setLed1(0, 0, 255);
-      setLed2(255, 0, 0);
-    } else if (perdio && !botonEmpezarState1 && botonEmpezarState2){
-      setLed2(0, 0, 255);
-      setLed1(255, 0, 0);
-    } else if (perdio && !botonEmpezarState1 && !botonEmpezarState2) {
-      setLeds(255, 0, 0);
     }
 
     if (botonPerderState1 && !estadoJugador1 || botonPerderState2 && !estadoJugador2){
@@ -199,12 +188,22 @@ void loop()
     if (estadoJugador1 && estadoJugador2){
       ganar();
     }
-    else if (t - msDelayEntreNotificaciones >= tiempoAnteriorNotificacion){
-      tiempoAnteriorNotificacion = t;
+    else if (millis() - msDelayEntreNotificaciones >= tiempoAnteriorNotificacion){
+      tiempoAnteriorNotificacion = millis();
       if (perdio) Serial.write(Codigos::PERDIERON);
       else if (estadoJugador1) Serial.write(Codigos::TERMINO_J1);
       else if (estadoJugador2) Serial.write(Codigos::TERMINO_J2);
       else Serial.write(Codigos::JUGANDO);
+    }
+
+    if (perdio && botonEmpezarState1 && !botonEmpezarState2){
+      setLed1(0, 0, 255);
+      setLed2(255, 0, 0);
+    } else if (perdio && !botonEmpezarState1 && botonEmpezarState2){
+      setLed2(0, 0, 255);
+      setLed1(255, 0, 0);
+    } else if (perdio && !botonEmpezarState1 && !botonEmpezarState2) {
+      setLeds(255, 0, 0);
     }
   }
 
