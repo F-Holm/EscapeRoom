@@ -18,6 +18,9 @@ bool estadoJugador2 = false;
 
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(CANT_PIXELES, PIN_NEOPIXEL, NEO_GRB + NEO_KHZ800);
 
+const unsigned int msDelayEntreNotificaciones = 1000;
+unsigned int tiempoAnteriorNotificacion = millis();
+
 bool listoEmpezar = false;
 
 bool ledGanar = false;
@@ -165,6 +168,7 @@ void loop()
     bool botonEmpezarState2 = !digitalRead(BOTON_EMPEZAR_2);
     bool botonGanarState2 = !digitalRead(BOTON_GANAR_2);
 
+    unsigned int t = millis();
 
     if (botonEmpezarState1 && botonEmpezarState2){
       empezar();
@@ -195,13 +199,22 @@ void loop()
     if (estadoJugador1 && estadoJugador2){
       ganar();
     }
+    else if (t - msDelayEntreNotificaciones >= tiempoAnteriorNotificacion){
+      tiempoAnteriorNotificacion = t;
+      if (perdio) Serial.write(Codigos::PERDIERON);
+      else if (estadoJugador1) Serial.write(Codigos::TERMINO_J1);
+      else if (estadoJugador2) Serial.write(Codigos::TERMINO_J2);
+      else Serial.write(Codigos::JUGANDO);
+    }
   }
 
-  //Tests
-  /*if (!digitalRead(BOTON_EMPEZAR_1)) Serial.println("Empezó 1");
+  // Tests //
+  /*
+  if (!digitalRead(BOTON_EMPEZAR_1)) Serial.println("Empezó 1");
   if (!digitalRead(BOTON_PERDER_1)) Serial.println("Perdió 1");
   if (!digitalRead(BOTON_PERDER_2)) Serial.println("Perdió 2");
   if (!digitalRead(BOTON_GANAR_1)) Serial.println("Ganó 1");
   if (!digitalRead(BOTON_EMPEZAR_2)) Serial.println("Empezó 2");
-  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");*/
+  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");
+  */
 }
