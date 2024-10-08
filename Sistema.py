@@ -286,21 +286,32 @@ class JuegoTrivia:
     def closeSocket(self):
         self.socket.close()
     
+    def _terminar(self):
+        if not self.terminar.is_set():
+            root.after(0, lambda: sistema.siguienteNivel())
+        self.terminar.set()
+        self.termino.set()
+    
     def analizarCodigo(self, codigo):
         if codigo == (Codigos.TRIVIA_0_MONEDAS.value):
             root.mostrarMonedas("0")
+            self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_1_MONEDAS.value):
             root.mostrarMonedas("1")
+            self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_2_MONEDAS.value):
             root.mostrarMonedas("2")
+            self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_3_MONEDAS.value):
             root.mostrarMonedas("3")
+            self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_4_MONEDAS.value):
             root.mostrarMonedas("4")
+            self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_PREGUNTA_1.value):
             root.actualizarEstado("Pregunta 1")
@@ -318,10 +329,7 @@ class JuegoTrivia:
             root.actualizarEstado("Pregunta 5")
             return False
         elif codigo == ord(Codigos.TERMINO.value):
-            if not self.terminar.is_set():
-                root.after(0, lambda: sistema.siguienteNivel())
-            self.terminar.set()
-            self.termino.set()
+            self._terminar()
             return False
         return True
 
@@ -371,8 +379,6 @@ class Fin:
 
     def close(self):
         pass
-
-
 
 class Sistema:
     niveles = None
