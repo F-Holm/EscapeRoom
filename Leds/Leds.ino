@@ -5,16 +5,12 @@ FASTLED_USING_NAMESPACE
 #define COLOR_ORDER GRB
 #define NUM_LEDS    300
 CRGB leds[300];
-
 #define BRIGHTNESS          255
 #define FRAMES_PER_SECOND  200
 
 #define RED 3
 #define GREEN 5
 #define BLUE 6
-
-
-unsigned int brilloNeoPixel = 50;
 
 String color = String('\0') + String('\0') + String('\0');
 
@@ -51,6 +47,85 @@ class RGB{
     }
 };
 
+class Efectos{
+  public:
+
+    static void apagado() {
+      for(int i = 0; i < NUM_LEDS;i++){
+        leds[i] = CRGB(0, 0, 0);
+      }
+      FastLED.show();
+    }
+
+    static void confetti() {
+      fadeToBlackBy( leds, NUM_LEDS, 20);
+      for (int veces=0;veces<random(0,15);veces++)
+      {
+        int pos = random16(NUM_LEDS);
+        leds[pos] += CRGB( 255, random(0,60), 0);
+      }
+      FastLED.show(); 
+    }
+
+    static void lightning(){
+      unsigned int tiempo=millis();
+
+      switch (etapaActual){
+        case 0:
+          for(int i=0; i<NUM_LEDS;i++){
+            leds[i]=CRGB(255, 255, 255);
+          }
+          FastLED.show();
+          etapaActual++;
+          previousMillis = tiempo;
+          break;
+        case 1:
+          if(tiempo - 5000 >= previousMillis){
+            for(int i=0; i<NUM_LEDS;i++){
+              leds[i]=CRGB(0, 0, 0);
+            }
+            FastLED.show(); 
+            previousMillis = tiempo;
+            etapaActual++;
+          }
+          break;
+        case 2:
+          if(tiempo - 5000 >= previousMillis){
+            for(int i=0; i<NUM_LEDS;i++){
+              leds[i]=CRGB(255, 255, 255);
+            }
+            FastLED.show(); 
+            previousMillis = tiempo;
+            etapaActual++;
+          }
+          break;
+        case 3:
+          if(tiempo - 500 >= previousMillis){
+            for(int i=0; i<NUM_LEDS;i++){
+              leds[i]=CRGB(0, 0, 0);
+            }
+            FastLED.show(); 
+            previousMillis = tiempo;
+            etapaActual++;
+          }
+          break;
+        case 4:
+          setEfecto(1);//default
+          break;
+      }
+    }
+
+    static void rayito() {
+      fadeToBlackBy( leds, NUM_LEDS, 20);
+      for (int veces=0;veces<random(0,15);veces++)
+      {
+        int pos = random16(NUM_LEDS);
+        leds[pos] += CRGB( random(200,255), random(200,255), random(200,255));
+      }
+      FastLED.show(); 
+    }
+};
+
 void setEfecto(int e){
   efectoActual = e;
   efectoActivo = true;
@@ -61,82 +136,13 @@ void setEfecto(int e){
 void efecto(){
   switch (efectoActual){
     case 0:
-      confetti();
+      Efectos::apagado();
       break;
     case 1:
-      lightning();
-      break;
-  }
-}
-
-//NEOPIXEL FASTLED
-void rayito() 
-{
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  for (int veces=0;veces<random(0,15);veces++)
-  {
-    int pos = random16(NUM_LEDS);
-    leds[pos] += CRGB( random(200,255), random(200,255), random(200,255));
-
-  }
-  FastLED.show(); 
-}
-
-void confetti() 
-{
-  fadeToBlackBy( leds, NUM_LEDS, 20);
-  for (int veces=0;veces<random(0,15);veces++)
-  {
-    int pos = random16(NUM_LEDS);
-    leds[pos] += CRGB( 255, random(0,60), 0);
-
-  }
-  FastLED.show(); 
-}
-void lightning(){
-  unsigned int tiempo=millis();
-
-  switch (etapaActual){
-    case 0:
-      for(int i=0; i<NUM_LEDS;i++){
-        leds[i]=CRGB(255, 255, 255);
-      }
-      FastLED.show();
-      etapaActual++;
-      previousMillis = tiempo;
-      break;
-    case 1:
-      if(tiempo - 5000 >= previousMillis){
-        for(int i=0; i<NUM_LEDS;i++){
-          leds[i]=CRGB(0, 0, 0);
-        }
-        FastLED.show(); 
-        previousMillis = tiempo;
-        etapaActual++;
-      }
+      Efectos::confetti();
       break;
     case 2:
-      if(tiempo - 5000 >= previousMillis){
-        for(int i=0; i<NUM_LEDS;i++){
-          leds[i]=CRGB(255, 255, 255);
-        }
-        FastLED.show(); 
-        previousMillis = tiempo;
-        etapaActual++;
-      }
-      break;
-    case 3:
-      if(tiempo - 500 >= previousMillis){
-        for(int i=0; i<NUM_LEDS;i++){
-          leds[i]=CRGB(0, 0, 0);
-        }
-        FastLED.show(); 
-        previousMillis = tiempo;
-        etapaActual++;
-      }
-      break;
-    case 4:
-      setEfecto(0);//default
+      Efectos::lightning();
       break;
   }
 }
@@ -170,7 +176,7 @@ void setup() {
 
 void loop() {
   /*if (efectoActivo) efecto();
-  if (Serial.available() > 0) {
+  /*if (Serial.available() > 0) {
     String colores = Serial.readString();//Si tiene 2 caracteres, si empieza en 0 es un efecto de luces RGB, si empieza en 1 es un efecto de neopixel. Si tiene 3 caracteres, cada caracter representa un color (RGB).
     if (colores.length() == 1) setEfecto(colores[0]);
     if (colores.length() == 3) cambiarColorRGB(colores);
