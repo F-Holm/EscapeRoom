@@ -27,4 +27,5 @@ def efecto(efecto):
     LEDS_ARDUINO.write(efecto.value)
 
 def closeLED():
-    LEDS_ARDUINO.close()
+    if LEDS_ARDUINO != None:
+        LEDS_ARDUINO.close()

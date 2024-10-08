@@ -10,9 +10,9 @@ IRA_ARDUINO = None
 BOTON_RFID_ARDUINO = None
 LEDS_ARDUINO = None
 
-IRA_ARDUINO = serial.Serial('/dev/ttyUSB2', 9600, timeout=1)
-BOTON_RFID_ARDUINO = serial.Serial('/dev/ttyUSB1', 9600, timeout=1)
-LEDS_ARDUINO = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
+#IRA_ARDUINO = serial.Serial('/dev/ttyUSB2', 9600, timeout=1)
+#BOTON_RFID_ARDUINO = serial.Serial('/dev/ttyUSB1', 9600, timeout=1)
+#LEDS_ARDUINO = serial.Serial('/dev/ttyUSB0', 9600, timeout=1)
 
 ira = None
 boton_rfid = None
