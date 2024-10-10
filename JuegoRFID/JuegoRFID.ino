@@ -74,7 +74,7 @@ void recibirDatos(){
     switch (info){
       case Codigos::RFID_START://iniciar
         juegoRFIDIniciado = true;
-        setParpadear(5, 255, 255, 255);
+        setParpadear(999999, 255, 255, 255);
         setVariables();
         break;
       case Codigos::RFID_RESTART://reiniciar
@@ -135,6 +135,7 @@ void terminoRFID(){
 void setVariables(){
   for (int i = 0;i < NUMPIXELS;i++) estadoParejas[i] = false;
   contadorParejasCorrectas = 0;
+  cambiarColorUniforme(0, 0, 0);
   cantParpadeos = 0;
   enviarParejasCorrectas();
 }
@@ -156,7 +157,7 @@ void setRespuestasCorrectasNeopixel(){
   pixels.show();
 }
 
-// Función para parpadear los LEDs en rojo
+// Función para parpadear los LEDs
 void parpadear() {
   if(cantParpadeos == 0) return;
   if(millis() - anterior < 400) return;
@@ -214,6 +215,7 @@ void verificarCombinacion() {
   // Comprobar si los tags leídos corresponden a una pareja y si no han sido utilizados
     if ((tags[0] == parejas[i][0] && tags[1] == parejas[i][1]) || (tags[0] == parejas[i][1] && tags[1] == parejas[i][0])) {
       if (!estadoParejas[i]) { // Si la pareja no ha sido ingresada
+        cantParpadeos = 0;
         estadoParejas[i] = true; // Marcamos la pareja como ingresada
         contadorParejasCorrectas++; // Aumentamos el contador
         // Encender el LED correspondiente
