@@ -12,12 +12,19 @@ CRGB leds[300];
 #define GREEN 5
 #define BLUE 6
 
-String color = String('\0') + String('\0') + String('\0');
+String color = String('\255') + String('\0') + String('\0');
 
-unsigned long previousMillis = 0;
+unsigned int previousMillis = 0;
 int efectoActual = -1;
 int etapaActual = -1;
 bool efectoActivo = false;
+
+void setEfecto(int e){
+  efectoActual = e;
+  efectoActivo = true;
+  etapaActual = 0;
+  previousMillis = millis();
+}
 
 class RGB{
   public:
@@ -67,21 +74,33 @@ class Efectos{
       FastLED.show(); 
     }
 
+    static void encendidoGradual() {
+      for (int veces=0;veces<random(0,15);veces++)
+      {
+        int pos = random16(NUM_LEDS);
+        leds[pos] = CRGB( 255, random(0,60), 0);
+      }
+      FastLED.show(); 
+    }
+
+
     static void lightning(){
-      unsigned int tiempo=millis();
+      unsigned int tiempo = millis();
 
       switch (etapaActual){
         case 0:
-          for(int i=0; i<NUM_LEDS;i++){
-            leds[i]=CRGB(255, 255, 255);
+          for(int i=0; i<NUM_LEDS ;i++){
+            if(i<100) leds[i] =CRGB(255, 255, 255);
+            else leds[i] =CRGB(255, 0, 0);
           }
           FastLED.show();
           etapaActual++;
           previousMillis = tiempo;
           break;
         case 1:
-          if(tiempo - 5000 >= previousMillis){
-            for(int i=0; i<NUM_LEDS;i++){
+          //delay(400);
+          if(tiempo >= previousMillis + 800){
+            for(int i=0; i<NUM_LEDS ;i++){
               leds[i]=CRGB(0, 0, 0);
             }
             FastLED.show(); 
@@ -90,9 +109,11 @@ class Efectos{
           }
           break;
         case 2:
-          if(tiempo - 5000 >= previousMillis){
-            for(int i=0; i<NUM_LEDS;i++){
-              leds[i]=CRGB(255, 255, 255);
+          //delay(200);
+          if(tiempo >= previousMillis + 400){
+            for(int i=0; i<NUM_LEDS ;i++){
+              if(i<100) leds[i] =CRGB(255, 255, 255);
+              else leds[i] =CRGB(255,0,0);
             }
             FastLED.show(); 
             previousMillis = tiempo;
@@ -100,8 +121,9 @@ class Efectos{
           }
           break;
         case 3:
-          if(tiempo - 500 >= previousMillis){
-            for(int i=0; i<NUM_LEDS;i++){
+          //delay(400);
+          if(tiempo >= previousMillis + 800){
+            for(int i=0; i<NUM_LEDS ;i++){
               leds[i]=CRGB(0, 0, 0);
             }
             FastLED.show(); 
@@ -110,28 +132,24 @@ class Efectos{
           }
           break;
         case 4:
-          setEfecto(1);//default
+          Efectos::apagado();
+          delay(3000);
+          setEfecto(2);//default
           break;
       }
     }
 
-    static void rayito() {
+    static void rayito() {int pos = random16(NUM_LEDS);
+        leds[pos] += CRGB( 255, 255, 255);
       fadeToBlackBy( leds, NUM_LEDS, 20);
       for (int veces=0;veces<random(0,15);veces++)
       {
         int pos = random16(NUM_LEDS);
-        leds[pos] += CRGB( random(200,255), random(200,255), random(200,255));
+        leds[pos] += CRGB( 255, 255, 255);
       }
       FastLED.show(); 
     }
 };
-
-void setEfecto(int e){
-  efectoActual = e;
-  efectoActivo = true;
-  etapaActual = 0;
-  previousMillis = millis();
-}
 
 void efecto(){
   switch (efectoActual){
@@ -143,6 +161,12 @@ void efecto(){
       break;
     case 2:
       Efectos::lightning();
+      break;
+    case 3:
+      Efectos::rayito();
+      break;
+    case 4:
+      Efectos::encendidoGradual();
       break;
   }
 }
@@ -169,9 +193,9 @@ void setup() {
     while (Serial.available() <= 0);
     int identificate = Serial.read();
     if (identificate == 5) Serial.print(8);
-    else continue;
+    else continue;random(200,
   }*/
-  setEfecto(1);
+  setEfecto(2);
 }
 
 void loop() {
@@ -181,6 +205,7 @@ void loop() {
     if (colores.length() == 1) setEfecto(colores[0]);
     if (colores.length() == 3) cambiarColorRGB(colores);
   }*/
+
   efecto();
-  RGB::cambiarColor(255, 0, 0);
+
 }
