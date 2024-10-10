@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkinter import messagebox
 import serial, threading, socket
 from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame, reproduciendo, reproducirSonido, detenerSonido
-from Led import cambiarColor, efecto, EfectosLedsRGB, Colores, EfectosNeoPixel, EfectosGlobales, closeLED
+from Led import efecto, Efectos, closeLED
 from Codigos import Codigos
 from Puertos import Puertos, IRA_ARDUINO, BOTON_RFID_ARDUINO, LEDS_ARDUINO
 from Niveles import Niveles, getNivel
@@ -28,6 +28,22 @@ class NivelTest:
     def close(self):
         pass
 
+class Pre_Inicial:
+    def __init__(self):
+        pass
+
+    def start(self):
+        efecto(Efectos.APAGADO)
+
+    def stop(self):
+        pass
+
+    def restart(self):
+        pass
+
+    def close(self):
+        pass
+
 class Inicio:
     reproduciendo = None
     hilo = None
@@ -38,7 +54,7 @@ class Inicio:
     def start(self):
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.reproduciendo.set()
-        reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
+        reproducirSonido(Sonidos.INTRODUCCION)
         self.hilo.start()
 
     def cerrarHilo(self):
@@ -48,18 +64,18 @@ class Inicio:
     
     def stop(self):
         self.cerrarHilo()
-        detenerSonido(Sonidos.TEXTO_MAS_LENTO)
+        detenerSonido(Sonidos.INTRODUCCION)
 
     def restart(self):
         self.cerrarHilo()
-        detenerSonido(Sonidos.TEXTO_MAS_LENTO)
-        reproducirSonido(Sonidos.TEXTO_MAS_LENTO)
+        detenerSonido(Sonidos.INTRODUCCION)
+        reproducirSonido(Sonidos.INTRODUCCION)
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.hilo.start()
     
     def hiloSonido(self):
         while self.reproduciendo.is_set():
-            if not (reproduciendo(Sonidos.TEXTO_MAS_LENTO)):
+            if not (reproduciendo(Sonidos.INTRODUCCION)):
                 self.reproduciendo.clear()
                 root.after(0, lambda: sistema.siguienteNivel())
 
@@ -92,6 +108,7 @@ class NivelBoton:
     def stop(self):
         self.cerrarHilo()
         detenerSonido(Sonidos.DESPERTADOR)
+        efecto(Efectos.ENCENDIDO_GRADUAL)
     
     def close(self):
         self.cerrarHilo()
@@ -384,9 +401,9 @@ class Sistema:
     niveles = None
     nivelActual = 0
 
-    def __init__(self):#NivelTest(), Inicio(), NivelBoton(), JuegoIra(), JuegoRFID(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), Inicio(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), Fin()]
-        iniciarPygame()
+    def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        iniciarPygame()#NivelTest
 
     def start(self):
         self.niveles[self.nivelActual].start()
@@ -454,11 +471,8 @@ class App(tk.Tk):
         
         self.escaperoom()
         self.nivelActual()
-        self.efectosGlobales()
-        self.efectosNeoPixel()
-        self.efectosLedsRGB()
-        self.coloresLedsRGB()
-        self.sonidos()
+        self.efectos()
+        self.sonidos1()
         self.sonidos2()
         
         #self.crearSwitch()
@@ -575,83 +589,40 @@ class App(tk.Tk):
         
         self.separadorHorizontal()
 
-    def efectosGlobales(self):
+    def efectos(self):
         row_frame = tk.Frame(self.main_frame)
         row_frame.pack(fill='x', expand=True)
         
-        row_label = tk.Label(row_frame, text="Efectos Globales")
+        row_label = tk.Label(row_frame, text="Efectos")
         row_label.pack(fill='x')
         
-        button_text = "Rayo"
-        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosGlobales.RAYO))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-        
-        self.separadorHorizontal()
-
-    def efectosNeoPixel(self):
-        row_frame = tk.Frame(self.main_frame)
-        row_frame.pack(fill='x', expand=True)
-        
-        row_label = tk.Label(row_frame, text="Efectos Neo Pixel")
-        row_label.pack(fill='x')
-        
-        button_text = "Cielo Infierno"
-        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosNeoPixel.CIELO_INFIERNO))
+        button_text = "Apagado"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.APAGADO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
-        button_text = "Cielo"
-        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosNeoPixel.CIELO))
+        button_text = "Confetti"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.CONFETTI))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Relámpago"
-        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosNeoPixel.RELAMPAGO))
+        button_text = "Lightning"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.LIGHTNING))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-        
-        self.separadorHorizontal()
 
-    def efectosLedsRGB(self):
-        row_frame = tk.Frame(self.main_frame)
-        row_frame.pack(fill='x', expand=True)
-        
-        row_label = tk.Label(row_frame, text="Efectos LEDs RGB")
-        row_label.pack(fill='x')
-        
-        button_text = "Rayo"
-        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(EfectosLedsRGB.RAYO))
+        button_text = "Cierre"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.CIERRE))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-        
-        self.separadorHorizontal()
 
-    def coloresLedsRGB(self):
-        row_frame = tk.Frame(self.main_frame)
-        row_frame.pack(fill='x', expand=True)
-        
-        row_label = tk.Label(row_frame, text="Colores LEDs")
-        row_label.pack(fill='x')
-        
-        button_text = "Negro"
-        button = tk.Button(row_frame, text=button_text, command=lambda: cambiarColor(Colores.NEGRO))
+        button_text = "Encendido Gradual"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.ENCENDIDO_GRADUAL))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
         button_text = "Blanco"
-        button = tk.Button(row_frame, text=button_text, command=lambda: cambiarColor(Colores.BLANCO))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-
-        button_text = "Rojo"
-        button = tk.Button(row_frame, text=button_text, command=lambda: cambiarColor(Colores.ROJO))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-
-        button_text = "Verde"
-        button = tk.Button(row_frame, text=button_text, command=lambda: cambiarColor(Colores.VERDE))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-
-        button_text = "Azul"
-        button = tk.Button(row_frame, text=button_text, command=lambda: cambiarColor(Colores.AZUL))
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.BLANCO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         self.separadorHorizontal()
 
-    def sonidos(self):
+    def sonidos1(self):
         row_frame = tk.Frame(self.main_frame)
         row_frame.pack(fill='x', expand=True)
         
@@ -690,10 +661,6 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HORA))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Perdiste"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PERDISTE))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-        
         #self.separadorHorizontal()
     
     def sonidos2(self):
@@ -703,6 +670,10 @@ class App(tk.Tk):
         #row_label = tk.Label(row_frame, text="Sonidos")
         #row_label.pack(fill='x')
         
+        button_text = "Perdiste"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PERDISTE))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
         button_text = "Risa Mala"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
@@ -711,8 +682,8 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA_2))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Texto"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.TEXTO_MAS_LENTO))
+        button_text = "Introducción"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.INTRODUCCION))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         #self.separadorHorizontal()

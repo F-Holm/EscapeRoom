@@ -20,7 +20,8 @@ class Sonidos(Enum):
     PERDISTE = Sonido("Sonidos/perdiste.mp3", 0, 7, 1.0)
     RISA_MALA = Sonido("Sonidos/risa_mala.mp3", 0, 8, 1.0)
     RISA_MALA_2 = Sonido("Sonidos/risa_mala_2.mp3", 0, 9, 1.0)
-    TEXTO_MAS_LENTO = Sonido("Sonidos/texto_mas_lento.mp3", 0, 10, 1.0)
+    INTRODUCCION = Sonido("Sonidos/Introducción.mp3", 0, 10, 1.0)
+    _333 = Sonido("Sonidos/333.mp3", 0, 10, 1.0)
 
 CANTIDAD_CANALES = 11
 

@@ -4,8 +4,8 @@ class Niveles(Enum):
     PRE_INICIAL = "Estado Pre-Inicial"
     INICIO = "Inicio"
     JUEGO_BOTON = "Juego Botón"
-    JUEGO_IRA = "Juego Ira"
     JUEGO_RFID = "Juego RFID"
+    JUEGO_IRA = "Juego Ira"
     JUEGO_TRIVIA = "Juego Trivia"
     FINAL = "Etapa Final"
 
@@ -17,9 +17,9 @@ def getNivel(numNivel):
     elif numNivel == 2:
         return Niveles.JUEGO_BOTON
     elif numNivel == 3:
-        return Niveles.JUEGO_IRA
-    elif numNivel == 4:
         return Niveles.JUEGO_RFID
+    elif numNivel == 4:
+        return Niveles.JUEGO_IRA
     elif numNivel == 5:
         return Niveles.JUEGO_TRIVIA
     elif numNivel == 6:
