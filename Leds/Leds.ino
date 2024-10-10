@@ -12,23 +12,12 @@ CRGB leds[300];
 #define GREEN 5
 #define BLUE 6
 
-String color = String('\255') + String('\0') + String('\0');
-
-unsigned int previousMillis = 0;
-int efectoActual = -1;
-int etapaActual = -1;
-bool efectoActivo = false;
-
-void setEfecto(int e){
-  efectoActual = e;
-  efectoActivo = true;
-  etapaActual = 0;
-  previousMillis = millis();
-}
-
 class RGB{
   public:
-    static void cambiarColor(int r, int g, int b){
+
+    static String color;
+
+    static void cambiarColorSinGuardar(int r, int g, int b){
       analogWrite(RED, r);
       analogWrite(GREEN, g);
       analogWrite(BLUE, b);
@@ -52,10 +41,40 @@ class RGB{
       analogWrite(GREEN, color[1]);
       analogWrite(BLUE, color[2]);
     }
-};
+}; String RGB::color = String('\255') + String('\0') + String('\0');
 
 class Efectos{
   public:
+
+    static unsigned int previousMillis;
+    static int efectoActual;
+    static int etapaActual;
+
+    static void efecto(){
+      switch (efectoActual){
+        case 0:
+          Efectos::apagado();
+          break;
+        case 1:
+          Efectos::confetti();
+          break;
+        case 2:
+          Efectos::lightning();
+          break;
+        case 3:
+          Efectos::rayito();
+          break;
+        case 4:
+          Efectos::encendidoGradual();
+          break;
+      }
+    }
+
+    static void setEfecto(int e){
+      efectoActual = e;
+      etapaActual = 0;
+      previousMillis = millis();
+    }
 
     static void apagado() {
       for(int i = 0; i < NUM_LEDS;i++){
@@ -75,64 +94,79 @@ class Efectos{
     }
 
     static void encendidoGradual() {
+      static int n = 0;
+      unsigned int tiempo = millis();
+
       for (int veces=0;veces<random(0,15);veces++)
       {
         int pos = random16(NUM_LEDS);
         leds[pos] = CRGB( 255, random(0,60), 0);
       }
-      FastLED.show(); 
-    }
+      FastLED.show();
+      
+      if (n == 0) RGB::cambiarColorSinGuardar(n, 0, 0);
+      if (previousMillis + n*(5670/255) <= millis()){
+        n++;
+        RGB::cambiarColorSinGuardar(n, 0, 0);
+        if (n == 255) n = 0;
+      }
+      if (previousMillis + 5670 <= millis()) setEfecto(1);
 
+    }
 
     static void lightning(){
       unsigned int tiempo = millis();
 
       switch (etapaActual){
         case 0:
-          for(int i=0; i<NUM_LEDS ;i++){
-            if(i<100) leds[i] =CRGB(255, 255, 255);
-            else leds[i] =CRGB(255, 0, 0);
+          if(true /*tiempo >= previousMillis + 800*/){
+            for(int i=0; i<NUM_LEDS ;i++){
+              if(i<100) leds[i] = CRGB(160, 160, 255);
+              else leds[i] = CRGB(70, 70, 255);
+            }
+            FastLED.show();
+            RGB::cambiarColorSinGuardar(125, 90, 100);
+            etapaActual++;
+            previousMillis = tiempo;
           }
-          FastLED.show();
-          etapaActual++;
-          previousMillis = tiempo;
           break;
         case 1:
-          //delay(400);
           if(tiempo >= previousMillis + 800){
-            for(int i=0; i<NUM_LEDS ;i++){
-              leds[i]=CRGB(0, 0, 0);
+            for(int i = 0; i < NUM_LEDS ;i++){
+              leds[i] = CRGB(0, 0, 0);
             }
-            FastLED.show(); 
+            FastLED.show();
+            RGB::cambiarColorSinGuardar(0, 0, 0);
             previousMillis = tiempo;
             etapaActual++;
           }
           break;
         case 2:
-          //delay(200);
-          if(tiempo >= previousMillis + 400){
+          if(tiempo >= previousMillis + 200){
             for(int i=0; i<NUM_LEDS ;i++){
-              if(i<100) leds[i] =CRGB(255, 255, 255);
-              else leds[i] =CRGB(255,0,0);
+              if(i<100) leds[i] = CRGB(160, 160, 255);
+              else leds[i] = CRGB(70,70,255);
             }
-            FastLED.show(); 
+            FastLED.show();
+            RGB::cambiarColorSinGuardar(125, 90, 100);
             previousMillis = tiempo;
             etapaActual++;
           }
           break;
         case 3:
-          //delay(400);
           if(tiempo >= previousMillis + 800){
             for(int i=0; i<NUM_LEDS ;i++){
-              leds[i]=CRGB(0, 0, 0);
+              leds[i] = CRGB(0, 0, 0);
             }
-            FastLED.show(); 
+            FastLED.show();
+            RGB::cambiarColorSinGuardar(0, 0, 0);
             previousMillis = tiempo;
             etapaActual++;
           }
           break;
         case 4:
           Efectos::apagado();
+          RGB::defaultColor();
           delay(3000);
           setEfecto(2);//default
           break;
@@ -149,27 +183,9 @@ class Efectos{
       }
       FastLED.show(); 
     }
-};
+}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1;
 
-void efecto(){
-  switch (efectoActual){
-    case 0:
-      Efectos::apagado();
-      break;
-    case 1:
-      Efectos::confetti();
-      break;
-    case 2:
-      Efectos::lightning();
-      break;
-    case 3:
-      Efectos::rayito();
-      break;
-    case 4:
-      Efectos::encendidoGradual();
-      break;
-  }
-}
+
 
 void setup() {
   FastLED.addLeds<LED_TYPE,11,BRG>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
@@ -178,34 +194,28 @@ void setup() {
 
   FastLED.setBrightness(BRIGHTNESS);
 
-
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
 
   RGB::defaultColor();
 
-
-
   Serial.begin(9600);
-
   /*while(true) {
     while (Serial.available() <= 0);
     int identificate = Serial.read();
     if (identificate == 5) Serial.print(8);
-    else continue;random(200,
+    else continue;
   }*/
-  setEfecto(2);
+  Efectos::setEfecto(2);
 }
 
 void loop() {
-  /*if (efectoActivo) efecto();
   /*if (Serial.available() > 0) {
-    String colores = Serial.readString();//Si tiene 2 caracteres, si empieza en 0 es un efecto de luces RGB, si empieza en 1 es un efecto de neopixel. Si tiene 3 caracteres, cada caracter representa un color (RGB).
-    if (colores.length() == 1) setEfecto(colores[0]);
-    if (colores.length() == 3) cambiarColorRGB(colores);
+    String color = Serial.readString();//Si tiene 2 caracteres, si empieza en 0 es un efecto de luces RGB, si empieza en 1 es un efecto de neopixel. Si tiene 3 caracteres, cada caracter representa un color (RGB).
+    if (color.length() == 1) Efectos::setEfecto(colores[0]);
+    if (color.length() == 3) RGB::cambiarColor(colores);
   }*/
-
-  efecto();
+  Efectos::efecto();
 
 }
