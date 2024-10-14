@@ -114,7 +114,7 @@ class Efectos{
           }
           break;
         case 1:
-          if(tiempo >= previousMillis + 800){
+          if(tiempo >= previousMillis + 300){
             for(int i = 0; i < NUM_LEDS ;i++){
               leds[i] = CRGB(0, 0, 0);
             }
@@ -125,7 +125,7 @@ class Efectos{
           }
           break;
         case 2:
-          if(tiempo >= previousMillis + 200){
+          if(tiempo >= previousMillis + 100){
             for(int i=0; i<NUM_LEDS ;i++){
               if(i<100) leds[i] = CRGB(160, 160, 255);
               else leds[i] = CRGB(70,70,255);
@@ -137,7 +137,7 @@ class Efectos{
           }
           break;
         case 3:
-          if(tiempo >= previousMillis + 800){
+          if(tiempo >= previousMillis + 300){
             for(int i=0; i<NUM_LEDS ;i++){
               leds[i] = CRGB(0, 0, 0);
             }
@@ -148,6 +148,52 @@ class Efectos{
           }
           break;
         case 4:
+          if(tiempo >= previousMillis + 100){
+            for(int i=0; i<NUM_LEDS ;i++){
+              if(i<100) leds[i] = CRGB(160, 160, 255);
+              else leds[i] = CRGB(70, 70, 255);
+            }
+            FastLED.show();
+            RGB::cambiarColor(125, 90, 100);
+            etapaActual++;
+            previousMillis = tiempo;
+          }
+          break;
+        case 5:
+          if(tiempo >= previousMillis + 300){
+            for(int i = 0; i < NUM_LEDS ;i++){
+              leds[i] = CRGB(0, 0, 0);
+            }
+            FastLED.show();
+            RGB::cambiarColor(0, 0, 0);
+            previousMillis = tiempo;
+            etapaActual++;
+          }
+          break;
+        case 6:
+          if(tiempo >= previousMillis + 100){
+            for(int i=0; i<NUM_LEDS ;i++){
+              if(i<100) leds[i] = CRGB(160, 160, 255);
+              else leds[i] = CRGB(70,70,255);
+            }
+            FastLED.show();
+            RGB::cambiarColor(125, 90, 100);
+            previousMillis = tiempo;
+            etapaActual++;
+          }
+          break;
+        case 7:
+          if(tiempo >= previousMillis + 300){
+            for(int i=0; i<NUM_LEDS ;i++){
+              leds[i] = CRGB(0, 0, 0);
+            }
+            FastLED.show();
+            RGB::cambiarColor(0, 0, 0);
+            previousMillis = tiempo;
+            etapaActual++;
+          }
+          break;
+        case 8:
           if(tiempo >= previousMillis + 200) set(1);//default
           break;
       }
@@ -170,8 +216,8 @@ class Efectos{
         n++;
       }
       if (previousMillis + 4000 <= millis()) {
-        set(5);
         n = 0;
+        set(5);
       }
 
     }
