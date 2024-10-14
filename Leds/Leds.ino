@@ -38,9 +38,10 @@ class Efectos{
     static unsigned int previousMillis;
     static int efectoActual;
     static int etapaActual;
-    static int rojo;
+    static unsigned int n;
 
     static void set(int e){
+      if (e == 3 || e == 4) n = 0;
       efectoActual = e;
       etapaActual = 0;
       previousMillis = millis();
@@ -52,11 +53,11 @@ class Efectos{
       }
       FastLED.show();
       RGB::cambiarColor(0, 0, 0);
+      n = 0;
       set(-1);
     }
 
     static void confetti() {
-      static unsigned int n = 0;
       static bool prendiendo = true;
       
       fadeToBlackBy( leds, NUM_LEDS, 20);
@@ -72,11 +73,10 @@ class Efectos{
       n = (prendiendo ? n + 1 : n - 1);
       RGB::cambiarColor(n, 0, 0);
 
-      if (previousMillis + 2000 <= millis()) set(3);
+      //if (previousMillis + 2000 <= millis()) set(3);
     }
 
     static void encendidoGradual() {
-      static int n = 0;
       unsigned int tiempo = millis();
 
       for (int veces=0;veces<random(0,15);veces++)
@@ -86,13 +86,14 @@ class Efectos{
       }
       FastLED.show();
       
-      if (n == 0) RGB::cambiarColor(n, 0, 0);
       if (previousMillis + n*(5670/255) <= millis()){
-        n++;
         RGB::cambiarColor(n, 0, 0);
-        if (n == 255) n = 0;
+        n++;
       }
-      if (previousMillis + 5670 <= millis()) set(1);
+      if (previousMillis + 5670 <= millis()) {
+        set(1);
+        n = 0;
+      }
 
     }
 
@@ -153,7 +154,6 @@ class Efectos{
     }
 
     static void cierre() {
-      static int n = 0;
       unsigned int tiempo = millis();
 
       for (int veces=0;veces<random(0,15);veces++)
@@ -165,13 +165,14 @@ class Efectos{
       
       FastLED.show();
 
-      if (n == 0) RGB::cambiarColor(RGB::r, n, n);
       if (previousMillis + n*(4000/255) <= millis()){
-        n++;
         RGB::cambiarColor((n > RGB::r ? n : RGB::r), (n > 180 ? 180 : n), (n > 200 ? 200 : n));
-        if (n == 255) n = 0;
+        n++;
       }
-      if (previousMillis + 4000 <= millis()) set(5);
+      if (previousMillis + 4000 <= millis()) {
+        set(5);
+        n = 0;
+      }
 
     }
 
@@ -186,7 +187,7 @@ class Efectos{
     }
 
 
-}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1; int rojo = 0;
+}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1; unsigned int Efectos::n = 0;
 
 void efecto(){
   switch (Efectos::efectoActual){
@@ -235,6 +236,7 @@ void setup() {
 void loop() {
   if (Serial.available() > 0) {
     int efecto = Serial.read();
+    //Serial.println(efecto);
     Efectos::set(efecto);
   }
   efecto();
