@@ -181,7 +181,7 @@ void loop()
       empezar();
     }
 
-    if (botonPerderState1 && !estadoJugador1 || botonPerderState2 && !estadoJugador2){
+    if (botonPerderState1 && !estadoJugador1 || botonPerderState2 && !estadoJugador2 && !perdio){
       perder();
     }
 
