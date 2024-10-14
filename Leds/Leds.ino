@@ -12,6 +12,8 @@ CRGB leds[300];
 #define GREEN 5
 #define BLUE 6
 
+#define AGUA 7
+
 class RGB{
   public:
 
@@ -219,10 +221,30 @@ class Efectos{
         n = 0;
         set(5);
       }
-
     }
 
-    static void blanco (){
+    static void perdiste() {
+      unsigned int tiempo = millis();
+
+      for (int veces=0;veces<random(0,15);veces++)
+      {
+        int pos = random16(NUM_LEDS);
+        leds[pos] = CRGB(255, 0, 0);
+      }
+      
+      FastLED.show();
+
+      if (previousMillis + n*(4000/255) <= millis()){
+        RGB::cambiarColor((n > RGB::r ? n : RGB::r), 0, 0);
+        n++;
+      }
+      if (previousMillis + 4000 <= millis()) {
+        n = 0;
+        set(7);
+      }
+    }
+
+    static void blanco(){
       for(int i = 0; i < NUM_LEDS;i++){
         if (i < 100) leds[i] = CRGB(160, 160, 255);
         else leds[i] = CRGB(70, 70, 255);
@@ -232,8 +254,33 @@ class Efectos{
       set(-1);
     }
 
+    static void rojo(){
+      for(int i = 0; i < NUM_LEDS;i++){
+        leds[i] = CRGB(255, 0, 0);
+      }
+      FastLED.show();
+      RGB::cambiarColor(255, 0, 0);
+      set(-1);
+    }
+
 
 }; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1; unsigned int Efectos::n = 0;
+
+bool aguaActiva = false;
+unsigned int inicioAgua = 0;
+
+void setAgua(){
+  aguaActiva = true;
+  inicioAgua = millis();
+  digitalWrite(AGUA, HIGH);
+}
+
+void agua(){
+  if (aguaActiva && inicioAgua + 500 <= millis()) {
+    digitalWrite(AGUA, LOW);
+    aguaActiva = false;
+  }
+}
 
 void efecto(){
   switch (Efectos::efectoActual){
@@ -254,6 +301,13 @@ void efecto(){
       break;
     case 5:
       Efectos::blanco();
+      break;
+    case 6:
+      Efectos::perdiste();
+      break;
+    case 7:
+      Efectos::rojo();
+      break;
   }
 }
 
@@ -282,8 +336,9 @@ void setup() {
 void loop() {
   if (Serial.available() > 0) {
     int efecto = Serial.read();
-    //Serial.println(efecto);
-    Efectos::set(efecto);
+    if(efecto != 200) Efectos::set(efecto);
+    else setAgua();
   }
   efecto();
+  agua();
 }
