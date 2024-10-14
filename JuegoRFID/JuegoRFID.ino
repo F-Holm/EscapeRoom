@@ -203,7 +203,7 @@ void setup() {
     if (identificate == Codigos::IDENTIFICATE) { Serial.print(Codigos::ID); break; }
     else continue;
   }*/
-  //juegoRFIDIniciado = true;setVariables();setParpadear(999999, 255, 255, 255);
+  juegoRFIDIniciado = true;setVariables();setParpadear(999999, 255, 255, 255);
 }
 
 void enviarParejasCorrectas(){
