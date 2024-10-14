@@ -434,11 +434,6 @@ class Sistema:
             0, self.start()
         root.actualizarNivel(self.nivelActual)
     
-    def reiniciarJuego(self):
-        self.stop()
-        self.nivelActual = 0
-        self.start()
-    
     def terminarJuego(self):
         for nivel in self.niveles:
             nivel.close()
@@ -546,9 +541,9 @@ class App(tk.Tk):
         row_label = tk.Label(row_frame, text="Escape Room")
         row_label.pack(fill='x')
 
-        button_text = "Iniciar Escape Room"
-        button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(0))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        #button_text = "Iniciar Escape Room"
+        #button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(0))
+        #button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
         button_text = "Nivel Anterior"
         button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(1))
@@ -710,5 +705,6 @@ class App(tk.Tk):
         messagebox.showinfo("Notificación", "Ganaron " + monedas + " monedas")
 
 if __name__ == "__main__":
+    iniciarSistema()
     root = App()
     root.mainloop()
