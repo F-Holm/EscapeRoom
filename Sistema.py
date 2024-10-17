@@ -454,10 +454,10 @@ class Sistema:
         self.start()
         root.actualizarNivel(self.nivelActual)
     
-    def startTimer():
-        _333 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
-        _7 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._))
-        _10 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
+    def startTimer(self):
+        self._333 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
+        self._7 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._))
+        self._10 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
 
 def iniciarSistema():
     global sistema
@@ -484,6 +484,7 @@ class App(tk.Tk):
         self.escaperoom()
         self.nivelActual()
         self.efectos()
+        self.pistas()
         self.sonidos1()
         self.sonidos2()
         
@@ -642,6 +643,35 @@ class App(tk.Tk):
 
         self.separadorHorizontal()
 
+    def pistas(self):
+        row_frame = tk.Frame(self.main_frame)
+        row_frame.pack(fill='x', expand=True)
+        
+        row_label = tk.Label(row_frame, text="Pistas")
+        row_label.pack(fill='x')
+        
+        button_text = "Armario"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PISTA_ARMARIO))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Gula"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PISTA_GULA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Ira"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PISTA_IRA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Lujuria"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PISTA_LUJURIA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        button_text = "Código"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PISTA_CODIGO))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
+        self.separadorHorizontal()
+
     def sonidos1(self):
         row_frame = tk.Frame(self.main_frame)
         row_frame.pack(fill='x', expand=True)
@@ -653,14 +683,6 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=detenerTodosLosSonidos)
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Risa Diabólica"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_DIABOLICA))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-
-        button_text = "Grito"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.GRITO))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-
         button_text = "Despertador"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.DESPERTADOR))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
@@ -677,10 +699,14 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.GANASTE))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Hora"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HORA))
+        button_text = "Perdiste"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PERDISTE))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-        
+
+        button_text = "Introducción"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.INTRODUCCION))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
         #self.separadorHorizontal()
     
     def sonidos2(self):
@@ -690,21 +716,18 @@ class App(tk.Tk):
         #row_label = tk.Label(row_frame, text="Sonidos")
         #row_label.pack(fill='x')
         
-        button_text = "Perdiste"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PERDISTE))
-        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
-
-        button_text = "Risa Mala"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA))
+        button_text = "Quedan 3:33 minutos"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos._333))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Risa Mala 2"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.RISA_MALA_2))
+        button_text = "Quedan 7 minutos"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos._7))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
-        button_text = "Introducción"
-        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.INTRODUCCION))
+        button_text = "Quedan 10 segundos"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos._10))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+        
         
         #self.separadorHorizontal()
 
