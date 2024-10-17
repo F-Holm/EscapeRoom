@@ -33,7 +33,7 @@ class Pre_Inicial:
         pass
 
     def start(self):
-        efecto(Efectos.APAGADO)
+        pass
 
     def stop(self):
         pass
@@ -56,6 +56,7 @@ class Inicio:
         self.reproduciendo.set()
         reproducirSonido(Sonidos.INTRODUCCION)
         self.hilo.start()
+        efecto(Efectos.APAGADO)
 
     def cerrarHilo(self):
         if self.hilo != None and self.hilo.is_alive():
@@ -371,6 +372,7 @@ class Fin:
         self.reproduciendo.set()
         reproducirSonido(Sonidos.GANASTE)
         self.hilo.start()
+        efecto(Efectos.CIERRE)
 
     def cerrarHilo(self):
         if self.hilo != None and self.hilo.is_alive():
@@ -615,6 +617,14 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.BLANCO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
+        button_text = "Perdiste"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.PERDISTE))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Rojo"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.ROJO))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
         self.separadorHorizontal()
 
     def sonidos1(self):

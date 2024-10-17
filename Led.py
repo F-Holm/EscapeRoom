@@ -10,6 +10,8 @@ class Efectos(Enum):
     CIERRE = b'\x03'
     ENCENDIDO_GRADUAL = b'\x04'
     BLANCO = b'\x05'
+    PERDISTE = b'\x06'
+    ROJO = b'\x07'
 
 def efecto(efecto):
     LEDS_ARDUINO.write(efecto.value)
