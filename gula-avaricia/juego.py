@@ -10,7 +10,8 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.123.10"
+IPLOCAL= "192.168.1.10"
+
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -92,7 +93,7 @@ class Socket:
     conexion = None
     
     hilo = None
-    terminar = None#Le indica al hilo que tiene que terminar
+    terminar = None #Le indica al hilo que tiene que terminar
 
     def __init__(self):
         self.terminar = threading.Event()
@@ -444,10 +445,10 @@ def main():
     stylesheet = load_stylesheet()
     app.setStyleSheet(stylesheet)
 
-#    correct_password = "1234"
-#    dialog = PasswordDialog(correct_password)
-#    if dialog.exec() == QDialog.Accepted:
-#        print("Contraseña correcta, iniciando el juego...")
+    #correct_password = "1234"
+    #dialog = PasswordDialog(correct_password)
+    #if dialog.exec() == QDialog.Accepted:
+    #    print("Contraseña correcta, iniciando el juego...")
 
     bienvenida()
 
