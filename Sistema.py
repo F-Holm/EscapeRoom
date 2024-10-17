@@ -770,7 +770,7 @@ class App(tk.Tk):
         self.texto = "Nivel Actual: " + getNivel(nivel).value + "\n\nNiveles:\n"
         for i in range(len(Niveles)):
             self.texto += getNivel(i).value
-            if i != 6:
+            if i != len(sistema.niveles) - 1:
                 self.texto += "\n"
         self.update_left_text("")
     
