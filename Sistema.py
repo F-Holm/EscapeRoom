@@ -403,6 +403,10 @@ class Sistema:
     niveles = None
     nivelActual = 0
 
+    _333 = None
+    _7 = None
+    _10 = None
+
     def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
         self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         iniciarPygame()#NivelTest
@@ -433,7 +437,7 @@ class Sistema:
         else:
             self.stop()
             self.nivelActual = 0
-            0, self.start()
+            self.start()
         root.actualizarNivel(self.nivelActual)
     
     def terminarJuego(self):
@@ -443,6 +447,17 @@ class Sistema:
         closePygame()
         closeTTK()
         sys.exit()
+    
+    def reiniciarJuego(self):
+        self.stop()
+        self.nivelActual = 0
+        self.start()
+        root.actualizarNivel(self.nivelActual)
+    
+    def startTimer():
+        _333 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
+        _7 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._))
+        _10 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
 
 def iniciarSistema():
     global sistema

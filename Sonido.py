@@ -9,21 +9,24 @@ class Sonido:
         self.volumen = volumen #de 0.0 a 1.0
 
 class Sonidos(Enum):
-    RISA_DIABOLICA = Sonido("Sonidos/risaDiabolica.mp3", 0, 0, 1.0)
-    GRITO = Sonido("Sonidos/grito.mp3", 0, 1, 1.0)
-    DESPERTADOR = Sonido("Sonidos/despertadorSamsung.mp3", 1, 2, 1.0)
-    TRUENO = Sonido("Sonidos/trueno.mp3", 0, 3, 1.0)
-    MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 4, 1.0)
-    
-    GANASTE = Sonido("Sonidos/ganaste.mp3", 0, 5, 1.0)
-    HORA = Sonido("Sonidos/hora.mp3", 0, 6, 1.0)
-    PERDISTE = Sonido("Sonidos/perdiste.mp3", 0, 7, 1.0)
-    RISA_MALA = Sonido("Sonidos/risa_mala.mp3", 0, 8, 1.0)
-    RISA_MALA_2 = Sonido("Sonidos/risa_mala_2.mp3", 0, 9, 1.0)
-    INTRODUCCION = Sonido("Sonidos/Introducción.mp3", 0, 10, 1.0)
-    _333 = Sonido("Sonidos/333.mp3", 0, 10, 1.0)
+    DESPERTADOR = Sonido("Sonidos/despertadorSamsung.mp3", 1, 1, 1.0)
+    TRUENO = Sonido("Sonidos/trueno.mp3", 0, 2, 1.0)
+    MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 3, 1.0)
+    GANASTE = Sonido("Sonidos/ganaste.mp3", 0, 4, 1.0)
+    PERDISTE = Sonido("Sonidos/perdiste.mp3", 0, 5, 1.0)
+    INTRODUCCION = Sonido("Sonidos/Introducción.mp3", 0, 6, 1.0)
+    #Timers
+    _333 = Sonido("Sonidos/Timers/333.mp3", 0, 7, 1.0)
+    _7 = Sonido("Sonidos/Timers/7Minutos.mp3", 0, 8, 1.0)
+    _10 = Sonido("Sonidos/Timers/cuentaRegresiva.mp3", 0, 9, 1.0)
+    #Pistas
+    PISTA_ARMARIO = Sonido("Sonidos/Pistas/armarioPista.mp3", 0, 10, 1.0)
+    PISTA_GULA = Sonido("Sonidos/Pistas/gulaPista.mp3", 0, 11, 1.0)
+    PISTA_IRA = Sonido("Sonidos/Pistas/juegoIraPista.mp3", 0, 12, 1.0)
+    PISTA_LUJURIA = Sonido("Sonidos/Pistas/lujuriaPista.mp3", 0, 13, 1.0)
+    PISTA_CODIGO = Sonido("Sonidos/Pistas/pistaCodigo.mp3", 0, 14, 1.0)
 
-CANTIDAD_CANALES = 11
+CANTIDAD_CANALES = 15
 
 def iniciarPygame():
     pygame.mixer.init()
