@@ -33,7 +33,7 @@ class Pre_Inicial:
         pass
 
     def start(self):
-        pass
+        detenerTodosLosSonidos()
 
     def stop(self):
         pass
@@ -52,6 +52,7 @@ class Inicio:
         self.reproduciendo = threading.Event()
 
     def start(self):
+        sistema.niveles[len(sistema.niveles) - 1].gano = True
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.reproduciendo.set()
         reproducirSonido(Sonidos.INTRODUCCION)
@@ -66,6 +67,8 @@ class Inicio:
     def stop(self):
         self.cerrarHilo()
         detenerSonido(Sonidos.INTRODUCCION)
+        reproducirSonido(Sonidos.MUSICA_FONDO)
+        sistema.startTimers()
 
     def restart(self):
         self.cerrarHilo()
@@ -133,69 +136,6 @@ class NivelBoton:
                 self.terminar.set()
                 self.termino.set()
 
-class JuegoIra:
-    hilo = None
-    terminar = None
-    termino = None
-    
-    def __init__(self):
-        self.terminar = threading.Event()
-        self.termino = threading.Event()
-
-    def start(self):
-        IRA_ARDUINO.write(Codigos.START.value)
-        self.terminar.clear()
-        self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloArduino)
-        self.hilo.start()
-
-    def cerrarHilo(self):
-        IRA_ARDUINO.write(Codigos.STOP.value)
-        if self.hilo != None and self.hilo.is_alive():
-            self.terminar.set()
-            self.hilo.join()
-
-    def stop(self):
-        self.cerrarHilo()
-    
-    def close(self):
-        self.cerrarHilo()
-        IRA_ARDUINO.close()
-
-    def restart(self):
-        IRA_ARDUINO.write(Codigos.RESTART.value)
-    
-    def analizarCodigo(self, codigo):
-        if codigo == ord(Codigos.IRA_JUGANDO.value):
-            root.actualizarEstado("Jugando")
-            return False
-        elif codigo == ord(Codigos.IRA_PERDIERON.value):
-            root.actualizarEstado("Perdieron")
-            return False
-        elif codigo == ord(Codigos.IRA_TERMINO_JUGADOR_1.value):
-            root.actualizarEstado("Terminó Jugador 1")
-            return False
-        elif codigo == ord(Codigos.IRA_TERMINO_JUGADOR_2.value):
-            root.actualizarEstado("Terminó Jugador 2")
-            return False
-        elif codigo == ord(Codigos.TERMINO.value):
-            if not self.terminar.is_set():
-                root.after(0, lambda: sistema.siguienteNivel())
-            self.terminar.set()
-            self.termino.set()
-            return False
-        return True
-
-    def hiloArduino(self):
-        while not self.terminar.is_set():
-            if IRA_ARDUINO.in_waiting > 0:
-                try:
-                    if self.analizarCodigo(int(IRA_ARDUINO.readline())):
-                        continue
-                except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
-                    continue
-
 class JuegoRFID:
     hilo = None
     terminar = None
@@ -257,6 +197,69 @@ class JuegoRFID:
             if BOTON_RFID_ARDUINO.in_waiting > 0:
                 try:
                     if self.analizarCodigo(int(BOTON_RFID_ARDUINO.readline())):
+                        continue
+                except Exception as e:
+                    print(f"Error leyendo desde el puerto serial: {e}")
+                    continue
+
+class JuegoIra:
+    hilo = None
+    terminar = None
+    termino = None
+    
+    def __init__(self):
+        self.terminar = threading.Event()
+        self.termino = threading.Event()
+
+    def start(self):
+        IRA_ARDUINO.write(Codigos.START.value)
+        self.terminar.clear()
+        self.termino.clear()
+        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo.start()
+
+    def cerrarHilo(self):
+        IRA_ARDUINO.write(Codigos.STOP.value)
+        if self.hilo != None and self.hilo.is_alive():
+            self.terminar.set()
+            self.hilo.join()
+
+    def stop(self):
+        self.cerrarHilo()
+    
+    def close(self):
+        self.cerrarHilo()
+        IRA_ARDUINO.close()
+
+    def restart(self):
+        IRA_ARDUINO.write(Codigos.RESTART.value)
+    
+    def analizarCodigo(self, codigo):
+        if codigo == ord(Codigos.IRA_JUGANDO.value):
+            root.actualizarEstado("Jugando")
+            return False
+        elif codigo == ord(Codigos.IRA_PERDIERON.value):
+            root.actualizarEstado("Perdieron")
+            return False
+        elif codigo == ord(Codigos.IRA_TERMINO_JUGADOR_1.value):
+            root.actualizarEstado("Terminó Jugador 1")
+            return False
+        elif codigo == ord(Codigos.IRA_TERMINO_JUGADOR_2.value):
+            root.actualizarEstado("Terminó Jugador 2")
+            return False
+        elif codigo == ord(Codigos.TERMINO.value):
+            if not self.terminar.is_set():
+                root.after(0, lambda: sistema.siguienteNivel())
+            self.terminar.set()
+            self.termino.set()
+            return False
+        return True
+
+    def hiloArduino(self):
+        while not self.terminar.is_set():
+            if IRA_ARDUINO.in_waiting > 0:
+                try:
+                    if self.analizarCodigo(int(IRA_ARDUINO.readline())):
                         continue
                 except Exception as e:
                     print(f"Error leyendo desde el puerto serial: {e}")
@@ -363,16 +366,27 @@ class JuegoTrivia:
 class Fin:
     reproduciendo = None
     hilo = None
+    gano = True
+    _e = None
+    _s = None
     
     def __init__(self):
         self.reproduciendo = threading.Event()
 
     def start(self):
+        sistema.stopTimers()
+        if self.gano:
+            self._s = Sonidos.GANASTE
+            self._e = Efectos.CIERRE
+        else:
+            self._s = Sonidos.PERDISTE
+            self._e = Efectos.PERDISTE
+        detenerTodosLosSonidos()
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.reproduciendo.set()
-        reproducirSonido(Sonidos.GANASTE)
+        reproducirSonido(self._s)
         self.hilo.start()
-        efecto(Efectos.CIERRE)
+        efecto(self._e)
 
     def cerrarHilo(self):
         if self.hilo != None and self.hilo.is_alive():
@@ -381,18 +395,18 @@ class Fin:
     
     def stop(self):
         self.cerrarHilo()
-        detenerSonido(Sonidos.GANASTE)
+        detenerSonido(self._s)
 
     def restart(self):
         self.cerrarHilo()
-        detenerSonido(Sonidos.GANASTE)
-        reproducirSonido(Sonidos.GANASTE)
+        detenerSonido(self._s)
+        reproducirSonido(self._s)
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.hilo.start()
     
     def hiloSonido(self):
         while self.reproduciendo.is_set():
-            if not (reproduciendo(Sonidos.GANASTE)):
+            if not (reproduciendo(self._s)):
                 self.reproduciendo.clear()
                 root.after(0, lambda: sistema.siguienteNivel())
 
@@ -406,6 +420,7 @@ class Sistema:
     _333 = None
     _7 = None
     _10 = None
+    _0 = None
 
     def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
         self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
@@ -454,10 +469,23 @@ class Sistema:
         self.start()
         root.actualizarNivel(self.nivelActual)
     
-    def startTimer(self):
-        self._333 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
-        self._7 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._))
-        self._10 = root.after((6*60 + 27) * 1000, reproducirSonido(Sonidos._333))
+    def startTimers(self):
+        self._333 = root.after((6*60 + 27) * 1000, lambda: reproducirSonido(Sonidos._333))
+        self._7 = root.after((3*60) * 1000, lambda: reproducirSonido(Sonidos._7))
+        self._10 = root.after((9*60 + 50) * 1000, lambda: reproducirSonido(Sonidos._10))
+        self._0 = root.after(( 10*60 + 18 ) * 1000, lambda: self.perdio())
+    
+    def stopTimers(self):
+        root.after_cancel(self._333)
+        root.after_cancel(self._7)
+        root.after_cancel(self._10)
+        root.after_cancel(self._0)
+    
+    def perdio(self):
+        self.stop()
+        self.nivelActual = len(self.niveles) - 1
+        self.niveles[self.nivelActual].gano = False
+        self.start()
 
 def iniciarSistema():
     global sistema
