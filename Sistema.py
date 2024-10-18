@@ -422,8 +422,8 @@ class Sistema:
     _10 = None
     _0 = None
 
-    def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+    def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), NivelTest(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         iniciarPygame()#NivelTest
 
     def start(self):
