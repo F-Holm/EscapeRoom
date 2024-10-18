@@ -273,12 +273,14 @@ void setAgua(){
   aguaActiva = true;
   inicioAgua = millis();
   digitalWrite(AGUA, HIGH);
+  //Serial.println("agua set");
 }
 
 void agua(){
-  if (aguaActiva && inicioAgua + 500 <= millis()) {
+  if (aguaActiva && inicioAgua + 300 <= millis()) {
     digitalWrite(AGUA, LOW);
     aguaActiva = false;
+    //Serial.println("off");
   }
 }
 
@@ -321,6 +323,7 @@ void setup() {
   pinMode(RED, OUTPUT);
   pinMode(GREEN, OUTPUT);
   pinMode(BLUE, OUTPUT);
+  pinMode(AGUA, OUTPUT);
 
   Efectos::set(0);
 
@@ -331,13 +334,14 @@ void setup() {
     if (identificate == 5) Serial.print(8);
     else continue;
   }*/
+  //setAgua();
 }
 
 void loop() {
   if (Serial.available() > 0) {
     int efecto = Serial.read();
-    if(efecto != 200) Efectos::set(efecto);
-    else setAgua();
+    if(efecto != 67) Efectos::set(efecto);
+    else if (efecto == 67) setAgua();
   }
   efecto();
   agua();
