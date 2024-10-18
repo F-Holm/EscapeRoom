@@ -129,7 +129,7 @@ void terminoRFID(){
   Serial.print(Codigos::RFID_TERMINO);
   juegoRFIDIniciado = false;
   contadorParejasCorrectas = 0;
-  setParpadear(5, 255, 255, 255);
+  setParpadear(5, 255, 0, 0);
 }
 
 void setVariables(){
@@ -203,7 +203,7 @@ void setup() {
     if (identificate == Codigos::IDENTIFICATE) { Serial.print(Codigos::ID); break; }
     else continue;
   }*/
-  juegoRFIDIniciado = true;setVariables();setParpadear(999999, 255, 255, 255);
+  //juegoRFIDIniciado = true;setVariables();setParpadear(999999, 255, 255, 255);
 }
 
 void enviarParejasCorrectas(){
@@ -243,7 +243,7 @@ void verificarCombinacion() {
 
 void loop() {
   parpadear();
-  //recibirDatos();
+  recibirDatos();
   
   if (juegoRFIDIniciado){
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
