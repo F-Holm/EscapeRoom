@@ -1,4 +1,4 @@
-import pygame
+import pygame, threading
 from enum import Enum
 
 class Sonido:
@@ -39,6 +39,16 @@ def reproducirSonido(sonido):
         canal.play(pygame.mixer.Sound(sonido.value.sonido), -1)
     else:
         canal.play(pygame.mixer.Sound(sonido.value.sonido))
+    if (sonido != Sonidos.MUSICA_FONDO):
+        hilo = threading.Thread(target=lambda: reanudarIntro(sonido))
+        hilo.start()
+        detenerSonido(Sonidos.MUSICA_FONDO)
+
+def reanudarIntro(sonido):
+    while reproduciendo(sonido):
+        pass
+    reproducirSonido(Sonidos.MUSICA_FONDO)
+
 
 def detenerSonido(sonido):
     canal = pygame.mixer.Channel(sonido.value.canal)
