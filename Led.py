@@ -13,6 +13,8 @@ class Efectos(Enum):
     PERDISTE = b'\x06'
     ROJO = b'\x07'
 
+    AGUA = b'\x43'
+
 def efecto(efecto):
     LEDS_ARDUINO.write(efecto.value)
     if (efecto == Efectos.LIGHTNING):

@@ -669,6 +669,10 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.ROJO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
+        button_text = "Agua"
+        button = tk.Button(row_frame, text=button_text, command=lambda: efecto(Efectos.AGUA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
         self.separadorHorizontal()
 
     def pistas(self):
