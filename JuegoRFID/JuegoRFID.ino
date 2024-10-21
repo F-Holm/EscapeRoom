@@ -21,11 +21,11 @@ Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ80
 
 // Define las parejas de tags aquí
 const String parejas[5][2] = {
-  {"b3958b17", "a052f279"}, // Pareja 1
-  {"c32af216", "18b061c9"}, // Pareja 2
-  {"a3f53695", "a3997b95"}, // Pareja 3
-  {"a3fe7f95", "d3e466a8"}, // Pareja 4
-  {"a39449a8", "43863495"} // Pareja 5
+  {"b3958b17", "a052f279"}, // Pareja 1:duki, emilia
+  {"c32af216", "18b061c9"}, // Pareja 2:antonella, messi
+  {"a3f53695", "a3997b95"}, // Pareja 3: oriana, dybala
+  {"a3fe7f95", "d3e466a8"}, // Pareja 4: zendaya, tom holland
+  {"a39449a8", "43863495"} // Pareja 5: obama, michelle
 };
 
 enum Codigos {
@@ -82,6 +82,8 @@ void recibirDatos(){
         break;
       case Codigos::RFID_STOP://terminar
         juegoRFIDIniciado = false;
+        cantParpadeos = 0;
+        cambiarColorUniforme(0, 0, 0);
         break;
       case Codigos::BOTON_START://iniciar
         setParpadeoBoton();
@@ -129,7 +131,7 @@ void terminoRFID(){
   Serial.print(Codigos::RFID_TERMINO);
   juegoRFIDIniciado = false;
   contadorParejasCorrectas = 0;
-  setParpadear(5, 255, 0, 0);
+  setParpadear(10, 0, 255, 0);
 }
 
 void setVariables(){
@@ -137,7 +139,6 @@ void setVariables(){
   contadorParejasCorrectas = 0;
   cambiarColorUniforme(0, 0, 0);
   cantParpadeos = 0;
-  enviarParejasCorrectas();
 }
 
 void cambiarColorUniforme(int _r, int _g, int _b){
@@ -206,8 +207,8 @@ void setup() {
   //juegoRFIDIniciado = true;setVariables();setParpadear(999999, 255, 255, 255);
 }
 
-void enviarParejasCorrectas(){
-  if (contadorParejasCorrectas != NUMPIXELS) Serial.print(Codigos::PAREJAS_0 + contadorParejasCorrectas);
+void enviarParejasCorrectas(int i){
+  if (contadorParejasCorrectas != NUMPIXELS) Serial.print(Codigos::PAREJAS_0 + i);
 }
 
 void verificarCombinacion() {
@@ -219,7 +220,7 @@ void verificarCombinacion() {
         estadoParejas[i] = true; // Marcamos la pareja como ingresada
         contadorParejasCorrectas++; // Aumentamos el contador
         // Encender el LED correspondiente
-        enviarParejasCorrectas();
+        enviarParejasCorrectas(i);
         setRespuestasCorrectasNeopixel();
 
         // Reseteamos las variables después de una combinación correcta
@@ -227,7 +228,7 @@ void verificarCombinacion() {
         tags[1] = "";
         return; // Salimos de la función
       } else { // si la pareja ya se ingresó
-        setParpadear(2, 255, 96, 0);
+        setParpadear(2, 255, 200, 0);
       }
     }
   }
