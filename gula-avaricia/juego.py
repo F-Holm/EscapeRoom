@@ -22,12 +22,12 @@ class Codigos(Enum):
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
 def apagarPantalla():
-    os.system('sudo vbetool dpms off')
-    #os.system('echo "hola"')
+    #os.system('sudo vbetool dpms off')
+    os.system('echo "hola"')
 
 def prenderPantalla():
-    os.system('sudo vbetool dpms on')
-    #os.system('echo "chau"')
+    #os.system('sudo vbetool dpms on')
+    os.system('echo "chau"')
 
 apagarPantalla()
 
@@ -173,7 +173,21 @@ class Socket:
             self.conexion.sendall(b'\xD2')
         elif score == 4:
             print("Score: 4")
-            self.conexion.sendall(b'\xD4') # GANO Y EL SIGUIENTE CODIGO SON LA CANTIDAD DE MONEDAS A ENTREGAR
+            self.conexion.sendall(b'\xD4')
+            
+    def comunicarPregunta(self,score):
+        if score == 0:
+            print("Score: 0")
+            self.conexion.sendall(b'\xDA') 
+        elif score == 1:
+            print("Score: 1")
+            self.conexion.sendall(b'\xDB')
+        elif score == 2:
+            print("Score: 2")
+            self.conexion.sendall(b'\xDC')
+        elif score == 3:
+            print("Score: 4")
+            self.conexion.sendall(b'\xDD')
 
 objeto = Socket()
 objeto.daemon = True
@@ -225,18 +239,18 @@ def verificarRta(answer, question_display, answer_buttons):
     if answer == current_question.correct_answer:
         score += 1
         easy_correct += 1
-        objeto.comunicarScore(score)
+        objeto.comunicarPregunta(score)
         msg_box = CustomDialog("Respuesta", "¡Correcto!")
         msg_box.exec()
     elif score > 0 :
         score = 0
-        objeto.comunicarScore(score)
+        objeto.comunicarPregunta(score)
         msg_box = CustomDialog("Respuesta", "¡Incorrecto! \n " + random.choice(dichos))
         msg_box.exec() 
 
     else :
         score = 0
-        objeto.comunicarScore(score)
+        objeto.comunicarPregunta(score)
         msg_box = CustomDialog("Respuesta", "¡Incorrecto!")
         msg_box.exec()
 
@@ -307,7 +321,6 @@ def ganar():
     global ventanaPreguntas
 
     termino=True
-    objeto.comunicarScore(4)
     objeto.comunicarScore(score)
     objeto.notificarTermino()
 
@@ -316,12 +329,10 @@ def ganar():
 
     mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
     mensaje.exec()
-
+    apagarPantalla()
     seguir.close()
     ventanaPreguntas.close()
-
     QTimer.singleShot(0, lambda: app.quit())
-    apagarPantalla()
 
 
 class PasswordDialog(QDialog):
