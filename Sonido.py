@@ -39,7 +39,7 @@ def reproducirSonido(sonido):
         canal.play(pygame.mixer.Sound(sonido.value.sonido), -1)
     else:
         canal.play(pygame.mixer.Sound(sonido.value.sonido))
-    if (sonido != Sonidos.MUSICA_FONDO):
+    if (sonido != Sonidos.MUSICA_FONDO and reproduciendo(Sonidos.MUSICA_FONDO)):
         hilo = threading.Thread(target=lambda: reanudarIntro(sonido))
         hilo.start()
         detenerSonido(Sonidos.MUSICA_FONDO)
