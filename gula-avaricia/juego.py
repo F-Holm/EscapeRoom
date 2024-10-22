@@ -11,7 +11,7 @@ from enum import Enum
 
 STYLE = "style.css"
 IPLOCAL= "192.168.1.10"
-
+#IPLOCAL= "192.168.0.7"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -117,6 +117,10 @@ class Socket:
                 print(datos)
             except BlockingIOError:
                 continue
+            except ConnectionResetError:
+                prenderPantalla()
+                errorConexion()
+                break
             if (datos == Codigos.START.value):
                 self.start()
             elif (datos == Codigos.STOP.value):
@@ -127,6 +131,11 @@ class Socket:
             elif (datos == Codigos.CLOSE.value):
                 self.close()#Tené en cuenta que el hilo no va a finalizar hasta que termine de ejecutarse esta función
                 break
+            elif (datos == b''):
+                prenderPantalla()
+                errorConexion()
+                break
+                
     
     def start(self):    
         empezar.set()
@@ -334,6 +343,9 @@ def ganar():
     ventanaPreguntas.close()
     QTimer.singleShot(0, lambda: app.quit())
 
+def errorConexion():
+    print("Servidor desconectado o Roto")
+    pass
 
 class PasswordDialog(QDialog):
     def __init__(self, correct_password, parent=None):
