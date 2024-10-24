@@ -140,6 +140,7 @@ class JuegoRFID:
     hilo = None
     terminar = None
     termino = None
+    parejas = ""
     
     def __init__(self):
         self.terminar = threading.Event()
@@ -151,6 +152,8 @@ class JuegoRFID:
         self.termino.clear()
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
+        self.parejas = ""
+        root.actualizarEstado("")
 
     def cerrarHilo(self):
         BOTON_RFID_ARDUINO.write(Codigos.STOP.value)
@@ -170,19 +173,24 @@ class JuegoRFID:
     
     def analizarCodigo(self, codigo):
         if codigo == ord(Codigos.RFID_0_PAREJAS.value):
-            root.actualizarEstado("0 Parejas Correctas")
+            self.parejas += "\nDuki y Emilia"
+            root.actualizarEstado(self.parejas)
             return False
         elif codigo == ord(Codigos.RFID_1_PAREJAS.value):
-            root.actualizarEstado("1 Parejas Correctas")
+            self.parejas += "\nAntonella y Messi"
+            root.actualizarEstado(self.parejas)
             return False
         elif codigo == ord(Codigos.RFID_2_PAREJAS.value):
-            root.actualizarEstado("2 Parejas Correctas")
+            self.parejas += "\nOriana y Dybala"
+            root.actualizarEstado(self.parejas)
             return False
         elif codigo == ord(Codigos.RFID_3_PAREJAS.value):
-            root.actualizarEstado("3 Parejas Correctas")
+            self.parejas += "\nZendaya y Tom Holland"
+            root.actualizarEstado(self.parejas)
             return False
         elif codigo == ord(Codigos.RFID_4_PAREJAS.value):
-            root.actualizarEstado("4 Parejas Correctas")
+            self.parejas += "\nObama y Michelle"
+            root.actualizarEstado(self.parejas)
             return False
         elif codigo == ord(Codigos.TERMINO.value):
             if not self.terminar.is_set():
@@ -195,12 +203,15 @@ class JuegoRFID:
     def hiloArduino(self):
         while not self.terminar.is_set():
             if BOTON_RFID_ARDUINO.in_waiting > 0:
+                dato = None
                 try:
-                    if self.analizarCodigo(int(BOTON_RFID_ARDUINO.readline())):
+                    dato = int(BOTON_RFID_ARDUINO.readline())
+                    if not dato:
                         continue
                 except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
+                    #print(f"Error leyendo desde el puerto serial: {e}")
                     continue
+                self.analizarCodigo(dato)
 
 class JuegoIra:
     hilo = None
@@ -258,12 +269,13 @@ class JuegoIra:
     def hiloArduino(self):
         while not self.terminar.is_set():
             if IRA_ARDUINO.in_waiting > 0:
+                dato = 0
                 try:
-                    if self.analizarCodigo(int(IRA_ARDUINO.readline())):
-                        continue
+                    dato = int(IRA_ARDUINO.readline())
                 except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
+                    #print(f"Error leyendo desde el puerto serial: {e}")
                     continue
+                self.analizarCodigo(dato)
 
 class JuegoTrivia:    
     socket = None
@@ -378,6 +390,7 @@ class Fin:
         if self.gano:
             self._s = Sonidos.GANASTE
             self._e = Efectos.CIERRE
+            reproducirSonido(Sonidos.HALLELUJAH)
         else:
             self._s = Sonidos.PERDISTE
             self._e = Efectos.PERDISTE
@@ -396,6 +409,7 @@ class Fin:
     def stop(self):
         self.cerrarHilo()
         detenerSonido(self._s)
+        detenerSonido(Sonidos.HALLELUJAH)
 
     def restart(self):
         self.cerrarHilo()
@@ -423,7 +437,7 @@ class Sistema:
     _0 = None
 
     def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), NivelTest(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), JuegoTrivia(), NivelTest()]
         iniciarPygame()#NivelTest
 
     def start(self):
@@ -551,6 +565,8 @@ class App(tk.Tk):
             text = "reiniciar el juego"
         elif accion == 4:
             text = "terminar el juego"
+        elif accion == 5:
+            text = "detener los timers"
         else:
             return
         
@@ -566,6 +582,11 @@ class App(tk.Tk):
                 sistema.reiniciarJuego()
             elif accion == 4:
                 sistema.terminarJuego()
+            elif accion == 5:
+                try:
+                    sistema.stopTimers()
+                except Exception as e:
+                    return
 
     def crearSwitch(self):
         switch_frame = tk.Frame(self.main_frame)
@@ -597,6 +618,10 @@ class App(tk.Tk):
 
         button_text = "Siguiente Nivel"
         button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(2))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Detener timer"
+        button = tk.Button(row_frame, text=button_text, command=lambda: self.show_confirmation_dialog(5))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
         button_text = "Reiniciar Escape Room"

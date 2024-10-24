@@ -20,13 +20,15 @@ class Sonidos(Enum):
     _7 = Sonido("Sonidos/Timers/7Minutos.mp3", 0, 8, 0.7)
     _10 = Sonido("Sonidos/Timers/cuentaRegresiva.mp3", 0, 9, 0.7)
     #Pistas
-    PISTA_ARMARIO = Sonido("Sonidos/Pistas/armarioPista.mp3", 0, 10, 0.7)
+    PISTA_ARMARIO = Sonido("Sonidos/Pistas/armarioPista.mp3", 0, 10, 0.5)
     PISTA_GULA = Sonido("Sonidos/Pistas/gulaPista.mp3", 0, 11, 0.7)
     PISTA_IRA = Sonido("Sonidos/Pistas/juegoIraPista.mp3", 0, 12, 0.7)
     PISTA_LUJURIA = Sonido("Sonidos/Pistas/lujuriaPista.mp3", 0, 13, 0.7)
     PISTA_CODIGO = Sonido("Sonidos/Pistas/pistaCodigo.mp3", 0, 14, 0.7)
+    #
+    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 1, 15, 0.7)
 
-CANTIDAD_CANALES = 15
+CANTIDAD_CANALES = 16
 
 def iniciarPygame():
     pygame.mixer.init()
