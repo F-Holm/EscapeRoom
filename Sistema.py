@@ -140,7 +140,6 @@ class JuegoRFID:
     hilo = None
     terminar = None
     termino = None
-    parejas = ""
     
     def __init__(self):
         self.terminar = threading.Event()
@@ -153,7 +152,7 @@ class JuegoRFID:
         self.hilo = threading.Thread(target=self.hiloArduino)
         self.hilo.start()
         self.parejas = ""
-        root.actualizarEstado("")
+        root.actualizarEstado("0 parejas")
 
     def cerrarHilo(self):
         BOTON_RFID_ARDUINO.write(Codigos.STOP.value)
@@ -173,24 +172,19 @@ class JuegoRFID:
     
     def analizarCodigo(self, codigo):
         if codigo == ord(Codigos.RFID_0_PAREJAS.value):
-            self.parejas += "\nDuki y Emilia"
-            root.actualizarEstado(self.parejas)
+            root.actualizarEstado("0 parejas")
             return False
         elif codigo == ord(Codigos.RFID_1_PAREJAS.value):
-            self.parejas += "\nAntonella y Messi"
-            root.actualizarEstado(self.parejas)
+            root.actualizarEstado("1 parejas")
             return False
         elif codigo == ord(Codigos.RFID_2_PAREJAS.value):
-            self.parejas += "\nOriana y Dybala"
-            root.actualizarEstado(self.parejas)
+            root.actualizarEstado("2 parejas")
             return False
         elif codigo == ord(Codigos.RFID_3_PAREJAS.value):
-            self.parejas += "\nZendaya y Tom Holland"
-            root.actualizarEstado(self.parejas)
+            root.actualizarEstado("3 parejas")
             return False
         elif codigo == ord(Codigos.RFID_4_PAREJAS.value):
-            self.parejas += "\nObama y Michelle"
-            root.actualizarEstado(self.parejas)
+            root.actualizarEstado("4 parejas")
             return False
         elif codigo == ord(Codigos.TERMINO.value):
             if not self.terminar.is_set():
