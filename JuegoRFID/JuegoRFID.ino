@@ -25,7 +25,7 @@ const String parejas[5][2] = {
   {"c32af216", "18b061c9"}, // Pareja 2:antonella, messi
   {"a3f53695", "a3997b95"}, // Pareja 3: oriana, dybala
   {"a3fe7f95", "d3e466a8"}, // Pareja 4: zendaya, tom holland
-  {"a39449a8", "43863495"} // Pareja 5: obama, michelle
+  {"132b2fa8", "e34164a8"} // Pareja 5: obama, michelle
 };
 
 enum Codigos {
@@ -207,8 +207,8 @@ void setup() {
   //juegoRFIDIniciado = true;setVariables();setParpadear(999999, 255, 255, 255);
 }
 
-void enviarParejasCorrectas(int i){
-  if (contadorParejasCorrectas != NUMPIXELS) Serial.print(Codigos::PAREJAS_0 + i);
+void enviarParejasCorrectas(){
+  if (contadorParejasCorrectas != NUMPIXELS) Serial.print(Codigos::PAREJAS_0 + contadorParejasCorrectas);
 }
 
 void verificarCombinacion() {
@@ -220,7 +220,7 @@ void verificarCombinacion() {
         estadoParejas[i] = true; // Marcamos la pareja como ingresada
         contadorParejasCorrectas++; // Aumentamos el contador
         // Encender el LED correspondiente
-        enviarParejasCorrectas(i);
+        enviarParejasCorrectas();
         setRespuestasCorrectasNeopixel();
 
         // Reseteamos las variables después de una combinación correcta
