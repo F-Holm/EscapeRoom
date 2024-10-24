@@ -213,11 +213,11 @@ class Efectos{
       
       FastLED.show();
 
-      if (previousMillis + n*(4000/255) <= millis()){
+      if (previousMillis + n*(6500/255) <= millis()){
         RGB::cambiarColor((n > RGB::r ? n : RGB::r), (n > 180 ? 180 : n), (n > 200 ? 200 : n));
         n++;
       }
-      if (previousMillis + 4000 <= millis()) {
+      if (previousMillis + 6500 <= millis()) {
         n = 0;
         set(5);
       }
