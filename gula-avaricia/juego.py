@@ -11,7 +11,7 @@ from enum import Enum
 
 STYLE = "style.css"
 IPLOCAL= "192.168.1.10"
-#IPLOCAL= "192.168.0.7"
+#IPLOCAL= "192.168.123.1"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -22,19 +22,18 @@ class Codigos(Enum):
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
 def apagarPantalla():
-    #os.system('sudo vbetool dpms off')
-    os.system('echo "hola"')
+    os.system('sudo vbetool dpms off')
+    #os.system('echo "hola"')
 
 def prenderPantalla():
-    #os.system('sudo vbetool dpms on')
-    os.system('echo "chau"')
-
-apagarPantalla()
+    os.system('sudo vbetool dpms on')
+    #os.system('echo "chau"')
 
 score = 0
 easy_correct = 0    
 current_question = None
 termino = False
+glitch_timer = None
 
 class Question:
     def __init__(self, text, options, correct_answer):
@@ -342,10 +341,15 @@ def ganar():
     seguir.close()
     ventanaPreguntas.close()
     QTimer.singleShot(0, lambda: app.quit())
-
+error= False
 def errorConexion():
+    global error
     print("Servidor desconectado o Roto")
-    pass
+    error= True
+    if empezar is not None:
+        empezar.set()
+    sys.exit()
+    
 
 class PasswordDialog(QDialog):
     def __init__(self, correct_password, parent=None):
@@ -446,6 +450,8 @@ def main():
     global easy_correct
     apagarPantalla()
     empezar.wait()
+    if error:
+        sys.exit() 
     empezar.clear()
 
     preguntasFacil = easy_questions
@@ -474,6 +480,9 @@ def main():
     #    print("Contraseña correcta, iniciando el juego...")
 
     bienvenida()
+    
+    if error:
+        sys.exit() 
 
     ventanaPreguntas = QWidget()
     ventanaPreguntas.setWindowTitle("Trivia")
@@ -510,5 +519,7 @@ def main():
         termino = False
 
 while True:
-    main() 
+    main()
+    if error:
+        break 
     print("Reiniciando el juego...")
