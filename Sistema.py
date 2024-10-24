@@ -484,10 +484,13 @@ class Sistema:
         self._0 = root.after(( 10*60 + 18 ) * 1000, lambda: self.perdio())
     
     def stopTimers(self):
-        root.after_cancel(self._333)
-        root.after_cancel(self._7)
-        root.after_cancel(self._10)
-        root.after_cancel(self._0)
+        try:
+            root.after_cancel(self._333)
+            root.after_cancel(self._7)
+            root.after_cancel(self._10)
+            root.after_cancel(self._0)
+        except Exception as e:
+            return
     
     def perdio(self):
         self.stop()
@@ -577,10 +580,7 @@ class App(tk.Tk):
             elif accion == 4:
                 sistema.terminarJuego()
             elif accion == 5:
-                try:
-                    sistema.stopTimers()
-                except Exception as e:
-                    return
+                sistema.stopTimers()
 
     def crearSwitch(self):
         switch_frame = tk.Frame(self.main_frame)
@@ -756,6 +756,10 @@ class App(tk.Tk):
 
         button_text = "Introducción"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.INTRODUCCION))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "Hallelujah"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.HALLELUJAH))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
 
         #self.separadorHorizontal()
