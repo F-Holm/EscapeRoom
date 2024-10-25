@@ -449,6 +449,12 @@ def main():
     global preguntasDificil
     global easy_correct
     apagarPantalla()
+    
+    app = None
+    seguir = None
+    ventanaPreguntas = None
+    current_question = None
+    
     empezar.wait()
     if error:
         sys.exit() 
@@ -459,10 +465,7 @@ def main():
 
     easy_correct = 0     
     score = 0 
-    app = None
-    seguir = None
-    ventanaPreguntas = None
-    current_question = None
+
 
 
     prenderPantalla()
