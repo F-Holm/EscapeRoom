@@ -26,7 +26,7 @@ class Sonidos(Enum):
     PISTA_LUJURIA = Sonido("Sonidos/Pistas/lujuriaPista.mp3", 0, 13, 0.7)
     PISTA_CODIGO = Sonido("Sonidos/Pistas/pistaCodigo.mp3", 0, 14, 0.7)
     #
-    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 1, 15, 0.7)
+    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 0, 15, 0.7)
 
 CANTIDAD_CANALES = 16
 
@@ -41,7 +41,7 @@ def reproducirSonido(sonido):
         canal.play(pygame.mixer.Sound(sonido.value.sonido), -1)
     else:
         canal.play(pygame.mixer.Sound(sonido.value.sonido))
-    if (sonido != Sonidos.MUSICA_FONDO and reproduciendo(Sonidos.MUSICA_FONDO)):
+    if (sonido != Sonidos.MUSICA_FONDO and reproduciendo(Sonidos.MUSICA_FONDO) and sonido != Sonidos.TRUENO):
         hilo = threading.Thread(target=lambda: reanudarIntro(sonido))
         hilo.start()
         detenerSonido(Sonidos.MUSICA_FONDO)

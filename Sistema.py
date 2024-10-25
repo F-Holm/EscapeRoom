@@ -129,7 +129,7 @@ class NivelBoton:
                     if not (int(BOTON_RFID_ARDUINO.readline()) == ord(Codigos.BOTON_TERMINO.value)):
                         continue
                 except Exception as e:
-                    print(f"Error leyendo desde el puerto serial: {e}")
+                    #print(f"Error leyendo desde el puerto serial: {e}")
                     continue
                 if not self.terminar.is_set():
                     root.after(0, lambda: sistema.siguienteNivel())
@@ -384,7 +384,7 @@ class Fin:
         if self.gano:
             self._s = Sonidos.GANASTE
             self._e = Efectos.CIERRE
-            reproducirSonido(Sonidos.HALLELUJAH)
+            #reproducirSonido(Sonidos.HALLELUJAH)
         else:
             self._s = Sonidos.PERDISTE
             self._e = Efectos.PERDISTE
@@ -403,7 +403,7 @@ class Fin:
     def stop(self):
         self.cerrarHilo()
         detenerSonido(self._s)
-        detenerSonido(Sonidos.HALLELUJAH)
+        #detenerSonido(Sonidos.HALLELUJAH)
 
     def restart(self):
         self.cerrarHilo()
@@ -431,7 +431,7 @@ class Sistema:
     _0 = None
 
     def __init__(self):#Pre_Inicial(), Inicio(), NivelBoton(), NivelTest(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()
-        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), JuegoTrivia(), NivelTest()]
+        self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         iniciarPygame()#NivelTest
 
     def start(self):
