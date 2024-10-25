@@ -27,7 +27,7 @@ class RGB{
       analogWrite(BLUE, _b); b = _b;
     }
 
-    static void defaultColor(){
+    static void cambiarColor(){
       analogWrite(RED, r);
       analogWrite(GREEN, g);
       analogWrite(BLUE, b);
@@ -40,10 +40,8 @@ class Efectos{
     static unsigned int previousMillis;
     static int efectoActual;
     static int etapaActual;
-    static unsigned int n;
 
     static void set(int e){
-      if (e == 3 || e == 4) n = 0;
       efectoActual = e;
       etapaActual = 0;
       previousMillis = millis();
@@ -55,7 +53,6 @@ class Efectos{
       }
       FastLED.show();
       RGB::cambiarColor(0, 0, 0);
-      n = 0;
       set(-1);
     }
 
@@ -70,12 +67,9 @@ class Efectos{
       }
       FastLED.show();
       
-      if (n == 255 && prendiendo) prendiendo = false;
-      else if (n == 0 && !prendiendo) prendiendo = true;
-      n = (prendiendo ? n + 1 : n - 1);
-      RGB::cambiarColor(n, 0, 0);
-
-      //if (previousMillis + 2000 <= millis()) set(3);
+      if (RGB::r == 255 && prendiendo) prendiendo = false;
+      else if (RGB::r == 0 && !prendiendo) prendiendo = true;
+      RGB::cambiarColor((prendiendo ? RGB::r + 1 : RGB::r - 1), 0, 0);
     }
 
     static void encendidoGradual() {
@@ -88,15 +82,8 @@ class Efectos{
       }
       FastLED.show();
       
-      if (previousMillis + n*(5670/255) <= millis()){
-        RGB::cambiarColor(n, 0, 0);
-        n++;
-      }
-      if (previousMillis + 5670 <= millis()) {
-        set(1);
-        n = 0;
-      }
-
+      if (previousMillis + RGB::r*(5670/255) <= millis()) RGB::cambiarColor((RGB::r <= 255 ? RGB::r + 1 : 255), RGB::g, RGB::b);
+      if (previousMillis + 5670 <= millis()) set(1);
     }
 
     static void lightning(){
@@ -213,14 +200,10 @@ class Efectos{
       
       FastLED.show();
 
-      if (previousMillis + n*(6500/255) <= millis()){
-        RGB::cambiarColor((n > RGB::r ? n : RGB::r), (n > 180 ? 180 : n), (n > 200 ? 200 : n));
-        n++;
+      if (previousMillis + RGB::r*(6500/255) <= millis()){
+        RGB::cambiarColor((RGB::r >= 255 ? 255 : RGB::r + 1), (RGB::g >= 180 ? 180 : RGB::g + 1), (RGB::b >= 200 ? 200 : RGB::b + 1));
       }
-      if (previousMillis + 6500 <= millis()) {
-        n = 0;
-        set(5);
-      }
+      if (previousMillis + 6500 <= millis()) set(5);
     }
 
     static void perdiste() {
@@ -234,14 +217,8 @@ class Efectos{
       
       FastLED.show();
 
-      if (previousMillis + n*(4000/255) <= millis()){
-        RGB::cambiarColor((n > RGB::r ? n : RGB::r), 0, 0);
-        n++;
-      }
-      if (previousMillis + 4000 <= millis()) {
-        n = 0;
-        set(7);
-      }
+      if (previousMillis + RGB::r*(4000/255) <= millis()) RGB::cambiarColor((255 <= RGB::r ? 255 : RGB::r + 1), 0, 0);
+      if (previousMillis + 4000 <= millis()) set(7);
     }
 
     static void blanco(){
@@ -264,7 +241,7 @@ class Efectos{
     }
 
 
-}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1; unsigned int Efectos::n = 0;
+}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1;
 
 bool aguaActiva = false;
 unsigned int inicioAgua = 0;
