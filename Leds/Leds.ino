@@ -22,9 +22,11 @@ class RGB{
     static int b;
 
     static void cambiarColor(int _r, int _g, int _b) {
-      analogWrite(RED, _r); r = _r;
-      analogWrite(GREEN, _g); g = _g;
-      analogWrite(BLUE, _b); b = _b;
+      if (r != _r || g != _g || b != _b) {
+        analogWrite(RED, _r); r = _r;
+        analogWrite(GREEN, _g); g = _g;
+        analogWrite(BLUE, _b); b = _b;
+      }
     }
 
     static void cambiarColor(){
@@ -40,11 +42,13 @@ class Efectos{
     static unsigned int previousMillis;
     static int efectoActual;
     static int etapaActual;
+    static unsigned int n;
 
     static void set(int e){
       efectoActual = e;
       etapaActual = 0;
       previousMillis = millis();
+      n = previousMillis;
     }
 
     static void apagado() {
@@ -191,34 +195,36 @@ class Efectos{
     static void cierre() {
       unsigned int tiempo = millis();
 
-      for (int veces=0;veces<random(0,15);veces++)
-      {
-        int pos = random16(NUM_LEDS);
-        if(pos < 100) leds[pos] = CRGB(160, 160, 255);
-        else leds[pos] = CRGB(70, 70, 255);
-      }
-      
-      FastLED.show();
-
-      if (previousMillis + RGB::r*(6500/255) <= millis()){
+      if (previousMillis + (6500/255) <= tiempo){
+        for (int veces=0;veces<random(0,15);veces++)
+        {
+          int pos = random16(NUM_LEDS);
+          if(pos < 100) leds[pos] = CRGB(160, 160, 255);
+          else leds[pos] = CRGB(70, 70, 255);
+        }
+        FastLED.show();
+        previousMillis = tiempo;
         RGB::cambiarColor((RGB::r >= 255 ? 255 : RGB::r + 1), (RGB::g >= 180 ? 180 : RGB::g + 1), (RGB::b >= 200 ? 200 : RGB::b + 1));
       }
-      if (previousMillis + 6500 <= millis()) set(5);
+
+      if (n + 6500 <= tiempo) set(5);
     }
 
     static void perdiste() {
       unsigned int tiempo = millis();
 
-      for (int veces=0;veces<random(0,15);veces++)
-      {
-        int pos = random16(NUM_LEDS);
-        leds[pos] = CRGB(255, 0, 0);
+      if (previousMillis + (4000/255) <= tiempo){
+        for (int veces=0;veces<random(0,15);veces++)
+        {
+          int pos = random16(NUM_LEDS);
+          leds[pos] = CRGB(255, 0, 0);
+        }
+        FastLED.show();
+        previousMillis = tiempo;
       }
-      
-      FastLED.show();
 
-      if (previousMillis + RGB::r*(4000/255) <= millis()) RGB::cambiarColor((255 <= RGB::r ? 255 : RGB::r + 1), 0, 0);
-      if (previousMillis + 4000 <= millis()) set(7);
+      if (n + RGB::r*(4000/255) <= tiempo) RGB::cambiarColor((255 <= RGB::r ? 255 : RGB::r + 1), 0, 0);;
+      if (n + 4000 <= tiempo) set(7);
     }
 
     static void blanco(){
@@ -241,7 +247,7 @@ class Efectos{
     }
 
 
-}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1;
+}; unsigned int Efectos::previousMillis = 0; int Efectos::efectoActual = -1; int Efectos::etapaActual = -1; unsigned int Efectos::n = 0;
 
 bool aguaActiva = false;
 unsigned int inicioAgua = 0;
