@@ -28,10 +28,11 @@ unsigned int tiempoLedGanar = 0;
 bool perdio = false;
 
 unsigned int ultToque = 0;
-const unsigned int vidas = 5;
+const unsigned int vidas = 3;
 unsigned int vidasRestantes = vidas;
-const unsigned int msGodMode = 100;
+const unsigned int msGodMode = 600;
 unsigned long int antirrebote=0;
+
 enum Codigos {
   START = 0,
   RESTART = 1,
@@ -73,6 +74,7 @@ void setVariables(){
   listoEmpezar = true;
   perdio = true;
   ultToque = millis();
+  vidasRestantes = vidas;
 }
 
 void setLed1(int r, int g, int b){
@@ -143,13 +145,13 @@ void perder(){
 void ganarJ1(){
   estadoJugador1 = true;
   setLed1(0, 255, 0);
-  Serial.print(Codigos::TERMINO_J1);
+  if (!estadoJugador2) Serial.print(Codigos::TERMINO_J1);
 }
 
 void ganarJ2(){
   estadoJugador2 = true;
   setLed2(0, 255, 0);
-  Serial.print(Codigos::TERMINO_J2);
+  if (!estadoJugador1) Serial.print(Codigos::TERMINO_J2);
 }
 
 void ganar(){
@@ -198,13 +200,13 @@ void loop()
       
     }
 
-    if ((botonPerderState1 && !estadoJugador1 || botonPerderState2 && !estadoJugador2) && !perdio/* && millis() <= msGodMode + ultToque*/){
-      /*if (vidasRestantes == 1) perder();
+    if ((botonPerderState1 && !estadoJugador1 || botonPerderState2 && !estadoJugador2) && !perdio && millis() >= msGodMode + ultToque){
+      if (vidasRestantes == 1) perder();
       else {
         vidasRestantes--;
         ultToque = millis();
-      }*/
-      perder();
+      }
+      //perder();
     }
 
     if (botonGanarState1 && !estadoJugador1 && !perdio){
@@ -221,10 +223,13 @@ void loop()
   }
 
   //Tests
+  
   /*if (!digitalRead(BOTON_EMPEZAR_1)) Serial.println("Empezó 1");
   if (!digitalRead(BOTON_PERDER_1)) Serial.println("Perdió 1");
   if (!digitalRead(BOTON_PERDER_2)) Serial.println("Perdió 2");
   if (!digitalRead(BOTON_GANAR_1)) Serial.println("Ganó 1");
   if (!digitalRead(BOTON_EMPEZAR_2)) Serial.println("Empezó 2");
-  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");*/
+  if (!digitalRead(BOTON_GANAR_2)) Serial.println("Ganó 2");
+  //Serial.println();
+  delay(1000);*/
 }
