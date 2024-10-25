@@ -229,6 +229,8 @@ void verificarCombinacion() {
         return; // Salimos de la función
       } else { // si la pareja ya se ingresó
         setParpadear(2, 255, 200, 0);
+        tags[0] = "";
+        tags[1] = "";
       }
     }
   }
@@ -242,24 +244,39 @@ void verificarCombinacion() {
   }
 }
 
+unsigned long lastReadTime[NR_OF_READERS] = {0, 0}; // Array para almacenar el último tiempo de lectura
+
 void loop() {
   parpadear();
   recibirDatos();
-  
-  if (juegoRFIDIniciado){
+
+  if (juegoRFIDIniciado) {
     for (uint8_t reader = 0; reader < NR_OF_READERS; reader++) {
       if (mfrc522[reader].PICC_IsNewCardPresent() && mfrc522[reader].PICC_ReadCardSerial()) {
-        tags[reader]="";
+        // Actualizar el tiempo de lectura
+        lastReadTime[reader] = millis();
+
+        // Leer el tag
+        tags[reader] = "";
         for (byte i = 0; i < mfrc522[reader].uid.size; i++) {
           tags[reader] += String(mfrc522[reader].uid.uidByte[i] < 0x10 ? "0" : "");
           tags[reader] += String(mfrc522[reader].uid.uidByte[i], HEX);
         }
         mfrc522[reader].PICC_HaltA();
         mfrc522[reader].PCD_StopCrypto1();
+      } else {
+        // Verificar si han pasado más de 2000 ms desde la última lectura
+        if (millis() - lastReadTime[reader] > 4000) {
+          tags[reader] = ""; // Resetear el tag a vacío
+        }
       }
     }
+    
     verificarCombinacion();
     if (contadorParejasCorrectas == NUMPIXELS) terminoRFID();
-  } else if (juegoBotonIniciado && !digitalRead(BOTON)) terminoBoton();
-  else if (juegoBotonIniciado) parpadeoBoton();
+  } else if (juegoBotonIniciado && !digitalRead(BOTON)) {
+    terminoBoton();
+  } else if (juegoBotonIniciado) {
+    parpadeoBoton();
+  }
 }
