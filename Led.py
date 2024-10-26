@@ -23,7 +23,7 @@ def conectarArduinoLeds():
         arduino = serial.Serial(Puertos.LEDS, 9600, timeout=1)
     except Exception as e:
         arduino = None
-        print("Arduino de leds no conectado: {e}")
+        print("Error conexión: Leds")
 
 def efecto(efecto):
     if arduino != None:
