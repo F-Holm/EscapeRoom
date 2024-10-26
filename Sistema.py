@@ -21,7 +21,7 @@ root = None
 #Como hay 2 clases que comparten arduino, crea la variable de forma global
 arduino_boton_rfid = None
 
-#clase que no tiene funcionalidad que sirve para poder testear un juego sin tener que testear todo
+#clase que no tiene funcionalidad que sirve para poder testear un juego sin tener que testear todo. Tiene comentarios sobre los método más repetidos
 class NivelTest:
     def __init__(self):
         pass
@@ -29,6 +29,7 @@ class NivelTest:
     def start(self):
         pass
 
+    #se llama cada vez que se pasa de nivel. Si querés que pase algo cuando termine el nivel, lo ponés en este método
     def stop(self):
         pass
 
