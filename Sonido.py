@@ -3,12 +3,12 @@ from enum import Enum
 
 class Sonido:
     def __init__(self, sonido, loop, canal, volumen):
-        self.sonido = sonido
-        self.loop = loop
-        self.canal = canal
+        self.sonido = sonido#dirección del archivo
+        self.loop = loop#true -> loop | false -> se reproduce una vez
+        self.canal = canal#cada sonido tiene su canal para poder reproducir varios al mismo tiempo
         self.volumen = volumen #de 0.0 a 1.0
 
-class Sonidos(Enum):
+class Sonidos(Enum):#Cada ítem es un objeto de la clase Sonido
     DESPERTADOR = Sonido("Sonidos/despertadorSamsung.mp3", 1, 1, 0.7)
     TRUENO = Sonido("Sonidos/trueno.mp3", 0, 2, 1.0)
     MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 3, 0.7)
@@ -28,7 +28,7 @@ class Sonidos(Enum):
     #
     HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 0, 15, 0.7)
 
-CANTIDAD_CANALES = 16
+CANTIDAD_CANALES = len(Sonidos)
 
 def iniciarPygame():
     pygame.mixer.init()
@@ -37,12 +37,15 @@ def iniciarPygame():
 def reproducirSonido(sonido):
     canal = pygame.mixer.Channel(sonido.value.canal)
     canal.set_volume(sonido.value.volumen)
+    
     if sonido.value.loop:
         canal.play(pygame.mixer.Sound(sonido.value.sonido), -1)
     else:
         canal.play(pygame.mixer.Sound(sonido.value.sonido))
+    
+    #Se detiene la música de fondo para que se entienda mejor los audios de Barbieri
     if (sonido != Sonidos.MUSICA_FONDO and reproduciendo(Sonidos.MUSICA_FONDO) and sonido != Sonidos.TRUENO):
-        hilo = threading.Thread(target=lambda: reanudarIntro(sonido))
+        hilo = threading.Thread(target=lambda: reanudarIntro(sonido))#creo un hilo para que vuelva a reproducir la música de fondo cuando 
         hilo.start()
         detenerSonido(Sonidos.MUSICA_FONDO)
 
@@ -66,7 +69,7 @@ def detenerTodosLosSonidos():
 def reproduciendo(sonido):
     return pygame.mixer.Channel(sonido.value.canal).get_busy()
 
-def toggleSonido(sonido):
+def toggleSonido(sonido):#
     canal = pygame.mixer.Channel(sonido.value.canal)
     if canal.get_busy():
         canal.stop()
