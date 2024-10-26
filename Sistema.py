@@ -141,7 +141,7 @@ class NivelBoton:
         try:
             arduino_boton_rfid = serial.Serial(Puertos.BOTON_RFID, 9600, timeout=1)
         except Exception as e:
-            root.after(1000, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_BOTON)))
+            root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_BOTON)))
     
     def hiloArduino(self):#pasa al siguiente nivel cuando termine el nivel
         while not self.terminar.is_set():
@@ -216,7 +216,7 @@ class JuegoRFID:
         try:
             arduino_boton_rfid = serial.Serial(Puertos.BOTON_RFID, 9600, timeout=1)
         except Exception as e:
-            root.after(1000, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_RFID)))
+            root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_RFID)))
     
     def analizarCodigo(self, codigo):#si el mensaje recibido del arduino indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == ord(Codigos.RFID_0_PAREJAS.value):
@@ -293,7 +293,7 @@ class JuegoIra:
         try:
             self.arduino = serial.Serial(Puertos.IRA, 9600, timeout=1)
         except Exception as e:
-            root.after(1000, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_IRA)))
+            root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_IRA)))
     
     def analizarCodigo(self, codigo):#si el mensaje recibido del arduino indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == ord(Codigos.IRA_JUGANDO.value):
@@ -380,7 +380,7 @@ class JuegoTrivia:
             self.socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))#pasa al siguiente nivel cuando termine el nivel
             self.socket.setblocking(False)
         except Exception as e:
-            root.after(1000, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_TRIVIA)))
+            root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_TRIVIA)))
     
     def analizarCodigo(self, codigo):#si el mensaje recibido de la computadora indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == (Codigos.TRIVIA_0_MONEDAS.value):
