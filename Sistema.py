@@ -572,6 +572,7 @@ class App(tk.Tk):#
         self.main_frame = tk.Frame(self)
         self.main_frame.pack(side='left', fill='both', expand=True)
         
+        #Elementos de la derecha. Cada método es una fila
         self.escaperoom()
         self.nivelActual()
         self.efectos()
@@ -579,7 +580,6 @@ class App(tk.Tk):#
         self.sonidos1()
         self.sonidos2()
         
-        #self.crearSwitch()
         self.separadorVertical()
         self.actualizarNivel(0)
     
@@ -602,7 +602,7 @@ class App(tk.Tk):#
         self.attributes("-fullscreen", self.fullscreen)
         return "break"
     
-    def show_confirmation_dialog(self, accion):
+    def show_confirmation_dialog(self, accion):#se llama cada vez que apretás un botón que requiera confirmación
         text = ""
         if accion == 0:
             text = "iniciar el juego"
@@ -633,14 +633,8 @@ class App(tk.Tk):#
                 sistema.terminarJuego()
             elif accion == 5:
                 sistema.stopTimers()
-
-    def crearSwitch(self):
-        switch_frame = tk.Frame(self.main_frame)
-        switch_frame.pack(fill='x')
-        switch = tk.Checkbutton(switch_frame, text="Switch")
-        switch.pack(side='right')
     
-    def separadorHorizontal(self):
+    def separadorHorizontal(self):#Separa cada una de las filas de la derecha
         separator = ttk.Separator(self.main_frame, orient='horizontal')
         separator.pack(fill='x', pady=5)
     
@@ -838,14 +832,7 @@ class App(tk.Tk):#
         
         #self.separadorHorizontal()
 
-    def maxLargoNivel(self):
-        max = 0
-        for i in range(len(Niveles)):
-            if len(getNivel(i).value) > max:
-                max = len(getNivel(i).value)
-        return max + 10 + len("Nivel Actual: ")#10 = 2*espacio = 2*5
-
-    def actualizarNivel(self, nivel):
+    def actualizarNivel(self, nivel):#muestra todos los niveles a la izquierda e indica el nivel actual. También elimina el estado del nivel anterior
         self.texto = "Nivel Actual: " + getNivel(nivel).value + "\n\nNiveles:\n"
         for i in range(len(Niveles)):
             self.texto += getNivel(i).value
@@ -853,10 +840,10 @@ class App(tk.Tk):#
                 self.texto += "\n"
         self.update_left_text("")
     
-    def actualizarEstado(self, estado):
+    def actualizarEstado(self, estado):#Estado es la información del nivel actual (cuantas parejas ingresó, en que pregunta está, si está jugando o perdió)
         self.update_left_text("\n\nEstado: " + estado)
 
-    def mostrarMonedas(self, monedas):
+    def mostrarMonedas(self, monedas):#Esto se llama cuando se termina la trivia
         messagebox.showinfo("Notificación", "Ganaron " + monedas + " monedas")
 
 if __name__ == "__main__":
