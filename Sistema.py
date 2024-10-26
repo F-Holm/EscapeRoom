@@ -38,13 +38,14 @@ class NivelTest:
     def close(self):
         pass
 
-#Estado inicial -> Es el estado de cuando entrás al escape room yu cuando salís. Hay que acordarse de apagar las luces (botón) antes de que entren los siguientes.
+#Estado inicial -> Es el estado de cuando entrás al escape room y cuando salís.
 class Pre_Inicial:
     def __init__(self):
         pass
 
     def start(self):
         detenerTodosLosSonidos()
+        root.after(5000, lambda: efecto(Efectos.APAGADO))#después de 5 segundos de terminar el escape room se apagan las luces
 
     def stop(self):
         pass
@@ -64,8 +65,8 @@ class Inicio:
         self.reproduciendo = threading.Event()
 
     def start(self):
-        sistema.niveles[len(sistema.niveles) - 1].gano = True
-        self.hilo = threading.Thread(target=self.hiloSonido)
+        sistema.niveles[len(sistema.niveles) - 1].gano = True#esta variable determina si gaste o perdiste, se cambia a false automáticamente si se te acaba el tiempo y acá la volvés a setear en true
+        self.hilo = threading.Thread(target=self.hiloSonido)#pasa al siguiente nivel cuando termine la introducción
         self.reproduciendo.set()
         reproducirSonido(Sonidos.INTRODUCCION)
         self.hilo.start()
@@ -89,7 +90,7 @@ class Inicio:
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.hilo.start()
     
-    def hiloSonido(self):
+    def hiloSonido(self):#pasa al siguiente nivel cuando termine la introducción
         while self.reproduciendo.is_set():
             if not (reproduciendo(Sonidos.INTRODUCCION)):
                 self.reproduciendo.clear()
@@ -136,7 +137,7 @@ class NivelBoton:
         detenerSonido(Sonidos.DESPERTADOR)
         reproducirSonido(Sonidos.DESPERTADOR)
     
-    def hiloArduino(self):
+    def hiloArduino(self):#pasa al siguiente nivel cuando termine el nivel
         while not self.terminar.is_set():
             if arduino_boton_rfid.in_waiting > 0:
                 try:
@@ -183,7 +184,7 @@ class JuegoRFID:
         arduino_boton_rfid.write(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo = threading.Thread(target=self.hiloArduino)#pasa al siguiente nivel cuando termine el nivel
         self.hilo.start()
         self.parejas = ""
         root.actualizarEstado("0 parejas")
@@ -204,7 +205,7 @@ class JuegoRFID:
     def restart(self):
         arduino_boton_rfid.write(Codigos.RESTART.value)
     
-    def analizarCodigo(self, codigo):
+    def analizarCodigo(self, codigo):#si el mensaje recibido del arduino indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == ord(Codigos.RFID_0_PAREJAS.value):
             root.actualizarEstado("0 parejas")
             return False
@@ -228,7 +229,7 @@ class JuegoRFID:
             return False
         return True
 
-    def hiloArduino(self):
+    def hiloArduino(self):#pasa al siguiente nivel cuando termine el nivel
         while not self.terminar.is_set():
             if arduino_boton_rfid.in_waiting > 0:
                 dato = None
@@ -256,7 +257,7 @@ class JuegoIra:
         self.arduino.write(Codigos.START.value)
         self.terminar.clear()
         self.termino.clear()
-        self.hilo = threading.Thread(target=self.hiloArduino)
+        self.hilo = threading.Thread(target=self.hiloArduino)#pasa al siguiente nivel cuando termine el nivel
         self.hilo.start()
 
     def cerrarHilo(self):
@@ -275,7 +276,7 @@ class JuegoIra:
     def restart(self):
         self.arduino.write(Codigos.RESTART.value)
     
-    def analizarCodigo(self, codigo):
+    def analizarCodigo(self, codigo):#si el mensaje recibido del arduino indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == ord(Codigos.IRA_JUGANDO.value):
             root.actualizarEstado("Jugando")
             return False
@@ -296,7 +297,7 @@ class JuegoIra:
             return False
         return True
 
-    def hiloArduino(self):
+    def hiloArduino(self):#pasa al siguiente nivel cuando termine el nivel
         while not self.terminar.is_set():
             if self.arduino.in_waiting > 0:
                 dato = 0
@@ -307,7 +308,7 @@ class JuegoIra:
                     continue
                 self.analizarCodigo(dato)
 
-class JuegoTrivia:    
+class JuegoTrivia:
     socket = None
     hilo = None
     terminar = None
@@ -315,7 +316,7 @@ class JuegoTrivia:
     
     def __init__(self):
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))
+        self.socket.connect((Puertos.IP_TRIVIA.value, Puertos.PUERTO_TRIVIA.value))#pasa al siguiente nivel cuando termine el nivel
         self.terminar = threading.Event()
         self.termino = threading.Event()
         self.socket.setblocking(False)
@@ -355,7 +356,7 @@ class JuegoTrivia:
         self.terminar.set()
         self.termino.set()
     
-    def analizarCodigo(self, codigo):
+    def analizarCodigo(self, codigo):#si el mensaje recibido de la computadora indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == (Codigos.TRIVIA_0_MONEDAS.value):
             root.mostrarMonedas("0")
             self._terminar()
@@ -396,7 +397,7 @@ class JuegoTrivia:
             return False
         return True
 
-    def hiloSocket(self):
+    def hiloSocket(self):#pasa al siguiente nivel cuando termine el nivel
         while not self.terminar.is_set():
             datos = None
             try:
@@ -427,7 +428,7 @@ class Fin:
             self._s = Sonidos.PERDISTE
             self._e = Efectos.PERDISTE
         detenerTodosLosSonidos()
-        self.hilo = threading.Thread(target=self.hiloSonido)
+        self.hilo = threading.Thread(target=self.hiloSonido)#pasa al siguiente nivel cuando termine el sonido
         self.reproduciendo.set()
         reproducirSonido(self._s)
         self.hilo.start()
@@ -450,7 +451,7 @@ class Fin:
         self.hilo = threading.Thread(target=self.hiloSonido)
         self.hilo.start()
     
-    def hiloSonido(self):
+    def hiloSonido(self):#pasa al siguiente nivel cuando termine el sonido
         while self.reproduciendo.is_set():
             if not (reproduciendo(self._s)):
                 self.reproduciendo.clear()
