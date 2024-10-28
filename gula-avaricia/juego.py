@@ -10,8 +10,8 @@ import threading
 from enum import Enum
 
 STYLE = "style.css"
-IPLOCAL= "192.168.1.10"
-#IPLOCAL= "192.168.123.1"
+#IPLOCAL= "192.168.1.10"
+IPLOCAL= "192.168.123.1"
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -22,12 +22,12 @@ class Codigos(Enum):
     TERMINO = b'\x04' # Indica que el juego terminó. Esto se mande desde el juego al sistema
 
 def apagarPantalla():
-    os.system('sudo vbetool dpms off')
-    #os.system('echo "hola"')
+    #os.system('sudo vbetool dpms off')
+    os.system('echo "apagado"')
 
 def prenderPantalla():
-    os.system('sudo vbetool dpms on')
-    #os.system('echo "chau"')
+    #os.system('sudo vbetool dpms on')
+    os.system('echo "prendido"')
 
 score = 0
 easy_correct = 0    
@@ -146,6 +146,7 @@ class Socket:
         global ventanaPreguntas
 
         apagarPantalla()
+        
         if glitch_timer is not None:
             glitch_timer.stop()
         if seguir is not None:
@@ -154,12 +155,14 @@ class Socket:
             ventanaPreguntas.close()
         if app is not None:
             app.quit()
+
         
 
 
     def close(self):
-        apagarPantalla()
+        errorConexion()
         self.conexion.close()
+        prenderPantalla()
         sys.exit()
         
 
@@ -341,13 +344,17 @@ def ganar():
     seguir.close()
     ventanaPreguntas.close()
     QTimer.singleShot(0, lambda: app.quit())
+
 error= False
+
 def errorConexion():
     global error
     print("Servidor desconectado o Roto")
+    objeto.stop()
     error= True
     if empezar is not None:
         empezar.set()
+    prenderPantalla()
     sys.exit()
     
 
