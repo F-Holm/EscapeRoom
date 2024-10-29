@@ -1,1 +1,0 @@
-print(ord(b'\x04') == int(b'4'))

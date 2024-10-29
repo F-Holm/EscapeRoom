@@ -26,9 +26,11 @@ class Sonidos(Enum):
     PISTA_LUJURIA = Sonido("Sonidos/Pistas/lujuriaPista.mp3", 0, 13, 0.7)
     PISTA_CODIGO = Sonido("Sonidos/Pistas/pistaCodigo.mp3", 0, 14, 0.7)
     #
-    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 0, 15, 0.7)
+    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 1, 15, 0.3)
+    _ = Sonido("Sonidos/_.mp3", 1, 16, 1.0)
+    NO_IRA = Sonido("Sonidos/NO_IRA.mp3", 0, 16, 0.7)
 
-CANTIDAD_CANALES = 16
+CANTIDAD_CANALES = len(Sonidos)
 
 def iniciarPygame():
     pygame.mixer.init()

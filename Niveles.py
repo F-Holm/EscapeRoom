@@ -11,21 +11,7 @@ class Niveles(Enum):
     FINAL = "Etapa Final"
 
 def getNivel(numNivel):
-    if numNivel == 0:
-        return Niveles.PRE_INICIAL
-    elif numNivel == 1:
-        return Niveles.INICIO
-    elif numNivel == 2:
-        return Niveles.JUEGO_BOTON
-    elif numNivel == 3:
-        return Niveles.CANDADO
-    elif numNivel == 4:
-        return Niveles.JUEGO_RFID
-    elif numNivel == 5:
-        return Niveles.JUEGO_IRA
-    elif numNivel == 6:
-        return Niveles.JUEGO_TRIVIA
-    elif numNivel == 7:
-        return Niveles.FINAL
-    else:
-        return None
+    return list(Niveles)[numNivel]
+
+def getNumOrden(nivel):
+    return list(Niveles).index(nivel)
