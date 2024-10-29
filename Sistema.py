@@ -313,7 +313,7 @@ class JuegoIra:
             return False
         elif codigo == ord(Codigos.TERMINO.value):
             if not self.terminar.is_set():
-                root.after(0, lambda: sistema.siguienteNivel())
+                root.after(1, lambda: sistema.siguienteNivel())
             self.terminar.set()
             self.termino.set()
             return False
@@ -372,7 +372,7 @@ class JuegoTrivia:
     
     def _terminar(self):#Cierra el hilo y pasa al siguiente nivel
         if not self.terminar.is_set():
-            root.after(0, lambda: sistema.siguienteNivel())
+            root.after(1, lambda: sistema.siguienteNivel())
         self.terminar.set()
         self.termino.set()
     
@@ -387,23 +387,23 @@ class JuegoTrivia:
     
     def analizarCodigo(self, codigo):#si el mensaje recibido de la computadora indica que terminó, setea los eventos para salir del hilo. Si el mensaje indica otra cosa, actualiza el estado actual (elemento de la interfaz).
         if codigo == (Codigos.TRIVIA_0_MONEDAS.value):
-            root.mostrarMonedas("0")
+            root.after(1, lambda: root.mostrarMonedas("0"))
             self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_1_MONEDAS.value):
-            root.mostrarMonedas("1")
+            root.after(1, lambda: root.mostrarMonedas("1"))
             self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_2_MONEDAS.value):
-            root.mostrarMonedas("2")
+            root.after(1, lambda: root.mostrarMonedas("2"))
             self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_3_MONEDAS.value):
-            root.mostrarMonedas("3")
+            root.after(1, lambda: root.mostrarMonedas("3"))
             self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_4_MONEDAS.value):
-            root.mostrarMonedas("4")
+            root.after(1, lambda: root.mostrarMonedas("4"))
             self._terminar()
             return False
         elif codigo == (Codigos.TRIVIA_PREGUNTA_1.value):
