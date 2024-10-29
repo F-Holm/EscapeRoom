@@ -140,10 +140,10 @@ class NivelBoton:
     def conectarArduino(self):#Si falla la conexión se reemplaza el nivel por un test
         global arduino_boton_rfid
         try:
-            arduino_boton_rfid = serial.Serial(Puertos.BOTON_RFID, 9600, timeout=1)
+            arduino_boton_rfid = serial.Serial(Puertos.BOTON_RFID.value, 9600, timeout=1)
         except Exception as e:
-            root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_BOTON)))
-    
+                root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_BOTON)))
+
     def hiloArduino(self):#pasa al siguiente nivel cuando termine el nivel
         while not self.terminar.is_set():
             if arduino_boton_rfid.in_waiting > 0:
@@ -215,7 +215,7 @@ class JuegoRFID:
     def conectarArduino(self):#Si falla la conexión se reemplaza el nivel por un test
         global arduino_boton_rfid
         try:
-            arduino_boton_rfid = serial.Serial(Puertos.BOTON_RFID, 9600, timeout=1)
+            arduino_boton_rfid = serial.Serial(Puertos.BOTON_RFID.value, 9600, timeout=1)
         except Exception as e:
             root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_RFID)))
     
@@ -292,7 +292,7 @@ class JuegoIra:
     
     def conectarArduino(self):#Si falla la conexión se reemplaza el nivel por un test
         try:
-            self.arduino = serial.Serial(Puertos.IRA, 9600, timeout=1)
+            self.arduino = serial.Serial(Puertos.IRA.value, 9600, timeout=1)
         except Exception as e:
             root.after(100, lambda: sistema.setNivelTest(getNumOrden(Niveles.JUEGO_IRA)))
     
@@ -551,6 +551,7 @@ class Sistema:
         self.nivelActual = 0
         self.start()
         root.actualizarNivel(self.nivelActual)
+        self.stopTimers()
     
     def startTimers(self):
         #roor.after( milisegundos, función ) -> despuesa de x milisegundos ejecuta una función. Con lambda le podés pasar parámetros

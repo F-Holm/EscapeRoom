@@ -20,7 +20,7 @@ arduino = None
 def conectarArduinoLeds():
     try:
         global arduino
-        arduino = serial.Serial(Puertos.LEDS, 9600, timeout=1)
+        arduino = serial.Serial(Puertos.LEDS.value, 9600, timeout=1)
     except Exception as e:
         arduino = None
         print("Error conexión: Leds")
