@@ -2,7 +2,7 @@ import sys
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
-import serial, threading, socket
+import serial, threading, socket, time
 from Sonido import Sonidos, detenerTodosLosSonidos, toggleSonido, closePygame, iniciarPygame, reproduciendo, reproducirSonido, detenerSonido
 from Led import efecto, Efectos, closeLED, conectarArduinoLeds
 from Codigos import Codigos
@@ -72,6 +72,7 @@ class Inicio:
         reproducirSonido(Sonidos.INTRODUCCION)
         self.hilo.start()
         efecto(Efectos.APAGADO)
+        root.actualizar_timer_label("10:00")
 
     def cerrarHilo(self):
         if self.hilo != None and self.hilo.is_alive():
@@ -82,6 +83,7 @@ class Inicio:
         self.cerrarHilo()
         detenerSonido(Sonidos.INTRODUCCION)
         reproducirSonido(Sonidos.MUSICA_FONDO)
+        sistema.hiloContador = threading.Thread(target=sistema.timer)
         sistema.startTimers()
 
     def restart(self):
@@ -122,7 +124,7 @@ class NivelBoton:
         arduino_boton_rfid.write(Codigos.BOTON_STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
-            self.hilo.join()
+            #self.hilo.join()
 
     def stop(self):
         self.cerrarHilo()
@@ -159,7 +161,7 @@ class NivelBoton:
                 self.termino.set()
 
 #Cuando pasas al juego de los RFID se ejecuta el efecto del rayo. Esto y el estado pre-inicial son las únicas cosas no automatizadas
-class NivelCandado:
+class Candado:
     def __init__(self):
         pass
 
@@ -200,7 +202,7 @@ class JuegoRFID:
         arduino_boton_rfid.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
-            self.hilo.join()
+            #self.hilo.join()
 
     def stop(self):
         self.cerrarHilo()
@@ -278,7 +280,7 @@ class JuegoIra:
         self.arduino.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
-            self.hilo.join()
+            #self.hilo.join()
 
     def stop(self):
         self.cerrarHilo()
@@ -353,7 +355,7 @@ class JuegoTrivia:
         self.enviarMensaje(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
-            self.hilo.join()
+            #self.hilo.join()
 
     def stop(self):
         self.cerrarHilo()
@@ -447,14 +449,14 @@ class Fin:
     def start(self):
         detenerTodosLosSonidos()
         sistema.stopTimers()
+        detenerTodosLosSonidos()
         if self.gano:
             self._s = Sonidos.GANASTE
             self._e = Efectos.CIERRE
-            #reproducirSonido(Sonidos.HALLELUJAH)# -> No funciona el sonido
+            reproducirSonido(Sonidos.HALLELUJAH)
         else:
             self._s = Sonidos.PERDISTE
             self._e = Efectos.PERDISTE
-        detenerTodosLosSonidos()
         self.hilo = threading.Thread(target=self.hiloSonido)#pasa al siguiente nivel cuando termine el sonido
         self.reproduciendo.set()
         reproducirSonido(self._s)
@@ -469,7 +471,7 @@ class Fin:
     def stop(self):
         self.cerrarHilo()
         detenerSonido(self._s)
-        #detenerSonido(Sonidos.HALLELUJAH)
+        detenerSonido(Sonidos.HALLELUJAH)
 
     def restart(self):
         self.cerrarHilo()
@@ -496,13 +498,17 @@ class Sistema:
     _7 = None#timer de que quedan 7:00
     _10 = None#timer de que quedan 0:10
     _0 = None#timer de que se acabó el tiempo. Llama a perdio()
-
+    
+    contadorActivo = None
+    hiloContador = None
+    
     def __init__(self):
-        self.niveles = [Pre_Inicial(), Inicio(), NivelBoton(), NivelCandado(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()]
+        self.niveles = [Pre_Inicial(), Inicio(), NivelBoton(), Candado(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()]
         #self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
         iniciarPygame()#librería que utilizo para los sonidos
         conectarArduinoLeds()#inicializa la variable para comunicarse con el arduino
         root.actualizarNivel(0)
+        self.contadorActivo = threading.Event()
 
     #Inicia el nivel actual
     def start(self):
@@ -538,10 +544,13 @@ class Sistema:
     
     #Se cierra el programa
     def terminarJuego(self):
+        self.stopTimers()
         for nivel in self.niveles:
             nivel.close()
         closeLED()
         closePygame()
+        if(self.hiloContador != None and self.hiloContador.is_alive()):
+            self.hiloContador.join()
         closeTTK()
         sys.exit()
     
@@ -557,8 +566,10 @@ class Sistema:
         #roor.after( milisegundos, función ) -> despuesa de x milisegundos ejecuta una función. Con lambda le podés pasar parámetros
         self._333 = root.after((6*60 + 27) * 1000, lambda: reproducirSonido(Sonidos._333))
         self._7 = root.after((3*60) * 1000, lambda: reproducirSonido(Sonidos._7))
-        self._10 = root.after((9*60 + 50) * 1000, lambda: reproducirSonido(Sonidos._10))
-        self._0 = root.after(( 10*60 + 18 ) * 1000, lambda: self.perdio())
+        self._10 = root.after((10*60 - 23) * 1000, lambda: reproducirSonido(Sonidos._10))
+        self._0 = root.after(( 10*60 ) * 1000, lambda: self.perdio())
+        self.contadorActivo.set()
+        self.hiloContador.start()
     
     def stopTimers(self):
         try:
@@ -566,8 +577,18 @@ class Sistema:
             root.after_cancel(self._7)
             root.after_cancel(self._10)
             root.after_cancel(self._0)
+            self.contadorActivo.clear()
         except Exception as e:
             return
+    
+    def timer(self):
+        segundos = 10 * 60
+        while self.contadorActivo.is_set() and segundos != -1:
+            mins, secs = divmod(segundos, 60)
+            timer = '{:02d}:{:02d}'.format(mins, secs)
+            root.actualizar_timer_label(timer)
+            time.sleep(1)
+            segundos -= 1
     
     def setNivelTest(self, n):
         self.niveles[n] = NivelTest()
@@ -622,11 +643,20 @@ class App(tk.Tk):
     
     def configurarColumnaIzquierda(self):
         self.left_frame = tk.Frame(self, width=250, bg='lightgrey')
-        self.left_frame.pack_propagate(False)  # Evita que el frame ajuste su tamaño automáticamente
+        self.left_frame.pack_propagate(False)
         self.left_frame.pack(side='left', fill='y')
-        
-        self.left_label = tk.Label(self.left_frame, text="Texto en la columna izquierda", bg='lightgrey', anchor='center')
+
+        # Parte superior de la columna izquierda
+        self.timer_label = tk.Label(self.left_frame, text="10:00", bg='lightgrey', font=('Helvetica', 48), anchor='center')
+        self.timer_label.pack(side='top', fill='x', pady=(50, 0))  # Agrega un margen de 10 píxeles en la parte superior
+
+        # Parte inferior de la columna izquierda
+        self.lower_frame = tk.Frame(self.left_frame, bg='lightgrey')
+        self.lower_frame.pack(side='bottom', fill='both', expand=True)
+
+        self.left_label = tk.Label(self.lower_frame, text="Texto en la columna inferior", bg='lightgrey', anchor='center')
         self.left_label.pack(fill='both', expand=True)
+
     
     def toggle_fullscreen(self, event=None):
         self.fullscreen = not self.fullscreen
@@ -671,6 +701,9 @@ class App(tk.Tk):
     
     def update_left_text(self, etapa):
         self.left_label.config(text=(self.texto + etapa))
+    
+    def actualizar_timer_label(self, nuevo_texto):
+        self.timer_label.config(text=nuevo_texto)
     
     def escaperoom(self):
         row_frame = tk.Frame(self.main_frame)
@@ -797,6 +830,10 @@ class App(tk.Tk):
         button_text = "Código"
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.PISTA_CODIGO))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
+
+        button_text = "No Ira"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos.NO_IRA))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         self.separadorHorizontal()
 
@@ -860,6 +897,9 @@ class App(tk.Tk):
         button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos._10))
         button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
+        button_text = "-"
+        button = tk.Button(row_frame, text=button_text, command=lambda: toggleSonido(Sonidos._))
+        button.pack(side='left', fill='both', expand=True, padx=5, pady=5)
         
         #self.separadorHorizontal()
 
