@@ -15,7 +15,7 @@ servidor = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 # Obtener la IP privada de la computadora
 #hostname = socket.gethostname()
 #ip_privada = socket.gethostbyname(hostname)
-ip_privada = "192.168.123.1"
+ip_privada = "192.168.0.7" 
 
 # Enlazar el socket a la dirección y puerto
 #servidor.bind((ip_privada, 8080))

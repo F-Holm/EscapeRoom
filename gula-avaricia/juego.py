@@ -11,7 +11,9 @@ from enum import Enum
 
 STYLE = "style.css"
 #IPLOCAL= "192.168.1.10"
-IPLOCAL= "192.168.123.1"
+#IPLOCAL= "192.168.123.1"
+IPLOCAL= "192.168.0.7"
+
 PUERTO= 8080
 
 class Codigos(Enum):
@@ -146,9 +148,12 @@ class Socket:
         global ventanaPreguntas
 
         apagarPantalla()
-        
-        if glitch_timer is not None:
-            glitch_timer.stop()
+    
+        try:
+            if glitch_timer is not None:
+                glitch_timer.stop()
+        except RuntimeError:
+            pass      
         if seguir is not None:
             seguir.close()  
         if ventanaPreguntas is not None:
@@ -332,14 +337,21 @@ def ganar():
     global ventanaPreguntas
 
     termino=True
-    objeto.comunicarScore(score)
-    objeto.notificarTermino()
+
 
     if glitch_timer is not None:
         glitch_timer.stop()
 
-    mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n  Podés ir a buscar {score} monedas!!.")
+    if score == 1:
+        mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n Si podes salir, tendras {score} moneda!!. ")
+    else:
+        mensaje = CustomDialog("¡GANASTE!", f"¡GANASTE!\nFelicidades, elegiste el camino correcto, \n no fuiste avaro, y la gula no te sobrepasó!  \n Si podes salir, tendras {score} monedas!!.")
+
     mensaje.exec()
+    
+    objeto.comunicarScore(score)
+    objeto.notificarTermino()
+
     apagarPantalla()
     seguir.close()
     ventanaPreguntas.close()
