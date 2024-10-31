@@ -98,9 +98,8 @@ void recibirDatos(){
   }
 }
 
-unsigned int anteriorParpadeoBoton = 0;
+unsigned long int anteriorParpadeoBoton = 0;
 bool encendidoBoton = false;
-unsigned int anteriorBoton = 0;
 
 void setParpadeoBoton(){
   digitalWrite(BOTON_LED, HIGH);
@@ -109,7 +108,7 @@ void setParpadeoBoton(){
 }
 
 void parpadeoBoton(){
-  unsigned int t = millis();
+  unsigned long int t = millis();
   if (t - anteriorParpadeoBoton >= 400){
     encendido = !encendido;
     digitalWrite(BOTON_LED, encendido);
@@ -139,6 +138,8 @@ void setVariables(){
   contadorParejasCorrectas = 0;
   cambiarColorUniforme(0, 0, 0);
   cantParpadeos = 0;
+  tags[0] = ""; 
+  tags[1] = "";
 }
 
 void cambiarColorUniforme(int _r, int _g, int _b){
@@ -244,7 +245,8 @@ void verificarCombinacion() {
   }
 }
 
-unsigned long lastReadTime[NR_OF_READERS] = {0, 0}; // Array para almacenar el último tiempo de lectura
+
+unsigned long int lastReadTime[NR_OF_READERS] = {0, 0}; // Array para almacenar el último tiempo de lectura
 
 void loop() {
   parpadear();
@@ -264,8 +266,9 @@ void loop() {
         }
         mfrc522[reader].PICC_HaltA();
         mfrc522[reader].PCD_StopCrypto1();
+        setParpadear(0, 0, 0, 0);
       } else {
-        // Verificar si han pasado más de 2000 ms desde la última lectura
+        // Verificar si han pasado más de 4000 ms desde la última lectura
         if (millis() - lastReadTime[reader] > 4000) {
           tags[reader] = ""; // Resetear el tag a vacío
         }
