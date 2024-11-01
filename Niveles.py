@@ -6,8 +6,8 @@ class Niveles(Enum):
     JUEGO_BOTON = "Juego Botón"
     CANDADO = "Candado"
     JUEGO_RFID = "Juego RFID"
-    JUEGO_IRA = "Juego Ira"
     JUEGO_TRIVIA = "Juego Trivia"
+    JUEGO_IRA = "Juego Ira"
     FINAL = "Etapa Final"
 
 def getNivel(numNivel):

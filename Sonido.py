@@ -9,6 +9,7 @@ class Sonido:
         self.volumen = volumen #de 0.0 a 1.0
 
 class Sonidos(Enum):#Cada ítem es un objeto de la clase Sonido
+    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 1, 0, 0.3)
     DESPERTADOR = Sonido("Sonidos/despertadorSamsung.mp3", 1, 1, 0.7)
     TRUENO = Sonido("Sonidos/trueno.mp3", 0, 2, 1.0)
     MUSICA_FONDO = Sonido("Sonidos/musicaFondo.mp3", 1, 3, 0.7)
@@ -25,10 +26,10 @@ class Sonidos(Enum):#Cada ítem es un objeto de la clase Sonido
     PISTA_IRA = Sonido("Sonidos/Pistas/juegoIraPista.mp3", 0, 12, 0.7)
     PISTA_LUJURIA = Sonido("Sonidos/Pistas/lujuriaPista.mp3", 0, 13, 0.7)
     PISTA_CODIGO = Sonido("Sonidos/Pistas/pistaCodigo.mp3", 0, 14, 0.7)
+    NO_IRA = Sonido("Sonidos/NO_IRA.mp3", 0, 15, 0.7)
     #
-    HALLELUJAH = Sonido("Sonidos/hallelujah.mp3", 1, 15, 0.3)
     _ = Sonido("Sonidos/_.mp3", 1, 16, 1.0)
-    NO_IRA = Sonido("Sonidos/NO_IRA.mp3", 0, 17, 0.7)
+    
 
 CANTIDAD_CANALES = len(Sonidos)
 

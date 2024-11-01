@@ -47,6 +47,7 @@ class Pre_Inicial:
     def start(self):
         detenerTodosLosSonidos()
         root.after(5000, lambda: efecto(Efectos.APAGADO))#después de 5 segundos de terminar el escape room se apagan las luces
+        root.after(5000, lambda: detenerTodosLosSonidos())
 
     def stop(self):
         pass
@@ -156,7 +157,7 @@ class NivelBoton:
                     #print(f"Error leyendo desde el puerto serial: {e}")
                     continue
                 if not self.terminar.is_set():
-                    root.after(0, lambda: sistema.siguienteNivel())
+                    root.after(1, lambda: sistema.siguienteNivel())
                 self.terminar.set()
                 self.termino.set()
 
@@ -202,7 +203,7 @@ class JuegoRFID:
         arduino_boton_rfid.write(Codigos.STOP.value)
         if self.hilo != None and self.hilo.is_alive():
             self.terminar.set()
-            #self.hilo.join()
+            self.hilo.join()
 
     def stop(self):
         self.cerrarHilo()
@@ -239,7 +240,7 @@ class JuegoRFID:
             return False
         elif codigo == ord(Codigos.TERMINO.value):
             if not self.terminar.is_set():
-                root.after(0, lambda: sistema.siguienteNivel())
+                root.after(1, lambda: sistema.siguienteNivel())
             self.terminar.set()
             self.termino.set()
             return False
@@ -503,8 +504,7 @@ class Sistema:
     hiloContador = None
     
     def __init__(self):
-        self.niveles = [Pre_Inicial(), Inicio(), NivelBoton(), Candado(), JuegoRFID(), JuegoIra(), JuegoTrivia(), Fin()]
-        #self.niveles = [NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest(), NivelTest()]
+        self.niveles = [Pre_Inicial(), Inicio(), NivelBoton(), Candado(), JuegoRFID(), JuegoTrivia(), JuegoIra(), Fin()]
         iniciarPygame()#librería que utilizo para los sonidos
         conectarArduinoLeds()#inicializa la variable para comunicarse con el arduino
         root.actualizarNivel(0)
@@ -547,6 +547,7 @@ class Sistema:
         self.stopTimers()
         for nivel in self.niveles:
             nivel.close()
+        efecto(Efectos.APAGADO)
         closeLED()
         closePygame()
         if(self.hiloContador != None and self.hiloContador.is_alive()):
